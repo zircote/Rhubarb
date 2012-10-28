@@ -17,70 +17,85 @@ class Rhubarb
 {
     const RHUBARB_USER_AGENT = 'rhubarb';
     const RHUBARB_VERSION = '0.0.4';
-    const RHUBARB_DEFAULT_EXCHANGE = 'celery';
-    const RHUBARB_RESULTS_EXCHANGE = 'celeryresults';
+    const RHUBARB_DEFAULT_EXCHANGE_NAME = 'celery';
+    const RHUBARB_RESULTS_EXCHANGE_NAME = 'celeryresults';
+    const RHUBARB_BROKER_NAMESPACE = '\\Rhubarb\\Broker\\';
 
     /**
-     * @var \AMQP\Connection
+     * @var Broker\BrokerInterface
      */
-    protected $connection;
-    protected $exchange;
+    protected $resultBroker;
+
+    /**
+     * @var Broker\BrokerInterface
+     */
+    protected $broker;
     protected $options = array(
-        'celery' => array(
-            'exchange' => self::RHUBARB_DEFAULT_EXCHANGE,
-            'results_exchange' => self::RHUBARB_RESULTS_EXCHANGE
-        )
+        'exchange' => self::RHUBARB_DEFAULT_EXCHANGE_NAME,
+        'results_exchange' => self::RHUBARB_RESULTS_EXCHANGE_NAME
     );
 
-    /**
-     * @param array $options
-     *
-     *
-     * $options = array(
-     *     'amqp' => array(),
-     *     'celery' => array(
-     *         'exchange' => self::RHUBARB_DEFAULT_EXCHANGE
-     *      )
-     *  );
-     */
-    public function __construct(array $options=array())
+    public function __construct(array $options = array())
     {
-        if($options){
-            $this->options = array_merge($this->options,$options);
-        }
-        $this->setConnection($options);
+        $this->setOptions(array_merge($this->options, $options));
     }
 
     /**
      * @param $options
      *
-     * @see \AMQP\Connection for option details
-     *
      * @return Rhubarb
+     * @throws Exception\Exception
      */
-    public function setConnection($options)
+    public function setBroker($options)
     {
-        if(isset($options['amqp']['connection']) && $options['amqp']['connection'] instanceof \AMQP\Connection){
-            $this->connection = $options['amqp']['connection'];
-        } else {
-            $this->connection = new \AMQP\Connection($options['amqp']['uri'], @$options['amqp']['uri'] ?: array());
+        $brokerClass = self::RHUBARB_BROKER_NAMESPACE . $options['type'];
+        if(!class_exists($brokerClass)){
+            throw new \Rhubarb\Exception\Exception(
+                sprintf('Broker class [%s] unknown',$brokerClass)
+            );
         }
+        $reflect = new \ReflectionClass($brokerClass);
+        $this->broker = $reflect->newInstanceArgs(array($options['options']));
+
         return $this;
-    }
-    public function getOptions()
-    {
-        return $this->options;
     }
 
     /**
-     * @return \AMQP\Connection
+     * @return \Rhubarb\Broker\BrokerInterface
      */
-    public function getConnection()
+    public function getBroker()
     {
-        if(!$this->connection){
-            $this->setConnection($this->options);
+        return $this->broker;
+    }
+
+    /**
+     * @param $options
+     *
+     * @return Rhubarb
+     * @throws Exception\Exception
+     */
+    public function setResultBroker($options)
+    {
+        $brokerClass = self::RHUBARB_BROKER_NAMESPACE . $options['type'];
+        if(!class_exists($brokerClass)){
+            throw new \Rhubarb\Exception\Exception(
+                sprintf('Broker class [%s] unknown',$brokerClass)
+            );
         }
-        return $this->connection;
+        $reflect = new \ReflectionClass($brokerClass);
+        $this->resultBroker = $reflect->newInstanceArgs(array($options['options']));
+        return $this;
+    }
+
+    /**
+     * @return \Rhubarb\Broker\BrokerInterface
+     */
+    public function getResultBroker()
+    {
+        if($this->resultBroker instanceof Broker\BrokerInterface){
+            return $this->resultBroker;
+        }
+        return $this->broker;
     }
 
     /**
@@ -93,5 +108,74 @@ class Rhubarb
     {
         $task = new Task($name, $args, $this);
         return $task->applyAsync();
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return Rhubarb
+     */
+    public function setOptions(array $options)
+    {
+        foreach ($options as $name => $value) {
+            $this->setOption($name, $value);
+        }
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     *
+     * @throws Exception\Exception
+     */
+    public function setOption($name, $value)
+    {
+        if (!is_string($name)) {
+            throw new \Rhubarb\Exception\Exception('invalid options name');
+        }
+        $name = strtolower($name);
+        if ($name == 'result_broker') {
+            $this->setResultBroker($value);
+        } elseif ($name == 'broker') {
+            $this->setBroker($value);
+        } else {
+            if (array_key_exists($name, $this->options)) {
+                $this->_setOption($name, $value);
+            }
+        }
+    }
+
+    /**
+     * @param $name
+     *
+     * @return null
+     */
+    public function getOption($name)
+    {
+        $name = strtolower($name);
+        if (array_key_exists($name, $this->options)) {
+            return $this->options[$name];
+        }
+        return null;
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     */
+    private function _setOption($name, $value)
+    {
+        if (is_string($name) && array_key_exists($name, $this->options)) {
+            $this->options[$name] = $value;
+        }
     }
 }

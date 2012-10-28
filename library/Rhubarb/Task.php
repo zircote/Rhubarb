@@ -63,12 +63,7 @@ class Task
 
     }
 
-    /**
-     * @param Rhubarb $rhubarb
-     *
-     * @return Task
-     */
-    public function setRhubarb(\Rhubarb\Rhubarb $rhubarb)
+    public function setRhubarb(Rhubarb $rhubarb)
     {
         $this->rhubarb = $rhubarb;
         return $this;
@@ -79,17 +74,17 @@ class Task
      */
     public function publishMessage()
     {
-        $options = $this->rhubarb->getOptions();
-        $channel = $this->rhubarb->getConnection()->channel();
-        $channel->exchangeDeclare($options['celery']['results_exchange'], 'direct', false, false, false);
-        $channel->exchangeDeclare($options['celery']['exchange'], 'direct', true, true);
-        $channel->queueBind('celery', $options['celery']['exchange'], $this->getId());
-        $channel->basicPublish(
-            new \AMQP\Message((string) $this, array('content_type' => 'application/json')),
-            $options['celery']['exchange'], $this->getId()
-        );
-        $channel->close();
+        $this->getRhubarb()->getBroker()->publishTask($this);
     }
+
+    /**
+     * @return string|bool
+     */
+    public function getResult()
+    {
+        return $this->getRhubarb()->getResultBroker()->getTaskResult($this);
+    }
+
     /**
      *
      * @return AsynchResult
@@ -181,26 +176,5 @@ class Task
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getResult()
-    {
-        try {
-            $channel = $this->getRhubarb()->getConnection()->channel();
-            if($message = $channel->basicGet($this->getId())){
-                $channel->basicAck($message->delivery_info['delivery_tag']);
-                $body = json_decode($message->body);
-                $channel->queueDelete($this->getId());
-                $channel->close();
-                return $body;
-            }
-            $channel->close();
-            return false;
-        } catch (\AMQP\Exception\ChannelException $e){
-            return false;
-        }
     }
 }
