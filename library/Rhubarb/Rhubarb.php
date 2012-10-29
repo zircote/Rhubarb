@@ -6,12 +6,29 @@ namespace Rhubarb;
  * @category
  * @subcategory
  */
-use AMQP\Connection;
 
 /**
  * @package
  * @category
  * @subcategory
+ *
+ * Use:
+ *
+ * $options = array(
+ *  'broker' => array(
+ *      'type' => 'Amqp',
+ *      'options' => array(
+ *          'uri' => 'amqp://celery:celery@localhost:5672/celery'
+ *      )
+ *  ),
+ *  'result_broker' => array(
+ *      'type' => 'Amqp',
+ *      'options' => array(
+ *          'uri' => 'amqp://celery:celery@localhost:5672/celery_results'
+ *      )
+ *  )
+ * );
+ * $rhubarb = new \Rhubarb\Rhubarb($options);
  */
 class Rhubarb
 {
@@ -55,7 +72,7 @@ class Rhubarb
             );
         }
         $reflect = new \ReflectionClass($brokerClass);
-        $this->broker = $reflect->newInstanceArgs(array($options['options']));
+        $this->broker = $reflect->newInstanceArgs(array((array) @$options['options']));
 
         return $this;
     }

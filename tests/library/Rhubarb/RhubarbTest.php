@@ -13,9 +13,61 @@ namespace RhubarbTests;
  */
 class RhubarbTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \Rhubarb\Broker\Test
+     */
+    protected $broker;
+    /**
+     * @var \Rhubarb\Rhubarb
+     */
+    protected $rhubarb;
 
+    /**
+     *
+     */
+    public function setup()
+    {
+        $options = array(
+            'broker' => array(
+                'type' => 'Test'
+            )
+        );
+        $this->rhubarb = new \Rhubarb\Rhubarb($options);
+        /* @var \Rhubarb\Broker\Test $broker */
+        $this->broker = $this->rhubarb->getBroker();
+    }
+
+    /**
+     *
+     */
+    public function tearDown()
+    {
+        $this->rhubarb = null;
+        $this->broker = null;
+    }
+
+    /**
+     * @param string $status
+     * @param        $taskId
+     *
+     * @return string
+     */
+    protected function getSuccesfulResult($status = 'SUCCESS', $taskId)
+    {
+        $resultExpected = sprintf(
+            '{"status": "%s", "traceback": null, "result": 2105, "task_id": "%s", "children": []}',
+            $status,
+            $taskId
+        );
+        return $resultExpected;
+    }
+
+    /**
+     *
+     */
     public function testJobSubmit()
     {
+        $this->markTestSkipped('skipped requires celery workers');
         $options = array(
             'broker' => array(
                 'type' => 'Amqp',
@@ -32,4 +84,56 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2105, $res->get());
     }
 
+    /**
+     *
+     */
+    public function testRhubarb()
+    {
+        $this->broker->setNextResult(false);
+        $res = $this->rhubarb->sendTask('test.task', array(2,2));
+
+        $expectedArgs = sprintf('{"id":"%s","task":"test.task","args":[2,2],"kwargs":{}}', $res->getTaskId());
+        $this->broker->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
+
+        $this->assertEquals($expectedArgs, $this->broker->getPublishedValues());
+        $this->assertEquals(2105, $res->get());
+        $this->assertEquals('SUCCESS', $res->state());
+        $this->assertNull($res->traceback());
+        $this->assertFalse($res->failed());
+        $this->assertTrue($res->successful());
+    }
+
+    public function testKwargsArePassed()
+    {
+
+        $this->broker->setNextResult(false);
+        $res = $this->rhubarb->sendTask('test.task', array('arg1' => 2, 'arg2' => 2));
+        $expected = sprintf(
+            '{"id":"%s","task":"test.task","args":[],"kwargs":{"arg1":2,"arg2":2}}',
+            $res->getTaskId()
+        );
+        $this->assertEquals($expected, $this->broker->getPublishedValues());
+    }
+
+    /**
+     * @expectedException \Rhubarb\Exception\TimeoutException
+     */
+    public function testTimeout()
+    {
+        $this->broker->setWait(4);
+        $res = $this->rhubarb->sendTask('test.task', array(2,2));
+        $this->broker->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
+        $res->get(1);
+    }
+
+    /**
+     *
+     */
+    public function testTimeWaits()
+    {
+        $this->broker->setWait(4);
+        $res = $this->rhubarb->sendTask('test.task', array(2,2));
+        $this->broker->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
+        $this->assertEquals(2105, $res->get());
+    }
 }

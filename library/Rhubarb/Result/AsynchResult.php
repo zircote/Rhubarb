@@ -76,7 +76,7 @@ class AsynchResult
     public function successful()
     {
         $this->getResult();
-        return $this->ready() && $this->body->state == self::SUCCESS;
+        return $this->ready() && $this->body->status == self::SUCCESS;
     }
 
     public function failed()
@@ -101,7 +101,7 @@ class AsynchResult
         if (!$this->ready()) {
             throw new \Rhubarb\Exception\TimeoutException(
                 sprintf(
-                    'AMQP task %s(%s) did not return after %s seconds',
+                    'Task %s(%s) did not return after %s seconds',
                     $this->getTaskId(),
                     (string)$this->getTask(),
                     $timeout

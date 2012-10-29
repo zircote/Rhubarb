@@ -10,6 +10,33 @@ namespace Rhubarb\Broker;
  * @package
  * @category
  * @subcategory
+ *
+ * Use:
+ *
+ * $options = array(
+ *  'broker' => array(
+ *      'type' => 'Amqp',
+ *      'options' => array(
+ *          'uri' => 'amqp://celery:celery@localhost:5672/celery'
+ *      )
+ *  ),
+ *  'result_broker' => array(
+ *      'type' => 'Amqp',
+ *      'options' => array(
+ *          'uri' => 'amqps://celery:celery@localhost:5671/celery_results',
+ *          'options' => array(
+ *              'ssl_options' => array(
+ *                  'verify_peer' => true,
+ *                  'allow_self_signed' => true,
+ *                  'cafile' => 'some_ca_file'
+ *                  'capath' => '/etc/ssl/ca,
+ *                  'local_cert' => /etc/ssl/self/key.pem'
+ *              ),
+ *          )
+ *      )
+ *  )
+ * );
+ * $rhubarb = new \Rhubarb\Rhubarb($options);
  */
 class Amqp implements BrokerInterface
 {
