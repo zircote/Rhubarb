@@ -1,6 +1,8 @@
 Rhubarb
 =======
 
+[![Build Status](https://secure.travis-ci.org/zircote/Rhubarb.png)](http://travis-ci.org/zircote/Rhubarb)
+
 A PHP Job Submission library for [Celery](http://celeryproject.org/)
 
 Setup:
