@@ -1,0 +1,26 @@
+{
+    "name": "zircote/rhubarb",
+    "description": "A PHP Celery Client Implementation",
+    "minimum-stability": "alpha",
+    "repositories":[
+            {
+            "type": "vcs",
+            "url": "git://github.com/zircote/AMQP.git"
+        }
+    ],
+    "authors": [
+        {
+            "name": "Robert Allen",
+            "email": "zircote@gmail.com"
+        }
+    ],
+    "require": {
+        "zircote/AMQP": "master-dev"
+    },
+    "autoload":{
+        "psr-0":{
+            "Rhubarb":"library",
+            "RhubarbTests":"tests/library"
+        }
+    }
+}
