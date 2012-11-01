@@ -1,31 +1,40 @@
 <?php
-namespace Rhubarb\Broker;
+namespace Rhubarb\ResultStore;
 
 /**
  * @package     Rhubarb
- * @category    Broker
+ * @category    ResultStore
  */
 /**
  * @package     Rhubarb
- * @category    Broker
+ * @category    ResultStore
  *
  * Use:
  *
  * $options = array(
  *  'broker' => array(
- *      'type' => 'Amqp',
- *      'options' => array(
- *          'uri' => 'amqp://celery:celery@localhost:5672/celery'
- *      )
+ *  ...
  *  ),
  *  'result_store' => array(
- *      ...
+ *      'type' => 'Amqp',
+ *      'options' => array(
+ *          'uri' => 'amqps://celery:celery@localhost:5671/celery_results',
+ *          'options' => array(
+ *              'ssl_options' => array(
+ *                  'verify_peer' => true,
+ *                  'allow_self_signed' => true,
+ *                  'cafile' => 'some_ca_file'
+ *                  'capath' => '/etc/ssl/ca,
+ *                  'local_cert' => /etc/ssl/self/key.pem'
+ *              ),
+ *          )
+ *      )
+ *  )
  * );
  * $rhubarb = new \Rhubarb\Rhubarb($options);
  */
-class Amqp extends AbstractBroker
+class Amqp extends AbstractResultStore
 {
-
     /**
      * @var \AMQP\Connection
      */
@@ -43,18 +52,21 @@ class Amqp extends AbstractBroker
         $this->setOptions($options);
     }
 
-    public function publishTask(\Rhubarb\Task $task)
+    public function getTaskResult(\Rhubarb\Task $task)
     {
-        $channel = $this->getConnection()->channel();
-        $channel->exchangeDeclare($this->exchange, 'direct', true, true);
-        $channel->queueBind('celery', $this->exchange, 'celery');
-        $channel->basicPublish(
-            new \AMQP\Message((string) $task, array('content_type' => 'application/json')),
-            $this->exchange,
-            $task->getId()
-        );
-        $channel->close();
-        $channel = null;
+        try {
+            $result = false;
+            $channel = $this->getConnection()->channel();
+            if($message = $channel->basicGet($task->getId())){
+                $channel->basicAck($message->delivery_info['delivery_tag']);
+                $channel->queueDelete($task->getId());
+                $result = json_decode($message->body);
+            }
+            $channel->close();
+            return $result;
+        } catch (\AMQP\Exception\ChannelException $e){
+            return $result;
+        }
     }
 
     /**
@@ -88,8 +100,8 @@ class Amqp extends AbstractBroker
      */
     public function setOptions(array $options)
     {
-        if(isset($options['exchange'])){
-            $this->exchange = $options['exchange'];
+        if(isset($options['result_store'])){
+            $this->resultsExchange = $options['result_store'];
         }
         $merged = array('uri' => isset($options['uri']) ? $options['uri'] : $this->options['uri']);
         $merge['options'] = array_merge($this->options['options'], (array) @$options['options']);

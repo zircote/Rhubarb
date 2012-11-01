@@ -2,14 +2,12 @@
 namespace Rhubarb\Exception;
 
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Exception
  */
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Exception
  */
 class Exception extends \Exception
 {

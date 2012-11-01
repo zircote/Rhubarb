@@ -1,13 +1,13 @@
 <?php
+namespace Rhubarb\Compression;
+
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Compression
  */
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Compression
  */
 class Bzip2
 {

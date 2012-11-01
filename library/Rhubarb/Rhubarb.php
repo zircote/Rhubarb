@@ -2,15 +2,13 @@
 namespace Rhubarb;
 
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Rhubarb
  */
 
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Rhubarb
  *
  * Use:
  *
@@ -21,7 +19,7 @@ namespace Rhubarb;
  *          'uri' => 'amqp://celery:celery@localhost:5672/celery'
  *      )
  *  ),
- *  'result_broker' => array(
+ *  'result_store' => array(
  *      'type' => 'Amqp',
  *      'options' => array(
  *          'uri' => 'amqp://celery:celery@localhost:5672/celery_results'
@@ -32,11 +30,54 @@ namespace Rhubarb;
  */
 class Rhubarb
 {
+    /**
+     * @var string
+     */
     const RHUBARB_USER_AGENT = 'rhubarb';
+    /**
+     * @var string
+     */
+    const RHUBARB_TASK_ROUTING_KEY = 'celery';
+    /**
+     * @var string
+     */
+    const RHUBARB_DEFAULT_TASK_QUEUE = 'celery';
+    /**
+     * @var string
+     */
+    const RHUBARB_DEFAULT_CONTENT_ENCODING = 'utf-8';
+    /**
+     * @var string
+     */
+    const RHUBARB_DEFAULT_BODY_ENCODING = 'base64';
+    /**
+     * @var string
+     */
+    const RHUBARB_CONTENT_TYPE = 'application/json';
+    /**
+     * @var string
+     */
     const RHUBARB_VERSION = '0.0.4';
+    /**
+     * @var string
+     */
     const RHUBARB_DEFAULT_EXCHANGE_NAME = 'celery';
+    /**
+     * @var string
+     */
     const RHUBARB_RESULTS_EXCHANGE_NAME = 'celeryresults';
-    const RHUBARB_BROKER_NAMESPACE = '\\Rhubarb\\Broker\\';
+    /**
+     * @var string
+     */
+    const RHUBARB_BROKER_NAMESPACE = '\\Rhubarb\\Broker';
+    /**
+     * @var string
+     */
+    const RHUBARB_RESULTSTORE_NAMESPACE = '\\Rhubarb\\ResultStore';
+    /**
+     * @var string
+     */
+    const NS_SEPERATOR = '\\';
 
     /**
      * @var Broker\BrokerInterface
@@ -47,11 +88,19 @@ class Rhubarb
      * @var Broker\BrokerInterface
      */
     protected $broker;
-    protected $options = array(
-        'exchange' => self::RHUBARB_DEFAULT_EXCHANGE_NAME,
-        'results_exchange' => self::RHUBARB_RESULTS_EXCHANGE_NAME
-    );
+    protected $options
+        = array(
+            'broker'       => array(
+                'exchange' => self::RHUBARB_DEFAULT_EXCHANGE_NAME,
+            ),
+            'result_store' => array(
+                'exchange' => self::RHUBARB_RESULTS_EXCHANGE_NAME
+            )
+        );
 
+    /**
+     * @param array $options
+     */
     public function __construct(array $options = array())
     {
         $this->setOptions(array_merge($this->options, $options));
@@ -65,14 +114,19 @@ class Rhubarb
      */
     public function setBroker($options)
     {
-        $brokerClass = self::RHUBARB_BROKER_NAMESPACE . $options['type'];
-        if(!class_exists($brokerClass)){
+        $namespace = self::RHUBARB_RESULTSTORE_NAMESPACE;
+        if (isset($options['class_namespace'])) {
+            $namespace = $options['class_namespace'];
+        }
+        $namespace = rtrim(self::NS_SEPERATOR, null, $namespace);
+        $brokerClass = $namespace . self::NS_SEPERATOR . $options['type'];
+        if (!class_exists($brokerClass)) {
             throw new \Rhubarb\Exception\Exception(
-                sprintf('Broker class [%s] unknown',$brokerClass)
+                sprintf('Broker class [%s] unknown', $brokerClass)
             );
         }
         $reflect = new \ReflectionClass($brokerClass);
-        $this->broker = $reflect->newInstanceArgs(array((array) @$options['options']));
+        $this->broker = $reflect->newInstanceArgs(array((array)@$options['options']));
 
         return $this;
     }
@@ -91,40 +145,48 @@ class Rhubarb
      * @return Rhubarb
      * @throws Exception\Exception
      */
-    public function setResultBroker($options)
+    public function setResultStore($options)
     {
-        $brokerClass = self::RHUBARB_BROKER_NAMESPACE . $options['type'];
-        if(!class_exists($brokerClass)){
+        if (!isset($options['type'])) {
+            return $this;
+        }
+        $namespace = self::RHUBARB_RESULTSTORE_NAMESPACE;
+        if (isset($options['class_namespace'])) {
+            $namespace = $options['class_namespace'];
+        }
+        $namespace = rtrim(self::NS_SEPERATOR, null, $namespace);
+        $resultStoreClass = $namespace . self::NS_SEPERATOR . $options['type'];
+        if (!class_exists($resultStoreClass)) {
             throw new \Rhubarb\Exception\Exception(
-                sprintf('Broker class [%s] unknown',$brokerClass)
+                sprintf('ResultStore class [%s] unknown', $resultStoreClass)
             );
         }
-        $reflect = new \ReflectionClass($brokerClass);
+        $reflect = new \ReflectionClass($resultStoreClass);
         $this->resultBroker = $reflect->newInstanceArgs(array($options['options']));
         return $this;
     }
 
     /**
-     * @return \Rhubarb\Broker\BrokerInterface
+     * @return \Rhubarb\ResultStore\ResultStoreInterface
      */
-    public function getResultBroker()
+    public function getResultStore()
     {
-        if($this->resultBroker instanceof Broker\BrokerInterface){
+        if ($this->resultBroker) {
             return $this->resultBroker;
         }
-        return $this->broker;
+        return false;
     }
 
     /**
      * @param $name
      * @param $args
      *
-     * @return Result\AsynchResult
+     * @return Task
      */
     public function sendTask($name, $args)
     {
         $task = new Task($name, $args, $this);
-        return $task->applyAsync();
+        return $task;
     }
 
     /**
@@ -160,8 +222,8 @@ class Rhubarb
             throw new \Rhubarb\Exception\Exception('invalid options name');
         }
         $name = strtolower($name);
-        if ($name == 'result_broker') {
-            $this->setResultBroker($value);
+        if ($name == 'result_store') {
+            $this->setResultStore($value);
         } elseif ($name == 'broker') {
             $this->setBroker($value);
         } else {

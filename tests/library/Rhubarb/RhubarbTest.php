@@ -18,6 +18,10 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
      */
     protected $broker;
     /**
+     * @var \Rhubarb\ResultStore\Test
+     */
+    protected $resultStore;
+    /**
      * @var \Rhubarb\Rhubarb
      */
     protected $rhubarb;
@@ -30,11 +34,15 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
         $options = array(
             'broker' => array(
                 'type' => 'Test'
+            ),
+            'result_store' => array(
+                'type' => 'Test'
             )
         );
         $this->rhubarb = new \Rhubarb\Rhubarb($options);
         /* @var \Rhubarb\Broker\Test $broker */
         $this->broker = $this->rhubarb->getBroker();
+        $this->resultStore = $this->rhubarb->getResultStore();
     }
 
     /**
@@ -44,6 +52,7 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
     {
         $this->rhubarb = null;
         $this->broker = null;
+        $this->resultStore = null;
     }
 
     /**
@@ -89,11 +98,11 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
      */
     public function testRhubarb()
     {
-        $this->broker->setNextResult(false);
+        $this->resultStore->setNextResult(false);
         $res = $this->rhubarb->sendTask('test.task', array(2,2));
 
         $expectedArgs = sprintf('{"id":"%s","task":"test.task","args":[2,2],"kwargs":{}}', $res->getTaskId());
-        $this->broker->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
+        $this->resultStore->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
 
         $this->assertEquals($expectedArgs, $this->broker->getPublishedValues());
         $this->assertEquals(2105, $res->get());
@@ -106,7 +115,7 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
     public function testKwargsArePassed()
     {
 
-        $this->broker->setNextResult(false);
+        $this->resultStore->setNextResult(false);
         $res = $this->rhubarb->sendTask('test.task', array('arg1' => 2, 'arg2' => 2));
         $expected = sprintf(
             '{"id":"%s","task":"test.task","args":[],"kwargs":{"arg1":2,"arg2":2}}',
@@ -120,9 +129,9 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
      */
     public function testTimeout()
     {
-        $this->broker->setWait(4);
+        $this->resultStore->setWait(4);
         $res = $this->rhubarb->sendTask('test.task', array(2,2));
-        $this->broker->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
+        $this->resultStore->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
         $res->get(1);
     }
 
@@ -131,9 +140,9 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
      */
     public function testTimeWaits()
     {
-        $this->broker->setWait(4);
+        $this->resultStore->setWait(4);
         $res = $this->rhubarb->sendTask('test.task', array(2,2));
-        $this->broker->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
+        $this->resultStore->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
         $this->assertEquals(2105, $res->get());
     }
 }

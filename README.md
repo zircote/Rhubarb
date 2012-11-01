@@ -49,7 +49,7 @@ Multiple Broker Support
                 'uri' => 'amqp://celery:celery@localhost:5672/celery'
             )
         ),
-        'result_broker' => array(
+        'result_store' => array(
             'type' => 'Amqp',
             'options' => array(
                 'uri' => 'amqp://celery:celery@localhost:5672/celery_results'

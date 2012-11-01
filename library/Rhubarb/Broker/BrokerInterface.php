@@ -2,14 +2,12 @@
 namespace Rhubarb\Broker;
 
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Broker
  */
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Broker
  */
 interface BrokerInterface
 {
@@ -22,12 +20,4 @@ interface BrokerInterface
      */
     public function publishTask(\Rhubarb\Task $task);
 
-    /**
-     * @abstract
-     *
-     * @param \Rhubarb\Task $task
-     *
-     * @return string|bool
-     */
-    public function getTaskResult(\Rhubarb\Task $task);
 }

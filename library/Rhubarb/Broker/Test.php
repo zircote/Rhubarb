@@ -2,24 +2,17 @@
 namespace Rhubarb\Broker;
 
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Broker
  */
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Broker
  */
 class Test implements BrokerInterface
 {
-
-    protected $nextResult;
     protected $exception;
     protected $published;
-
-    protected $wait = 0;
-    protected $timer;
 
     /**
      * @param array $options
@@ -27,18 +20,6 @@ class Test implements BrokerInterface
     public function __construct(array $options)
     {
 
-    }
-
-    public function setWait($wait = 0)
-    {
-        $this->wait = $wait;
-    }
-    /**
-     * @param $result
-     */
-    public function setNextResult($result)
-    {
-        $this->nextResult = $result;
     }
 
     /**
@@ -54,7 +35,6 @@ class Test implements BrokerInterface
      */
     public function reset()
     {
-        $this->nextResult = null;
         $this->exception = null;
         $this->published = null;
     }
@@ -70,21 +50,5 @@ class Test implements BrokerInterface
     public function getPublishedValues()
     {
         return $this->published;
-    }
-
-    /**
-     * @param \Rhubarb\Task $task
-     *
-     * @return bool|string
-     */
-    public function getTaskResult(\Rhubarb\Task $task)
-    {
-        if(!$this->timer){
-            $this->timer = time() + $this->wait;
-        }
-        if($this->timer <= time()){
-            return json_decode($this->nextResult);
-        }
-        return false;
     }
 }
