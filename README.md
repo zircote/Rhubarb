@@ -29,12 +29,9 @@ Using the [Celery Docs `add` example](http://docs.celeryproject.org/en/latest/ge
         )
     );
     $rhubarb = new \Rhubarb\Rhubarb($options);
+    $rhubarb->sendTask('proj.tasks.add', array(2, 2))->delay();
+    // No result will be provided since it has no result broker defined.
 
-    $result = $rhubarb->sendTask('proj.tasks.add', array(2, 2));
-    $timeout = 10; // seconds
-    $checkInterval = 0.2; //test for result every 200ms
-    var_dump($result->get($timeout, $checkInterval));
-    // int(5)
 ```
 
 Multiple Broker Support
@@ -58,7 +55,7 @@ Multiple Broker Support
     );
     $rhubarb = new \Rhubarb\Rhubarb($options);
 
-    $result = $rhubarb->sendTask('proj.tasks.add', array(2, 2));
+    $result = $rhubarb->sendTask('proj.tasks.add', array(2, 2))->delay();
     $timeout = 10; // seconds
     $checkInterval = 0.2; //test for result every 200ms
     var_dump($result->get($timeout, $checkInterval));

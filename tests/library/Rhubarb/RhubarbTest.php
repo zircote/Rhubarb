@@ -72,7 +72,7 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
+     * @group job
      */
     public function testJobSubmit()
     {
@@ -81,15 +81,26 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
             'broker' => array(
                 'type' => 'Amqp',
                 'options' => array(
+                    'exchange' => 'celery',
+                    'uri' => 'amqp://celery:celery@localhost:5672/celery'
+                )
+            ),
+            'result_store' => array(
+                'type' => 'Amqp',
+                'options' => array(
+                    'exchange' => 'celeryresults',
                     'uri' => 'amqp://celery:celery@localhost:5672/celery'
                 )
             )
         );
         $rhubarb = new \Rhubarb\Rhubarb($options);
 
-        $res = $rhubarb->sendTask('reaper.tasks.testFunc2', array('val1' => 2, 'val2' => 3));
+        $res = $rhubarb->sendTask('proj.tasks.add', array(2, 3));
+        $res->delay();
+        $result = $res->get(2);
         $this->assertEquals(5, $res->get());
-        $res = $rhubarb->sendTask('reaper.tasks.testFunc2', array('val1' => 2102, 'val2' => 3));
+        $res = $rhubarb->sendTask('proj.tasks.add', array(2102, 3));
+        $res->delay();
         $this->assertEquals(2105, $res->get());
     }
 
@@ -99,17 +110,18 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
     public function testRhubarb()
     {
         $this->resultStore->setNextResult(false);
-        $res = $this->rhubarb->sendTask('test.task', array(2,2));
-
-        $expectedArgs = sprintf('{"id":"%s","task":"test.task","args":[2,2],"kwargs":{}}', $res->getTaskId());
-        $this->resultStore->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
-
+        $task = $this->rhubarb->sendTask('test.task', array(2,2));
+        $task->delay();
+        $expectedArgs = sprintf('{"id":"%s","task":"test.task","args":[2,2],"kwargs":{},"expires":null,"utc":true,'.
+                '"callbacks":null,"eta":null,"errbacks":null}', $task->getId());
+        $expected = $this->getSuccesfulResult('SUCCESS', $task->getId());
+        $this->resultStore->setNextResult($expected);
         $this->assertEquals($expectedArgs, $this->broker->getPublishedValues());
-        $this->assertEquals(2105, $res->get());
-        $this->assertEquals('SUCCESS', $res->state());
-        $this->assertNull($res->traceback());
-        $this->assertFalse($res->failed());
-        $this->assertTrue($res->successful());
+        $this->assertEquals(2105, $task->get());
+        $this->assertEquals('SUCCESS', $task->state());
+        $this->assertNull($task->traceback());
+        $this->assertFalse($task->failed());
+        $this->assertTrue($task->successful());
     }
 
     public function testKwargsArePassed()
@@ -118,9 +130,11 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
         $this->resultStore->setNextResult(false);
         $res = $this->rhubarb->sendTask('test.task', array('arg1' => 2, 'arg2' => 2));
         $expected = sprintf(
-            '{"id":"%s","task":"test.task","args":[],"kwargs":{"arg1":2,"arg2":2}}',
-            $res->getTaskId()
+            '{"id":"%s","task":"test.task","args":[],"kwargs":{"arg1":2,"arg2":2},"expires":null,"utc":true,'.
+                '"callbacks":null,"eta":null,"errbacks":null}',
+            $res->getId()
         );
+        $res->delay();
         $this->assertEquals($expected, $this->broker->getPublishedValues());
     }
 
@@ -131,7 +145,8 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
     {
         $this->resultStore->setWait(4);
         $res = $this->rhubarb->sendTask('test.task', array(2,2));
-        $this->resultStore->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
+        $res->delay();
+        $this->resultStore->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getId()));
         $res->get(1);
     }
 
@@ -141,8 +156,9 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
     public function testTimeWaits()
     {
         $this->resultStore->setWait(4);
-        $res = $this->rhubarb->sendTask('test.task', array(2,2));
-        $this->resultStore->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getTaskId()));
-        $this->assertEquals(2105, $res->get());
+        $task = $this->rhubarb->sendTask('test.task', array(2,2));
+        $this->resultStore->setNextResult($this->getSuccesfulResult('SUCCESS', $task->getId()));
+        $task->delay();
+        $this->assertEquals(2105, $task->get());
     }
 }

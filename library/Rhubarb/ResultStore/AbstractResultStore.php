@@ -28,11 +28,5 @@ abstract class AbstractResultStore implements ResultStoreInterface
      *
      * @return AMQP
      */
-    public function setOptions(array $options)
-    {
-        $merged = array('uri' => isset($options['uri']) ? $options['uri'] : $this->options['uri']);
-        $merge['options'] = array_merge($this->options['options'], (array) @$options['options']);
-        $this->options = $merged;
-        return $this;
-    }
+    abstract public function setOptions(array $options);
 }

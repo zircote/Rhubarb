@@ -68,6 +68,10 @@ class Test extends AbstractResultStore
         if($this->timer <= time()){
             return json_decode($this->nextResult);
         }
-        return false;
+        return null;
+    }
+    public function setOptions(array $options)
+    {
+
     }
 }

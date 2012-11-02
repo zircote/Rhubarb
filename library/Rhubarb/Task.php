@@ -13,8 +13,6 @@ namespace Rhubarb;
  */
 class Task
 {
-    const CELERY_SERIALIZER = 'json';
-
     const PENDING = 'PENDING';
     const STARTED = 'STARTED';
     const SUCCESS = 'SUCCESS';
@@ -25,7 +23,7 @@ class Task
     /**
      * @var string
      */
-    protected $responseBody;
+    public $responseBody;
     /**
      * @var bool
      */
@@ -67,6 +65,14 @@ class Task
      * @var string
      */
     protected $eta;
+    /**
+     * @var int
+     */
+    protected $countdown;
+    /**
+     * @var int
+     */
+    protected $priority = 0;
 
     /**
      * id:    The unique id of the executing task.
@@ -96,13 +102,17 @@ class Task
     }
 
     /**
-     * @param string  $name
-     * @param array   $args
-     * @param Rhubarb $rhubarb
+     * @param string      $name
+     * @param array       $args
+     * @param Rhubarb     $rhubarb
+     * @param null|string $id
      */
-    public function __construct($name, $args = array(), Rhubarb $rhubarb)
+    public function __construct($name, $args = array(), Rhubarb $rhubarb, $id = null)
     {
-        $this->setId(\Uuid\Uuid::generate())
+        if(!$id){
+           $id = \Uuid\Uuid::generate();
+        }
+        $this->setId($id)
             ->setArgs($args)
             ->setName($name)
             ->setRhubarb($rhubarb);
@@ -116,8 +126,14 @@ class Task
      */
     public function delay($options = array())
     {
+        if (isset($options['countdown'])) {
+            $this->setCountdown($options['countdown']);
+        }
         if (isset($options['expires'])) {
             $this->setExpires($options['expires']);
+        }
+        if (isset($options['priority'])) {
+            $this->setPriority($options['priority']);
         }
         if (isset($options['utc'])) {
             $this->setUtc((bool)$options['utc']);
@@ -140,10 +156,13 @@ class Task
     public function getResult()
     {
         if ($this->getRhubarb()->getResultStore()) {
-            return $this->getRhubarb()->getResultStore()->getTaskResult($this);
+            if(!$this->responseBody){
+                $this->responseBody = $this->getRhubarb()->getResultStore()->getTaskResult($this);
+            }
         } else {
             throw new \Rhubarb\Exception\Exception('no ResultStore is defined');
         }
+        return $this->responseBody;
     }
 
     /**
@@ -359,14 +378,6 @@ class Task
     }
 
     /**
-     * @return string
-     */
-    public function getTaskId()
-    {
-        return $this->getId();
-    }
-
-    /**
      * @return bool
      */
     public function ready()
@@ -405,7 +416,6 @@ class Task
         $intervalUs = (int)($interval * 1000000);
         $iterationLimit = (int)($timeout / $interval);
 
-        $this->getResult();
         for ($i = 0; $i < $iterationLimit; $i++) {
             if ($this->ready()) {
                 break;
@@ -433,5 +443,82 @@ class Task
     {
         $encodedJson = json_encode($this->toArray());
         return (string)$encodedJson;
+    }
+
+    /**
+     *
+     * @param int $countdown
+     *
+     * @return Task
+     */
+    public function setCountdown($countdown)
+    {
+        $this->countdown = $countdown;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCountdown()
+    {
+        return $this->countdown;
+    }
+
+    /**
+     *
+     * @param int $priority
+     * @return Task
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     *
+     * @param string $responseBody
+     * @return Task
+     */
+    public function setResponseBody($responseBody)
+    {
+        $this->responseBody = $responseBody;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResponseBody()
+    {
+        return $this->responseBody;
+    }
+
+    /**
+     *
+     * @param boolean $taskSent
+     * @return Task
+     */
+    public function setTaskSent($taskSent)
+    {
+        $this->taskSent = $taskSent;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getTaskSent()
+    {
+        return $this->taskSent;
     }
 }

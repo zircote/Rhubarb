@@ -65,7 +65,7 @@ class Rhubarb
     /**
      * @var string
      */
-    const RHUBARB_RESULTS_EXCHANGE_NAME = 'celeryresults';
+    const RHUBARB_RESULTS_EXCHANGE_NAME = 'celery';
     /**
      * @var string
      */
@@ -90,12 +90,8 @@ class Rhubarb
     protected $broker;
     protected $options
         = array(
-            'broker'       => array(
-                'exchange' => self::RHUBARB_DEFAULT_EXCHANGE_NAME,
-            ),
-            'result_store' => array(
-                'exchange' => self::RHUBARB_RESULTS_EXCHANGE_NAME
-            )
+            'broker'       => array(),
+            'result_store' => array()
         );
 
     /**
@@ -103,7 +99,7 @@ class Rhubarb
      */
     public function __construct(array $options = array())
     {
-        $this->setOptions(array_merge($this->options, $options));
+        $this->setOptions($options);
     }
 
     /**
@@ -114,11 +110,11 @@ class Rhubarb
      */
     public function setBroker($options)
     {
-        $namespace = self::RHUBARB_RESULTSTORE_NAMESPACE;
-        if (isset($options['class_namespace'])) {
+        $namespace = self::RHUBARB_BROKER_NAMESPACE;
+        if (isset($options['class_namespace']) && $options['class_namespace']) {
             $namespace = $options['class_namespace'];
         }
-        $namespace = rtrim(self::NS_SEPERATOR, null, $namespace);
+        $namespace = rtrim($namespace,self::NS_SEPERATOR);
         $brokerClass = $namespace . self::NS_SEPERATOR . $options['type'];
         if (!class_exists($brokerClass)) {
             throw new \Rhubarb\Exception\Exception(
@@ -151,10 +147,10 @@ class Rhubarb
             return $this;
         }
         $namespace = self::RHUBARB_RESULTSTORE_NAMESPACE;
-        if (isset($options['class_namespace'])) {
+        if (isset($options['class_namespace'])&& $options['class_namespace']) {
             $namespace = $options['class_namespace'];
         }
-        $namespace = rtrim(self::NS_SEPERATOR, null, $namespace);
+        $namespace = rtrim($namespace,self::NS_SEPERATOR);
         $resultStoreClass = $namespace . self::NS_SEPERATOR . $options['type'];
         if (!class_exists($resultStoreClass)) {
             throw new \Rhubarb\Exception\Exception(
@@ -162,7 +158,7 @@ class Rhubarb
             );
         }
         $reflect = new \ReflectionClass($resultStoreClass);
-        $this->resultBroker = $reflect->newInstanceArgs(array($options['options']));
+        $this->resultBroker = $reflect->newInstanceArgs(array((array)@$options['options']));
         return $this;
     }
 
@@ -223,8 +219,10 @@ class Rhubarb
         }
         $name = strtolower($name);
         if ($name == 'result_store') {
+            $value = array_merge($this->options['result_store'], $value);
             $this->setResultStore($value);
         } elseif ($name == 'broker') {
+            $value = array_merge($this->options['broker'], $value);
             $this->setBroker($value);
         } else {
             if (array_key_exists($name, $this->options)) {
