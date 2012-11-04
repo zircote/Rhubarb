@@ -76,7 +76,7 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
      */
     public function testJobSubmit()
     {
-//        $this->markTestSkipped('skipped requires celery workers');
+        $this->markTestSkipped('skipped requires celery workers');
         $options = array(
             'broker' => array(
                 'type' => 'Amqp',
