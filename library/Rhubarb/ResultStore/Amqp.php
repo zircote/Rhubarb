@@ -58,13 +58,15 @@ class Amqp extends AbstractResultStore
             $result = null;
             $taskId = str_replace('-','', $task->getId());
             $channel = $this->getConnection()->channel();
-            if ($message = $channel->basicGet($taskId)) {
+            if ($message = $channel->basicGet(array('queue' => $taskId))) {
                 $messageBody = json_decode($message->body);
                 if (json_last_error()) {
                     throw new \Rhubarb\Exception\InvalidJsonException('Serialization Error, result is not valid JSON');
                 }
                 $channel->basicAck($message->delivery_info['delivery_tag']);
-                $channel->queueDelete($taskId, true, true, true);
+                $channel->queueDelete(
+                    array( 'queue' => $taskId, 'if_unused' => true, 'if_empty' => true, 'no_wait' => true)
+                );
                 $channel->close();
                 $result = $messageBody;
             }

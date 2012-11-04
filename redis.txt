@@ -1,0 +1,76 @@
+1351566428.830999 "SMEMBERS" "_kombu.binding.celery"
+
+keyprefix_queue = '_kombu.binding.%s'
+
+print_r(explode("\x06\x16","celery\x06\x16\x06\x16celery"));
+Array(
+[routing_key] => celery
+[pattern] =>
+[queue] => celery
+)
+
+1351566428.831256 "LPUSH" "celery" "{\"body\": \"eyJyZXRyaWVzIjogMCwgInRhc2siOiAicHJvai50YXNrcy5hZGQiLCAiZXJyYmFja3MiOiBudWxsLCAiY2FsbGJhY2tzIjogbnVsbCwgImt3YXJncyI6IHt9LCAiZXRhIjogbnVsbCwgImFyZ3MiOiBbMiwgMl0sICJpZCI6ICIzMzQ2MGIzZC0xNTc3LTRkNGItYTU1Zi0yOGY3YmIzYTFmOGIiLCAiZXhwaXJlcyI6IG51bGwsICJ1dGMiOiB0cnVlfQ==\", \"headers\": {}, \"content-type\": \"application/json\", \"properties\": {\"exclusive\": false, \"name\": \"celery\", \"body_encoding\": \"base64\", \"delivery_info\": {\"priority\": 0, \"routing_key\": \"celery\", \"exchange\": \"celery\"}, \"durable\": true, \"delivery_mode\": 2, \"no_ack\": false, \"alias\": null, \"queue_arguments\": null, \"binding_arguments\": null, \"delivery_tag\": \"a7ffb98b-e6a3-481b-9e51-18b8763675a9\", \"auto_delete\": false}, \"content-encoding\": \"utf-8\"}"
+
+stdClass Object
+(
+    [body] => eyJyZXRyaWVzIjogMCwgInRhc2siOiAicHJvai50YXNrcy5hZGQiLCAiZXJyYmFja3MiOiBudWxsLCAiY2FsbGJhY2tzIjogbnVsbCwgImt3YXJncyI6IHt9LCAiZXRhIjogbnVsbCwgImFyZ3MiOiBbMiwgMl0sICJpZCI6ICIzMzQ2MGIzZC0xNTc3LTRkNGItYTU1Zi0yOGY3YmIzYTFmOGIiLCAiZXhwaXJlcyI6IG51bGwsICJ1dGMiOiB0cnVlfQ==
+    [headers] => stdClass Object
+        (
+        )
+
+    [content-type] => application/json
+    [properties] => stdClass Object
+        (
+            [exclusive] =>
+            [name] => celery
+            [body_encoding] => base64
+            [delivery_info] => stdClass Object
+                (
+                    [priority] => 0
+                    [routing_key] => celery
+                    [exchange] => celery
+                )
+
+            [durable] => 1
+            [delivery_mode] => 2
+            [no_ack] =>
+            [alias] =>
+            [queue_arguments] =>
+            [binding_arguments] =>
+            [delivery_tag] => a7ffb98b-e6a3-481b-9e51-18b8763675a9
+            [auto_delete] =>
+        )
+
+    [content-encoding] => utf-8
+)
+
+{"retries": 0, "task": "proj.tasks.add", "errbacks": null, "callbacks": null, "kwargs": {}, "eta": null, "args": [2, 2], "id": "33460b3d-1577-4d4b-a55f-28f7bb3a1f8b", "expires": null, "utc": true}
+
+stdClass Object
+(
+    [retries] => 0
+    [task] => proj.tasks.add
+    [errbacks] =>
+    [callbacks] =>
+    [kwargs] => stdClass Object
+        (
+        )
+
+    [eta] =>
+    [args] => Array
+        (
+            [0] => 2
+            [1] => 2
+        )
+
+    [id] => 33460b3d-1577-4d4b-a55f-28f7bb3a1f8b
+    [expires] =>
+    [utc] => 1
+)
+
+
+(error) ERR unknown command 'celery-task-meta-33460b3d-1577-4d4b-a55f-28f7bb3a1f8b'
+
+redis 127.0.0.1:6379> get celery-task-meta-33460b3d-1577-4d4b-a55f-28f7bb3a1f8b
+
+"{\"status\": \"SUCCESS\", \"traceback\": null, \"result\": 4, \"children\": []}"

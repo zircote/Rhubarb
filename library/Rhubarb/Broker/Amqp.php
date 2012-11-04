@@ -37,7 +37,7 @@ class Amqp extends AbstractBroker
         'uri' => 'amqp://guest:guest@localhost:5672/',
         'options' => array()
     );
-    
+
     protected $message = null;
 
     public function __construct(array $options = array())
@@ -52,18 +52,20 @@ class Amqp extends AbstractBroker
 //        );
 //        array('x-ha-policy' => array('S', 'all'));
         $channel = $this->getConnection()->channel();
-        $channel->queueDeclare('celery', false, true, false, false, false, array('x-ha-policy' => array('S', 'all')));
-        $channel->exchangeDeclare($this->exchange, 'direct', true, true);
-        $channel->queueBind('celery', $this->exchange, $task->getId());
+        $channel->queueDeclare(
+            array('queue' => 'celery', 'durable' => true,'auto_delete' => false,
+                  'arguments' => array('x-ha-policy' => array('S', 'all')))
+        );
+        $channel->exchangeDeclare($this->exchange, 'direct',array('passive' => true, 'durable' => true));
+        $channel->queueBind('celery', $this->exchange, array('routing_key' => $task->getId()));
         $msgProperties =  array('content_type' => \Rhubarb\Rhubarb::RHUBARB_CONTENT_TYPE);
         if($task->getPriority()){
             $msgProperties['priority'] = $task->getPriority();
         }
-        
+
         $channel->basicPublish(
-            new \AMQP\Message((string) $task,$msgProperties),
-            $this->exchange,
-            $task->getId()
+            new \AMQP\Message((string) $task, $msgProperties),
+            array('exchange' => $this->exchange, 'routing_key' => $task->getId())
         );
         $channel->close();
         $channel = null;
@@ -111,6 +113,12 @@ class Amqp extends AbstractBroker
             }
             $this->exchange = $options['exchange'];
             unset($options['exchange']);
+        }
+        if(isset($options['queue'])){
+            if(isset($options['queue']['arguments'])){
+                $this->queueOptions = $options['queue'];
+            }
+            unset($options['queue']);
         }
         $merged = array('uri' => isset($options['uri']) ? $options['uri'] : $this->options['uri']);
         $merge['options'] = array_merge($this->options['options'], (array) @$options['options']);

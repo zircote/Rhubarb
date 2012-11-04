@@ -76,19 +76,24 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
      */
     public function testJobSubmit()
     {
-        $this->markTestSkipped('skipped requires celery workers');
+//        $this->markTestSkipped('skipped requires celery workers');
         $options = array(
             'broker' => array(
                 'type' => 'Amqp',
                 'options' => array(
                     'exchange' => 'celery',
+                    'queue' => array(
+                        'arguments' => array(
+                            'x-ha-policy' => array('S', 'all')
+                        )
+                    ),
                     'uri' => 'amqp://celery:celery@localhost:5672/celery'
                 )
             ),
             'result_store' => array(
                 'type' => 'Amqp',
                 'options' => array(
-                    'exchange' => 'celeryresults',
+                    'exchange' => 'celery',
                     'uri' => 'amqp://celery:celery@localhost:5672/celery'
                 )
             )
