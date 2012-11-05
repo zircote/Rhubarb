@@ -1,13 +1,13 @@
 {
     "name": "zircote/rhubarb",
     "description": "A PHP Celery Client Implementation",
-    "minimum-stability": "alpha",
-    "repositories":[
-            {
-            "type": "vcs",
-            "url": "git://github.com/zircote/AMQP.git"
-        }
-    ],
+    "homepage": "https://github.com/zircote/Rhubarb",
+    "type": "library",
+    "license" : "Apache2",
+    "keywords": ["Celery", "Job Queue", "Asynchronous", "work flow", "task schedule"],
+    "support": {
+        "issues": "https://github.com/zircote/Rhubarb/issues"
+    },
     "authors": [
         {
             "name": "Robert Allen",
@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "zircote/AMQP": "master-dev",
+        "zircote/amqp": "master-dev",
         "zircote/uuid": "master-dev"
     },
     "autoload":{
