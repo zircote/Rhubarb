@@ -3,8 +3,8 @@
     "description": "A PHP Celery Client Implementation",
     "homepage": "https://github.com/zircote/Rhubarb",
     "type": "library",
-    "version": "0.0.1",
-    "license" : "Apache2",
+    "version": "0.0.2",
+    "license" : "Apache-2.0",
     "keywords": ["Celery", "Job Queue", "Asynchronous", "work flow", "task schedule"],
     "support": {
         "issues": "https://github.com/zircote/Rhubarb/issues"
@@ -17,7 +17,7 @@
     ],
     "require": {
         "zircote/amqp": "dev-master",
-        "zircote/uuid": "dev-master"
+        "zircote/uuid": "0.1.0"
     },
     "autoload":{
         "psr-0":{
