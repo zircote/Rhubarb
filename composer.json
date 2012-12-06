@@ -15,8 +15,8 @@
         }
     ],
     "require": {
-        "zircote/amqp": "master-dev",
-        "zircote/uuid": "master-dev"
+        "zircote/amqp": "dev-master",
+        "zircote/uuid": "dev-master"
     },
     "autoload":{
         "psr-0":{
