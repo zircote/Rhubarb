@@ -3,6 +3,7 @@
     "description": "A PHP Celery Client Implementation",
     "homepage": "https://github.com/zircote/Rhubarb",
     "type": "library",
+    "version": "0.0.1",
     "license" : "Apache2",
     "keywords": ["Celery", "Job Queue", "Asynchronous", "work flow", "task schedule"],
     "support": {
