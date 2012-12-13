@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "zircote/amqp": "dev-master",
+        "zircote/amqp": "*",
         "zircote/uuid": "0.1.0"
     },
     "autoload":{
