@@ -62,7 +62,7 @@ class Task
     protected $rhubarb;
 
     /**
-     * @var string
+     * @var \DateTime
      */
     protected $expires;
     /**
@@ -78,7 +78,7 @@ class Task
      */
     protected $errbacks;
     /**
-     * @var string
+     * @var \DateTime
      */
     protected $eta;
     /**
@@ -88,7 +88,7 @@ class Task
     /**
      * @var int
      */
-    protected $priority = 0;
+    protected $priority = 5;
 
     /**
      * id:    The unique id of the executing task.
@@ -108,11 +108,11 @@ class Task
             'id'        => $this->id,
             'task'      => $this->name,
             'args'      => $this->args,
-            'kwargs'    => (object)$this->kwargs,
-            'expires'   => $this->expires,
-            'utc'       => $this->utc,
+            'kwargs'    => (object) $this->kwargs,
+            'expires'   => ($this->expires instanceof \DateTime) ? $this->expires->format(\DateTime::ISO8601) : null,
+            'utc'       => (bool) $this->utc,
             'callbacks' => $this->callbacks,
-            'eta'       => $this->eta,
+            'eta'       => ($this->eta instanceof \DateTime) ? $this->eta->format(\DateTime::ISO8601) : null,
             'errbacks'  => $this->errbacks
         );
     }
@@ -298,18 +298,17 @@ class Task
     }
 
     /**
-     *
-     * @param string $eta
+     * @param \DateTime $eta  
      * @return Task
      */
-    public function setEta($eta)
+    public function setEta(\DateTime $eta)
     {
         $this->eta = $eta;
         return $this;
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getEta()
     {
@@ -318,17 +317,17 @@ class Task
 
     /**
      *
-     * @param string $expires
+     * @param \DateTime $expires
      * @return Task
      */
-    public function setExpires($expires)
+    public function setExpires(\DateTime $expires)
     {
         $this->expires = $expires;
         return $this;
     }
 
     /**
-     * @return string
+     * @return \DateTime
      */
     public function getExpires()
     {
@@ -538,3 +537,4 @@ class Task
         return $this->taskSent;
     }
 }
+
