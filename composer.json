@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "zircote/amqp": "1.0.1",
+        "zircote/amqp": "1.0.2",
         "zircote/uuid": "0.1.0"
     },
     "autoload":{
