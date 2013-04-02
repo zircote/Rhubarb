@@ -47,10 +47,6 @@ class Amqp extends AbstractBroker
 
     public function publishTask(\Rhubarb\Task $task)
     {
-//        array('x-ha-policy' => array('S', 'nodes'),
-//              'x-ha-policy-params' => array('A', array('rabbit@host','fox@host'))
-//        );
-//        array('x-ha-policy' => array('S', 'all'));
         $channel = $this->getConnection()->channel();
         $channel->queueDeclare(
             array('queue' => 'celery', 'durable' => true,'auto_delete' => false,
@@ -78,7 +74,10 @@ class Amqp extends AbstractBroker
     {
         if(!$this->connection){
             $options = $this->getOptions();
-            $connection = new \AMQP\Connection($options['uri'], @$options['options'] ?: array());
+            $connection = new \AMQP\Connection(
+                $options['uri'],
+                isset($options['options']) ? $options['options'] : array()
+            );
             $this->setConnection($connection);
         }
         return $this->connection;
@@ -121,7 +120,10 @@ class Amqp extends AbstractBroker
             unset($options['queue']);
         }
         $merged = array('uri' => isset($options['uri']) ? $options['uri'] : $this->options['uri']);
-        $merge['options'] = array_merge($this->options['options'], (array) @$options['options']);
+        $merge['options'] = array_merge(
+            $this->options['options'],
+            isset($options['options']) ? (array) $options['options'] : array()
+        );
         $this->options = $merged;
         return $this;
     }
