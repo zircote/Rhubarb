@@ -100,7 +100,6 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
                     'exchange' => 'celery',
                     'queue' => array(
                         'arguments' => array(
-                            'x-ha-policy' => array('S', 'all')
                         )
                     ),
                     'uri' => 'amqp://celery:celery@localhost:5672/celery'
@@ -119,7 +118,7 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
         $res = $rhubarb->sendTask('proj.tasks.add', array(2, 3));
         $res->delay();
         $result = $res->get(2);
-        $this->assertEquals(5, $res->get());
+        $this->assertEquals(5, $result);
         $res = $rhubarb->sendTask('proj.tasks.add', array(2102, 3));
         $res->delay();
         $this->assertEquals(2105, $res->get());
