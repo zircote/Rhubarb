@@ -21,6 +21,7 @@ namespace Rhubarb;
  * @category    Rhubarb
  * @subcategory Task
  */
+use Rhumsaa\Uuid\Uuid;
 
 /**
  * @package     Rhubarb
@@ -126,7 +127,7 @@ class Task
     public function __construct($name, $args = array(), Rhubarb $rhubarb, $id = null)
     {
         if(!$id){
-           $id = \Uuid\Uuid::generate();
+           $id = (string) Uuid::uuid1();
         }
         $this->setId($id)
             ->setArgs($args)
