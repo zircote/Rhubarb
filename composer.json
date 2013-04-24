@@ -16,7 +16,10 @@
     ],
     "require": {
         "zircote/amqp": "1.0.0",
-        "zircote/uuid": "0.1.0"
+        "rhumsaa/uuid": "2.1.0"
+    },
+    "require-dev":{
+        "phpunit/phpunit": "3.7.19"
     },
     "autoload":{
         "psr-0":{
