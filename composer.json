@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "zircote/amqp": "1.0.0",
+        "zircote/amqp": "1.0.*",
         "rhumsaa/uuid": "2.1.0"
     },
     "require-dev":{
