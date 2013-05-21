@@ -1,10 +1,20 @@
+---
+env:
+  global:
+  - secure: ! 'PBjr3GgU1sHC4yD4Fj0k5nMaX1+li8fw2WHVXR/crDDsgLLV+AgnfWvFCCJXnfvs7ikHG/OfP3IvrTsip6bhIybpfvzI/B3YqPuUgEtfds2mbo2iZVofdaedlTAB5R0wOeQRL5wmQdRNMetaBErhh87biZBX2HW3BLnm85dtH0c='
 language: php
-
 before_script:
+  - mkdir ~/.composer
+  - printf '{"config":{"github-oauth":{"github.com":"%s"}}}' $GITHUB_OAUTH_TOKEN > ~/.composer/config.json
+  - git clone git://github.com/alanxz/rabbitmq-c.git
+  - cd rabbitmq-c && git checkout librabbitmq-0.1-amqp_0_9_1
+  - cd rabbitmq-c && git submodule init && git submodule update
+  - cd rabbitmq-c && autoreconf -i && ./configure && make && sudo make install
+  - git clone git://github.com/pdezwart/php-amqp.git
+  - cd php-amqp && phpize && ./configure && make
+  - echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - composer install
-
 php:
   - 5.3
   - 5.4
-
 script: phpunit -c tests/phpunit.xml
