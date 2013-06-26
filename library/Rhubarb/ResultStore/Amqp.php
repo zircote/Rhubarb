@@ -20,6 +20,8 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
+use Rhubarb\Exception\CeleryConfigurationException;
+
 /**
  * @package     Rhubarb
  * @category    ResultStore
@@ -76,6 +78,12 @@ class Amqp extends AbstractResultStore
             $channel = $this->getConnection()->channel();
 
             if ($message = $channel->basicGet(array('queue' => $taskId))) {
+                $content_type = $message->get('content_type');
+
+                if ($content_type !== 'application/json') {
+                    throw new CeleryConfigurationException("Response's content-type is not application/json. Got: {$content_type}. Make sure, that CELERY_RESULT_SERIALIZER is set to \"json\"");
+                }
+
                 $messageBody = json_decode($message->body);
 
                 if (json_last_error()) {
