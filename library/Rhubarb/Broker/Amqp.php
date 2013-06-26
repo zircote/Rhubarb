@@ -47,10 +47,7 @@ class Amqp extends AbstractBroker
 
     public function publishTask(\Rhubarb\Task $task)
     {
-//        array('x-ha-policy' => array('S', 'nodes'),
-//              'x-ha-policy-params' => array('A', array('rabbit@host','fox@host'))
-//        );
-//        array('x-ha-policy' => array('S', 'all'));
+        
         $channel = $this->getConnection()->channel();
         $channel->queueDeclare(
             array('queue' => 'celery', 'durable' => true,'auto_delete' => false,

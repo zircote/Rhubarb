@@ -18,6 +18,12 @@
  * @package  Rhubarb
  * @category Tests
  */
-define('AMQP_DEBUG', false);
+
+defined('AMQP_DEBUG')
+    || define('AMQP_DEBUG', (getenv('AMQP_DEBUG') ? getenv('AMQP_DEBUG') : false));
+
+defined('RUN_AMQP_TESTS')
+    || define('RUN_AMQP_TESTS', (getenv('RUN_AMQP_TESTS') ? getenv('RUN_AMQP_TESTS') : false));
+
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 

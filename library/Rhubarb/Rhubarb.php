@@ -20,6 +20,7 @@ namespace Rhubarb;
  * @package     Rhubarb
  * @category    Rhubarb
  */
+use  Rhubarb\Exception\Exception;
 
 /**
  * @package     Rhubarb
@@ -121,7 +122,7 @@ class Rhubarb
      * @param $options
      *
      * @return Rhubarb
-     * @throws Exception\Exception
+     * @throws Exception
      */
     public function setBroker($options)
     {
@@ -132,7 +133,7 @@ class Rhubarb
         $namespace = rtrim($namespace,self::NS_SEPERATOR);
         $brokerClass = $namespace . self::NS_SEPERATOR . $options['type'];
         if (!class_exists($brokerClass)) {
-            throw new \Rhubarb\Exception\Exception(
+            throw new Exception(
                 sprintf('Broker class [%s] unknown', $brokerClass)
             );
         }
@@ -154,7 +155,7 @@ class Rhubarb
      * @param $options
      *
      * @return Rhubarb
-     * @throws Exception\Exception
+     * @throws Exception
      */
     public function setResultStore($options)
     {
@@ -168,7 +169,7 @@ class Rhubarb
         $namespace = rtrim($namespace,self::NS_SEPERATOR);
         $resultStoreClass = $namespace . self::NS_SEPERATOR . $options['type'];
         if (!class_exists($resultStoreClass)) {
-            throw new \Rhubarb\Exception\Exception(
+            throw new Exception(
                 sprintf('ResultStore class [%s] unknown', $resultStoreClass)
             );
         }
@@ -225,12 +226,12 @@ class Rhubarb
      * @param $name
      * @param $value
      *
-     * @throws Exception\Exception
+     * @throws Exception
      */
     public function setOption($name, $value)
     {
         if (!is_string($name)) {
-            throw new \Rhubarb\Exception\Exception('invalid options name');
+            throw new Exception('invalid options name');
         }
         $name = strtolower($name);
         if ($name == 'result_store') {

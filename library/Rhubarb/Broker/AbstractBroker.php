@@ -11,7 +11,6 @@ namespace Rhubarb\Broker;
  */
 abstract class AbstractBroker implements BrokerInterface
 {
-    protected $exchange = \Rhubarb\Rhubarb::RHUBARB_DEFAULT_EXCHANGE_NAME;
     protected $options = array();
     protected $message
         = array(
