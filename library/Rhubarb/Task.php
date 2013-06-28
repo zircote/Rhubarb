@@ -101,24 +101,6 @@ class Task
     protected $kwargs = array();
 
     /**
-     * @return array
-     */
-    public function toArray()
-    {
-        return array(
-            'id'        => $this->id,
-            'task'      => $this->name,
-            'args'      => $this->args,
-            'kwargs'    => (object) $this->kwargs,
-            'expires'   => ($this->expires instanceof \DateTime) ? $this->expires->format(\DateTime::ISO8601) : null,
-            'utc'       => (bool) $this->utc,
-            'callbacks' => $this->callbacks,
-            'eta'       => ($this->eta instanceof \DateTime) ? $this->eta->format(\DateTime::ISO8601) : null,
-            'errbacks'  => $this->errbacks
-        );
-    }
-
-    /**
      * @param string      $name
      * @param array       $args
      * @param Rhubarb     $rhubarb
@@ -536,6 +518,24 @@ class Task
     public function getTaskSent()
     {
         return $this->taskSent;
+    }
+    
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+            'id'        => $this->id,
+            'task'      => $this->name,
+            'args'      => $this->args,
+            'kwargs'    => (object) $this->kwargs,
+            'expires'   => ($this->expires instanceof \DateTime) ? $this->expires->format(\DateTime::ISO8601) : null,
+            'utc'       => (bool) $this->utc,
+            'callbacks' => $this->callbacks,
+            'eta'       => ($this->eta instanceof \DateTime) ? $this->eta->format(\DateTime::ISO8601) : null,
+            'errbacks'  => $this->errbacks
+        );
     }
 }
 

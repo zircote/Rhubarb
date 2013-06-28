@@ -20,10 +20,11 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
-use \Rhubarb\Exception\InvalidJsonException;
-use \AMQP\Exception\ChannelException;
-use \AMQP\Connection;
-use \Rhubarb\Task;
+use Rhubarb\Exception\InvalidJsonException;
+use AMQP\Exception\ChannelException;
+use AMQP\Connection;
+use Rhubarb\Rhubarb;
+use Rhubarb\Task;
 
 /**
  * @package     Rhubarb
@@ -53,24 +54,8 @@ use \Rhubarb\Task;
  * );
  * $rhubarb = new \Rhubarb\Rhubarb($options);
  */
-class Amqp extends AbstractResultStore
+class Amqp extends \Rhubarb\Connector\Amqp implements ResultStoreInterface
 {
-    /**
-     * @var Connection
-     */
-    protected $connection;
-    /**
-     * @var array
-     */
-    protected $options = array(
-        'uri' => 'amqp://guest:guest@localhost:5672/',
-        'options' => array()
-    );
-
-    public function __construct(array $options = array())
-    {
-        $this->setOptions($options);
-    }
 
     /**
      * @param Task $task
@@ -99,54 +84,5 @@ class Amqp extends AbstractResultStore
         } catch (ChannelException $e){
             return $result;
         }
-    }
-
-    /**
-     * @return Connection
-     */
-    public function getConnection()
-    {
-        if (!$this->connection) {
-            $options = $this->getOptions();
-            $connection = new Connection($options['uri'], @$options['options'] ?: array());
-            $this->setConnection($connection);
-        }
-        return $this->connection;
-    }
-
-    /**
-     * @param Connection $connection
-     *
-     * @return AMQP
-     */
-    public function setConnection(Connection $connection)
-    {
-        $this->connection = $connection;
-        return $this;
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return AMQP
-     *
-     * @throws \UnexpectedValueException
-     */
-    public function setOptions(array $options)
-    {
-        if (isset($options['result_store'])) {
-            $this->resultsExchange = $options['result_store'];
-        }
-        if(isset($options['exchange'])){
-            if(!is_string($options['exchange'])){
-                throw new \UnexpectedValueException('exchange value is not a string, a string is required');
-            }
-            $this->resultsExchange = $options['exchange'];
-            unset($options['exchange']);
-        }
-        $merged = array('uri' => isset($options['uri']) ? $options['uri'] : $this->options['uri']);
-        $merge['options'] = array_merge($this->options['options'], (array) @$options['options']);
-        $this->options = $merged;
-        return $this;
     }
 }

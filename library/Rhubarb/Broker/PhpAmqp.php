@@ -5,13 +5,13 @@ namespace Rhubarb\Broker;
  * @package     Rhubarb
  * @category    Broker
  */
-use AMQPConnection;
+use Rhubarb\Connector\PhpAmqp as PhpAmqpConnector;
 use AMQPChannel;
 use AMQPExchange;
 use AMQPQueue;
 use Rhubarb\Exception\Exception;
+use Rhubarb\Message;
 use Rhubarb\Rhubarb;
-use Rhubarb\Task;
 
 /**
  * @package     Rhubarb
@@ -31,42 +31,16 @@ use Rhubarb\Task;
  * );
  * $rhubarb = new \Rhubarb\Rhubarb($options);
  */
-class PhpAmqp extends AbstractBroker
+class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
 {
-    protected $exchange = Rhubarb::RHUBARB_DEFAULT_EXCHANGE_NAME;
-
+    
     /**
-     * @var AmqpConnection
-     */
-    protected $connection;
-    /**
-     * @var array
-     */
-    protected $options = array(
-        'connection' => array(
-            'host' => '127.0.0.1',
-            'port' => 5672,
-            'vhost' => '/',
-            'login' => 'guest',
-            'password' => 'guest'
-        ),
-        'options' => array()
-    );
-
-    /**
-     * @param array $options
-     */
-    public function __construct(array $options = array())
-    {
-        $this->setOptions($options);
-    }
-
-    /**
-     * @param Task $task
+     * @param \Rhubarb\Task $task
      * @throws \Rhubarb\Exception\Exception
      */
-    public function publishTask(Task $task)
+    public function publishTask(\Rhubarb\Task $task)
     {
+        $msg = new Message();
         $connection = $this->getConnection();
         $connection->connect();
         $channel = new AMQPChannel($connection);
@@ -76,7 +50,7 @@ class PhpAmqp extends AbstractBroker
         }
         $queue = new AMQPQueue($channel);
         
-        $queue->setName($this->message['properties']['name']);
+        $queue->setName($msg->getPropName());
         $queue->setFlags(AMQP_DURABLE);
         if ($this->options['options']) {
             $queue->setArguments($this->options['options']);
@@ -104,72 +78,5 @@ class PhpAmqp extends AbstractBroker
             $msgProperties
         );
         $this->getConnection()->disconnect();
-    }
-
-    /**
-     * @return AMQPConnection
-     */
-    public function getConnection()
-    {
-        if (!$this->connection) {
-            $options = $this->getOptions();
-            $connection = new AMQPConnection($options['connection']);
-            $this->setConnection($connection);
-        }
-        return $this->connection;
-    }
-
-    /**
-     * @param AMQPConnection $connection
-     *
-     * @return AMQP
-     */
-    public function setConnection(AMQPConnection $connection)
-    {
-        $this->connection = $connection;
-        return $this;
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return AMQP
-     *
-     * @throws \UnexpectedValueException
-     */
-    public function setOptions(array $options)
-    {
-        if (isset($options['exchange'])) {
-            $this->exchange = $options['exchange'];
-        }
-        if (isset($options['exchange'])) {
-            if (!is_string($options['exchange'])) {
-                throw new \UnexpectedValueException('exchange value is not a string, a string is required');
-            }
-            $this->exchange = $options['exchange'];
-            unset($options['exchange']);
-        }
-        if (isset($options['queue'])) {
-            if (isset($options['queue']['arguments'])) {
-                $this->queueOptions = $options['queue'];
-            }
-            unset($options['queue']);
-        }
-        if (isset($options['uri'])) {
-            $uri = parse_url($options['uri']);
-            if (!isset($uri['port'])) {
-                $uri['scheme'] == 'amqps' ? 5673 : $this->options['connection']['port'];
-            } else {
-                $port = isset($uri['port']) ? $uri['port'] : $this->options['connection']['port'];
-            }
-            unset($options['uri']);
-            $options['connection']['host'] = $uri['host'];
-            $options['connection']['port'] = $port;
-            $options['connection']['vhost'] = isset($uri['path']) ? $uri['path'] : $this->options['connection']['path'];
-            $options['connection']['login'] = isset($uri['username']) ? $uri['username'] : $this->options['connection']['login'];
-            $options['connection']['password'] = isset($uri['pass']) ? $uri['pass'] : $this->options['connection']['password'];
-            $this->options['connection'] = $options['connection'];
-        }
-        return $this;
     }
 }

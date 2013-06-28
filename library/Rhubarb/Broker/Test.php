@@ -22,6 +22,15 @@ class Test implements BrokerInterface
 
     }
 
+    public function setOptions(array $options)
+    {
+        
+    }
+    
+    public function getOptions()
+    {
+        
+    }
     /**
      * @param \Exception $exception
      */

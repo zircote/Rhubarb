@@ -20,13 +20,14 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
+use Rhubarb\Connector\PhpAmqp as PhpAmqpConnector;
 use Rhubarb\Exception\Exception;
 use Rhubarb\Rhubarb;
 use Rhubarb\Task;
 use Rhubarb\Exception\InvalidJsonException;
-use AMQPConnection;
 use AMQPQueue;
 use AMQPChannel;
+
 /**
  * @package     Rhubarb
  * @category    ResultStore
@@ -55,30 +56,8 @@ use AMQPChannel;
  * );
  * $rhubarb = new \Rhubarb\Rhubarb($options);
  */
-class PhpAmqp extends AbstractResultStore
+class PhpAmqp extends PhpAmqpConnector implements ResultStoreInterface
 {
-    /**
-     * @var AmqpConnection
-     */
-    protected $connection;
-    /**
-     * @var array
-     */
-    protected $options = array(
-        'connection' => array(
-            'host' => '127.0.0.1',
-            'port' => 5672,
-            'vhost' => '/',
-            'login' => 'guest',
-            'password' => 'guest'
-        ),
-        'options' => array()
-    );
-
-    public function __construct(array $options = array())
-    {
-        $this->setOptions($options);
-    }
 
     public function getTaskResult(Task $task)
     {
@@ -94,7 +73,7 @@ class PhpAmqp extends AbstractResultStore
             $queue = new AMQPQueue($channel);
             $queue->setName($taskId);
             $queue->setArgument('x-expires', 86400000);
-            $queue->declare();
+            $queue->declareQueue();
             if ($message = $queue->get()) {
                 $messageBody = json_decode($message->getBody());
                 if (json_last_error()) {
@@ -108,69 +87,5 @@ class PhpAmqp extends AbstractResultStore
         } catch (\AMQPChannelException $e){
         }
         return $result;
-    }
-
-    /**
-     * @return AMQPConnection
-     */
-    public function getConnection()
-    {
-        if (!$this->connection) {
-            $options = $this->getOptions();
-            $connection = new AMQPConnection($options['connection']);
-            $this->setConnection($connection);
-        }
-        return $this->connection;
-    }
-
-    /**
-     * @param AMQPConnection $connection
-     *
-     * @return AMQP
-     */
-    public function setConnection(AMQPConnection $connection)
-    {
-        $this->connection = $connection;
-        return $this;
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return AMQP
-     *
-     * @throws \UnexpectedValueException
-     */
-    public function setOptions(array $options)
-    {
-        if (isset($options['exchange'])) {
-            if (!is_string($options['exchange'])) {
-                throw new \UnexpectedValueException('exchange value is not a string, a string is required');
-            }
-            $this->exchange = $options['exchange'];
-            unset($options['exchange']);
-        }
-        if (isset($options['queue'])) {
-            if (isset($options['queue']['arguments'])) {
-                $this->queueOptions = $options['queue'];
-            }
-            unset($options['queue']);
-        }
-        if (isset($options['uri'])) {
-            $uri = parse_url($options['uri']);
-            if (!isset($uri['port'])) {
-                $uri['scheme'] == 'amqps' ? 5673 : $this->options['connection']['port'];
-            } else {
-                $port = isset($uri['port']) ? $uri['port'] : $this->options['connection']['port'];
-            }
-            unset($options['uri']);
-            $options['connection']['host'] = $uri['host'];
-            $options['connection']['port'] = $port;
-            $options['connection']['vhost'] = isset($uri['path']) ? $uri['path'] : $this->options['connection']['path'];
-            $options['connection']['login'] = isset($uri['username']) ? $uri['username'] : $this->options['connection']['login'];
-            $options['connection']['password'] = isset($uri['pass']) ? $uri['pass'] : $this->options['connection']['password'];
-            $this->options['connection'] = $options['connection'];
-        }
-        return $this;
     }
 }

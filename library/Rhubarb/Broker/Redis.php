@@ -18,4 +18,12 @@ class Redis implements BrokerInterface
     {
         //'LPUSH';
     }
+    public function getOptions()
+    {
+        
+    }
+    public function setOptions(array $options)
+    {
+        
+    }
 }
