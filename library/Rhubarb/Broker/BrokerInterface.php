@@ -19,16 +19,4 @@ interface BrokerInterface
      */
     public function publishTask(\Rhubarb\Task $task);
 
-    /**
-     * @return array
-     */
-    public function getOptions();
-
-    /**
-     * @param array $options
-     *
-     * @return self
-     */
-    public function setOptions(array $options);
-
 }

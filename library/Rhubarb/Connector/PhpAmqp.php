@@ -13,7 +13,7 @@ use AMQPConnection;
  * @category    
  * @subcategory 
  */
-class PhpAmqp
+class PhpAmqp implements ConnectorInterface
 {
 
     /**

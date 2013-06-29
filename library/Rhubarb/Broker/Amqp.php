@@ -34,7 +34,7 @@ class Amqp extends AmqpConnector implements BrokerInterface
     protected $message = null;
 
     /**
-     * @param Task $task
+     * @param \Rhubarb\Task $task
      */
     public function publishTask(\Rhubarb\Task $task)
     {

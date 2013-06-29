@@ -13,7 +13,7 @@ use AMQP\Connection;
  * @category    
  * @subcategory 
  */
-class Amqp 
+class Amqp implements ConnectorInterface
 {
 
     /**

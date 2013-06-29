@@ -22,6 +22,7 @@ namespace Rhubarb\ResultStore;
  */
 use Rhubarb\Exception\InvalidJsonException;
 use AMQP\Exception\ChannelException;
+use Rhubarb\Connector\Amqp as AmqpConnector;
 use AMQP\Connection;
 use Rhubarb\Rhubarb;
 use Rhubarb\Task;
@@ -55,13 +56,13 @@ use Rhubarb\Exception\CeleryConfigurationException;
  * );
  * $rhubarb = new \Rhubarb\Rhubarb($options);
  */
-class Amqp extends \Rhubarb\Connector\Amqp implements ResultStoreInterface
+class Amqp extends AmqpConnector implements ResultStoreInterface
 {
 
     /**
      * @param Task $task
      * @return bool|mixed|null|string
-     * @throws \Rhubarb\Exception\InvalidJsonException
+     * @throws InvalidJsonException
      * @throws CeleryConfigurationException
      */
     public function getTaskResult(Task $task)
@@ -93,7 +94,7 @@ class Amqp extends \Rhubarb\Connector\Amqp implements ResultStoreInterface
 
                 $result = $messageBody;
             }
-        } catch (\AMQP\Exception\ChannelException $e) {
+        } catch (ChannelException $e) {
         }
 
         return $result;
