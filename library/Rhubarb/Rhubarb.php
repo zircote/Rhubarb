@@ -53,10 +53,6 @@ class Rhubarb
     /**
      * @var string
      */
-    const RHUBARB_TASK_ROUTING_KEY = 'celery';
-    /**
-     * @var string
-     */
     const RHUBARB_DEFAULT_TASK_QUEUE = 'celery';
     /**
      * @var string

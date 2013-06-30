@@ -40,7 +40,6 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
      */
     public function publishTask(\Rhubarb\Task $task)
     {
-        $msg = new Message();
         $connection = $this->getConnection();
         $connection->connect();
         $channel = new AMQPChannel($connection);
@@ -50,7 +49,7 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
         }
         $queue = new AMQPQueue($channel);
         
-        $queue->setName($msg->getPropName());
+        $queue->setName($task->message->getQueue());
         $queue->setFlags(AMQP_DURABLE);
         if ($this->options['options']) {
             $queue->setArguments($this->options['options']);
@@ -60,19 +59,21 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
         $exchange = new AMQPExchange($channel);
         $exchange->setFlags(AMQP_PASSIVE|AMQP_DURABLE);
         $exchange->setType(AMQP_EX_TYPE_DIRECT);
-        $exchange->setName($this->exchange);
+        $exchange->setName($task->message->getPropExchange());
         $exchange->declareExchange();
-        $queue->bind($this->exchange, $task->getId());
+        $queue->bind($task->message->getPropExchange(), $task->getId());
         
         $msgProperties = array(
-            'content_type' => Rhubarb::RHUBARB_CONTENT_TYPE
+            'content_type' => $task->message->getContentType()
         );
         
         if ($task->getPriority()) {
             $msgProperties['priority'] = $task->getPriority();
         }
+        $task->message->setPropBodyEncoding(null);
+        $taskArray = $task->toArray();
         $exchange->publish(
-            (string)$task, 
+            json_encode($taskArray['body']), 
             $task->getId(), 
             AMQP_NOPARAM,
             $msgProperties

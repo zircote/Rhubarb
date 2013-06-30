@@ -101,6 +101,11 @@ class Task
     protected $kwargs = array();
 
     /**
+     * @var Message
+     */
+    public $message;
+    
+    /**
      * @param string      $name
      * @param array       $args
      * @param Rhubarb     $rhubarb
@@ -115,6 +120,7 @@ class Task
             ->setArgs($args)
             ->setName($name)
             ->setRhubarb($rhubarb);
+        $this->message = new Message();
 
     }
 
@@ -142,6 +148,14 @@ class Task
         }
         if (isset($options['errbacks'])) {
             $this->setCallbacks($options['errbacks']);
+        }
+        if (isset($options['queue_args'])) {
+            $this->message->setPropQueueArgs($options['queue_args']);
+        }
+        if (isset($options['exchange'])) {
+            $this->message->setPropExchange($options['exchange']);
+        } else {
+            $this->message->setPropExchange(Rhubarb::RHUBARB_DEFAULT_EXCHANGE_NAME);
         }
         $this->taskSent = true;
         $this->getRhubarb()->getBroker()->publishTask($this);
@@ -525,7 +539,7 @@ class Task
      */
     public function toArray()
     {
-        return array(
+        $body = array(
             'id'        => $this->id,
             'task'      => $this->name,
             'args'      => $this->args,
@@ -536,6 +550,8 @@ class Task
             'eta'       => ($this->eta instanceof \DateTime) ? $this->eta->format(\DateTime::ISO8601) : null,
             'errbacks'  => $this->errbacks
         );
+        $this->message->setBody($body);
+        return $this->message->toArray();
     }
 }
 

@@ -2,7 +2,7 @@
 env:
   global:
   - secure: ! 'PBjr3GgU1sHC4yD4Fj0k5nMaX1+li8fw2WHVXR/crDDsgLLV+AgnfWvFCCJXnfvs7ikHG/OfP3IvrTsip6bhIybpfvzI/B3YqPuUgEtfds2mbo2iZVofdaedlTAB5R0wOeQRL5wmQdRNMetaBErhh87biZBX2HW3BLnm85dtH0c='
-  - RUN_AMQP_TESTS=0
+  - RUN_AMQP_TESTS=1
 
 
 services:

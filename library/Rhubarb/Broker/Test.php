@@ -53,7 +53,9 @@ class Test implements BrokerInterface
      */
     public function publishTask(\Rhubarb\Task $task)
     {
-        $this->published = (string) $task;
+        
+        $taskArray = $task->toArray();
+        $this->published = json_encode($taskArray['body']);
     }
 
     public function getPublishedValues()
