@@ -20,6 +20,7 @@ namespace Rhubarb;
  * @package     Rhubarb
  * @category    Rhubarb
  */
+use  Rhubarb\Exception\Exception;
 
 /**
  * @package     Rhubarb
@@ -49,10 +50,6 @@ class Rhubarb
      * @var string
      */
     const RHUBARB_USER_AGENT = 'rhubarb';
-    /**
-     * @var string
-     */
-    const RHUBARB_TASK_ROUTING_KEY = 'celery';
     /**
      * @var string
      */
@@ -121,7 +118,7 @@ class Rhubarb
      * @param $options
      *
      * @return Rhubarb
-     * @throws Exception\Exception
+     * @throws Exception
      */
     public function setBroker($options)
     {
@@ -132,7 +129,7 @@ class Rhubarb
         $namespace = rtrim($namespace,self::NS_SEPERATOR);
         $brokerClass = $namespace . self::NS_SEPERATOR . $options['type'];
         if (!class_exists($brokerClass)) {
-            throw new \Rhubarb\Exception\Exception(
+            throw new Exception(
                 sprintf('Broker class [%s] unknown', $brokerClass)
             );
         }
@@ -154,7 +151,7 @@ class Rhubarb
      * @param $options
      *
      * @return Rhubarb
-     * @throws Exception\Exception
+     * @throws Exception
      */
     public function setResultStore($options)
     {
@@ -168,7 +165,7 @@ class Rhubarb
         $namespace = rtrim($namespace,self::NS_SEPERATOR);
         $resultStoreClass = $namespace . self::NS_SEPERATOR . $options['type'];
         if (!class_exists($resultStoreClass)) {
-            throw new \Rhubarb\Exception\Exception(
+            throw new Exception(
                 sprintf('ResultStore class [%s] unknown', $resultStoreClass)
             );
         }
@@ -225,24 +222,24 @@ class Rhubarb
      * @param $name
      * @param $value
      *
-     * @throws Exception\Exception
+     * @throws Exception
      */
     public function setOption($name, $value)
     {
         if (!is_string($name)) {
-            throw new \Rhubarb\Exception\Exception('invalid options name');
+            throw new Exception('invalid options name');
         }
         $name = strtolower($name);
         if ($name == 'result_store') {
-            $value = array_merge($this->options['result_store'], $value);
+            $this->options['result_store'] = $value;
             $this->setResultStore($value);
         } elseif ($name == 'broker') {
-            $value = array_merge($this->options['broker'], $value);
+            $this->options['broker'] = $value;
             $this->setBroker($value);
         } else {
-            if (array_key_exists($name, $this->options)) {
-                $this->_setOption($name, $value);
-            }
+//            if (array_key_exists($name, $this->options)) {
+//                $this->_setOption($name, $value);
+//            }
         }
     }
 

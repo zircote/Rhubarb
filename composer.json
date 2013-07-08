@@ -15,11 +15,16 @@
         }
     ],
     "require": {
-        "zircote/amqp": "1.0.*",
         "rhumsaa/uuid": "2.1.0"
     },
     "require-dev":{
         "phpunit/phpunit": "3.7.19"
+    },
+    "suggest": {
+        "zircote/amqp": "for php-amqp support and/or TLS AMQP support",
+        "ext-amqp": "for rabbitmq-c/pecl-amqp support",
+        "predis/predis": "for redis broker support",
+        "ext-mongo": "for MongoDB broker/result store support"
     },
     "autoload":{
         "psr-0":{
