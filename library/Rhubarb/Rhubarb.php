@@ -53,10 +53,6 @@ class Rhubarb
     /**
      * @var string
      */
-    const RHUBARB_TASK_ROUTING_KEY = 'celery';
-    /**
-     * @var string
-     */
     const RHUBARB_DEFAULT_TASK_QUEUE = 'celery';
     /**
      * @var string
@@ -235,15 +231,15 @@ class Rhubarb
         }
         $name = strtolower($name);
         if ($name == 'result_store') {
-            $value = array_merge($this->options['result_store'], $value);
+            $this->options['result_store'] = $value;
             $this->setResultStore($value);
         } elseif ($name == 'broker') {
-            $value = array_merge($this->options['broker'], $value);
+            $this->options['broker'] = $value;
             $this->setBroker($value);
         } else {
-            if (array_key_exists($name, $this->options)) {
-                $this->_setOption($name, $value);
-            }
+//            if (array_key_exists($name, $this->options)) {
+//                $this->_setOption($name, $value);
+//            }
         }
     }
 

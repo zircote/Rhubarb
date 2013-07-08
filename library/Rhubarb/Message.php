@@ -7,6 +7,7 @@ namespace Rhubarb;
  * @subcategory Message
  */
 use Rhubarb\Rhubarb;
+use Rhumsaa\Uuid\Uuid;
 
 /**
  * @package     Rhubarb
@@ -34,6 +35,8 @@ use Rhubarb\Rhubarb;
  */
 class Message 
 {
+    const BODY_ENCODING_BASE64 = 'base64';
+    
     /**
      * @return array
      */
@@ -53,18 +56,18 @@ class Message
             'properties'       => array(
                 'exclusive'         => null,
                 'name'              => Rhubarb::RHUBARB_DEFAULT_TASK_QUEUE,
-                'body_encoding'     => Rhubarb::RHUBARB_DEFAULT_BODY_ENCODING,
+                'body_encoding'     => null,
                 'delivery_info'     => array(
                     'priority'    => 0,
-                    'routing_key' => Rhubarb::RHUBARB_TASK_ROUTING_KEY,
+                    'routing_key' => null,
                     'exchange'    => Rhubarb::RHUBARB_DEFAULT_EXCHANGE_NAME
                 ),
                 'durable'           => true,
                 'delivery_mode'     => 2,
                 'no_ack'            => null,
                 'alias'             => null,
-                'queue_arguments'   => null,
-                'binding_arguments' => null,
+                'queue_arguments'   => array(),
+                'binding_arguments' => array(),
                 'delivery_tag'      => null,
                 'auto_delete'       => null,
             ),
@@ -72,12 +75,39 @@ class Message
         );
 
     /**
+     * @var string
+     */
+    protected $queue = Rhubarb::RHUBARB_DEFAULT_TASK_QUEUE;
+
+    public function __construct()
+    {
+    }
+    /**
+     *
+     * @param string $queue
+     * @return self
+     */
+    public function setQueue($queue)
+    {
+        $this->queue = $queue;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getQueue()
+    {
+        return $this->queue;
+    }
+    
+    /**
      * @param $propRoutingKey
      * @return self
      */
     public function setPropRoutingKey($propRoutingKey)
     {
-        $this->message['properties']['routing_key'] = $propRoutingKey;
+        $this->message['properties']['delivery_info']['routing_key'] = $propRoutingKey;
         return $this;
     }
 
@@ -86,7 +116,7 @@ class Message
      */
     public function getPropRoutingKey()
     {
-        return  $this->message['properties']['routing_key'];
+        return  $this->message['properties']['delivery_info']['routing_key'];
     }
 
     /**
@@ -95,7 +125,7 @@ class Message
      */
     public function setPropQueueArgs($propQueueArgs)
     {
-        $this->message['queue_arguments'] = $propQueueArgs;
+        $this->message['properties']['queue_arguments'] = $propQueueArgs;
         return $this;
     }
 
@@ -104,7 +134,7 @@ class Message
      */
     public function getPropQueueArgs()
     {
-        return$this->message['queue_arguments'];
+        return$this->message['properties']['queue_arguments'];
     }
 
     /**
@@ -347,7 +377,7 @@ class Message
      */
     public function setContentType($contentType)
     {
-        $this->message['properties']['content-type'] = $contentType;
+        $this->message['content-type'] = $contentType;
         return $this;
     }
 
@@ -356,7 +386,7 @@ class Message
      */
     public function getContentType()
     {
-        return $this->message['properties']['content-type'];
+        return $this->message['content-type'];
     }
 
     /**
@@ -365,7 +395,7 @@ class Message
      */
     public function setContentEncoding($contentEncoding)
     {
-        $this->message['properties']['content-encoding'] = $contentEncoding;
+        $this->message['content-encoding'] = $contentEncoding;
         return $this;
     }
 
@@ -374,7 +404,7 @@ class Message
      */
     public function getContentEncoding()
     {
-        return $this->message['properties']['content-encoding'];
+        return $this->message['content-encoding'];
     }
 
     /**
@@ -393,5 +423,28 @@ class Message
     public function getBody()
     {
         return $this->message['body'];
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+       $message = $this->message;
+        switch (strtolower($message['properties']['body_encoding'])) {
+            case self::BODY_ENCODING_BASE64:
+                $message['body'] = base64_encode(json_encode($message['body']));
+                break;
+        }
+        return $message;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        $message = $this->toArray();
+        return json_encode($message);
     }
 }
