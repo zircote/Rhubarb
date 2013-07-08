@@ -7,6 +7,7 @@ namespace Rhubarb\Broker;
  */
 use Rhubarb\Connector\Predis as PredisConnection;
 use Rhubarb\Message;
+use Rhubarb\Rhubarb;
 use Rhumsaa\Uuid\Uuid;
 
 /**
@@ -20,6 +21,7 @@ class Predis extends PredisConnection implements BrokerInterface
      */
     public function publishTask(\Rhubarb\Task $task)
     {
-        $this->connection->lpush($this->exchange, (string) $task);
+        $task->getMessage()->setPropBodyEncoding(Message::BODY_ENCODING_BASE64);
+        $this->getConnection()->lpush($task->getMessage()->getPropExchange(), (string) $task);
     }
 }

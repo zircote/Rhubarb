@@ -26,47 +26,40 @@ namespace RhubarbTests;
  * @package     Rhubarb
  * @category    Tests
  * @subcategory Rhubarb
- * @group PhpAmqp
+ * @group Redis
  */
-class PhpAmqpTest  extends \PHPUnit_Framework_TestCase
+class PredisTest extends \PHPUnit_Framework_TestCase
 {
-
+    
     /**
      * @group job
      */
     public function testJobSubmit()
     {
-        if (!defined('CONNECTOR') || CONNECTOR != 'amqp') {
-            $this->markTestSkipped('skipped requires AMQP celery workers');
+        if (!defined('CONNECTOR') || CONNECTOR != 'redis') {
+            $this->markTestSkipped('skipped requires `redis` celery workers');
         }
-        
         $options = array(
             'broker' => array(
-                'type' => 'PhpAmqp',
+                'type' => 'Predis',
                 'options' => array(
                     'exchange' => 'celery',
-                    'queue' => array(
-                        'arguments' => array(
-                        )
-                    ),
-                    'uri' => 'amqp://guest:guest@localhost:5672/celery'
                 )
             ),
             'result_store' => array(
-                'type' => 'PhpAmqp',
+                'type' => 'Predis',
                 'options' => array(
                     'exchange' => 'celery',
-                    'uri' => 'amqp://guest:guest@localhost:5672/celery'
                 )
             )
         );
         $rhubarb = new \Rhubarb\Rhubarb($options);
 
-        $res = $rhubarb->sendTask('tasks.add', array(2, 3));
+        $res = $rhubarb->sendTask('tasks1.add', array(2, 3));
         $res->delay();
         $result = $res->get(2);
         $this->assertEquals(5, $result);
-        $res = $rhubarb->sendTask('tasks.add', array(2102, 3));
+        $res = $rhubarb->sendTask('tasks1.add', array(2102, 3));
         $res->delay();
         $this->assertEquals(2105, $res->get());
     }
