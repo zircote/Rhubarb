@@ -28,14 +28,6 @@ class Predis
     protected $options = array(
         'uri' => 'redis://localhost:6379/0',
         'options' => array()
-//        'exchange' => array(
-//            'name' => 'celery',
-//            'arguments' => array()
-//        ),
-//        'queue' => array(
-//            'name' => 'celery',
-//            'arguments' => array()
-//        )
     );
 
     /**
@@ -107,6 +99,7 @@ class Predis
     {
         if (!$this->connection) {
             $options = $this->getOptions();
+            $options['uri'] = preg_replace('/redis\:/', 'tcp:', $options['uri']);
             $connection = new Client($options['uri'], @$options['options'] ? : array());
             $this->setConnection($connection);
         }

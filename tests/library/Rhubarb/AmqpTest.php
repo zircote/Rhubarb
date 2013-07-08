@@ -36,8 +36,8 @@ class AmqpTest extends \PHPUnit_Framework_TestCase
      */
     public function testJobSubmit()
     {
-        if (!defined('RUN_AMQP_TESTS') || !RUN_AMQP_TESTS) {
-            $this->markTestSkipped('skipped requires celery workers');
+        if (!defined('CONNECTOR') || CONNECTOR != 'amqp') {
+            $this->markTestSkipped('skipped requires AMQP celery workers');
         }
         $options = array(
             'broker' => array(

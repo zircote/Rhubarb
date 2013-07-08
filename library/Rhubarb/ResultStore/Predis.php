@@ -20,14 +20,16 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
+use Rhubarb\Connector\Predis as PredisConnector;
+
 /**
  * @package     Rhubarb
  * @category    ResultStore
  */
-class Redis extends AbstractResultStore
+class Predis extends PredisConnector implements ResultStoreInterface
 {
     public function getTaskResult(\Rhubarb\Task $task)
     {
-
+        return json_decode($this->getConnection()->get('celery-task-meta-' . $task->getId()));
     }
 }

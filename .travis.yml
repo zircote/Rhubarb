@@ -1,8 +1,10 @@
 ---
 env:
   global:
-  - secure: ! 'PBjr3GgU1sHC4yD4Fj0k5nMaX1+li8fw2WHVXR/crDDsgLLV+AgnfWvFCCJXnfvs7ikHG/OfP3IvrTsip6bhIybpfvzI/B3YqPuUgEtfds2mbo2iZVofdaedlTAB5R0wOeQRL5wmQdRNMetaBErhh87biZBX2HW3BLnm85dtH0c='
-  - RUN_AMQP_TESTS=1
+    - secure: ! 'PBjr3GgU1sHC4yD4Fj0k5nMaX1+li8fw2WHVXR/crDDsgLLV+AgnfWvFCCJXnfvs7ikHG/OfP3IvrTsip6bhIybpfvzI/B3YqPuUgEtfds2mbo2iZVofdaedlTAB5R0wOeQRL5wmQdRNMetaBErhh87biZBX2HW3BLnm85dtH0c='
+  matrix:
+    - CONNECTOR=redis
+    - CONNECTOR=amqp
 
 
 services:
@@ -13,14 +15,15 @@ services:
 language: php
 
 before_script:
-  - sudo rabbitmqctl add_vhost /celery
-  - sudo rabbitmqctl set_permissions -p /celery guest ".*" ".*"  ".*"
   - mkdir -p ~/.composer
   - printf '{"config":{"github-oauth":{"github.com":"%s"}}}' $GITHUB_OAUTH_TOKEN > ~/.composer/config.json
-  - echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - composer install
-  - sudo pip install celery
-  - sudo celery -A tasks worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &
+  - composer require zircote/amqp:* predis/predis:*
+  - if [ "$CONNECTOR" = "amqp" ]; then echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - if [ "$CONNECTOR" = "amqp" ]; then sudo rabbitmqctl add_vhost /celery; fi
+  - if [ "$CONNECTOR" = "amqp" ]; then sudo rabbitmqctl set_permissions -p /celery guest ".*" ".*"  ".*"; fi
+  - sudo pip install celery celery-with-redis
+  - if [ "$CONNECTOR" = "amqp" ]; then (sudo celery -A tasks worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi
+  - if [ "$CONNECTOR" = "redis" ]; then (sudo celery -A tasks1 worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi
   - sleep 3
   
 php:
