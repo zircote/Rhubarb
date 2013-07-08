@@ -15,11 +15,15 @@
         }
     ],
     "require": {
-        "ext-amqp": ">= 0.1",
-        "rhumsaa/uuid": "2.1.0"
+        "rhumsaa/uuid": "2.1.0",
+        "zircote/amqp": "dev-master"
     },
     "require-dev":{
         "phpunit/phpunit": "3.7.19"
+    },
+    "suggest": {
+        "zircote/amqp": "for php-amqp support and/or TLS amqp support",
+        "ext-amqp": "for rabbitmq-c/pecl-amqp support"
     },
     "autoload":{
         "psr-0":{

@@ -5,6 +5,7 @@ namespace Rhubarb\Broker;
  * @package     Rhubarb
  * @category    Broker
  */
+
 /**
  * @package     Rhubarb
  * @category    Broker
@@ -12,8 +13,6 @@ namespace Rhubarb\Broker;
 interface BrokerInterface
 {
     /**
-     * @abstract
-     *
      * @param \Rhubarb\Task $task
      *
      * @return void

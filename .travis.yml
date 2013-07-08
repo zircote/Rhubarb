@@ -2,19 +2,30 @@
 env:
   global:
   - secure: ! 'PBjr3GgU1sHC4yD4Fj0k5nMaX1+li8fw2WHVXR/crDDsgLLV+AgnfWvFCCJXnfvs7ikHG/OfP3IvrTsip6bhIybpfvzI/B3YqPuUgEtfds2mbo2iZVofdaedlTAB5R0wOeQRL5wmQdRNMetaBErhh87biZBX2HW3BLnm85dtH0c='
+  - RUN_AMQP_TESTS=1
+
+
+services:
+  - rabbitmq
+  - redis-server
+  - mongodb
+  
 language: php
+
 before_script:
-  - mkdir ~/.composer
+  - sudo rabbitmqctl add_vhost /celery
+  - sudo rabbitmqctl set_permissions -p /celery guest ".*" ".*"  ".*"
+  - mkdir -p ~/.composer
   - printf '{"config":{"github-oauth":{"github.com":"%s"}}}' $GITHUB_OAUTH_TOKEN > ~/.composer/config.json
-  - git clone git://github.com/alanxz/rabbitmq-c.git
-  - cd rabbitmq-c && git checkout librabbitmq-0.1-amqp_0_9_1
-  - cd rabbitmq-c && git submodule init && git submodule update
-  - cd rabbitmq-c && autoreconf -i && ./configure && make && sudo make install
-  - git clone git://github.com/pdezwart/php-amqp.git
-  - cd php-amqp && phpize && ./configure && make
   - echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - composer install
+  - sudo pip install celery
+  - sudo celery -A tasks worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &
+  - sleep 3
+  
 php:
   - 5.3
   - 5.4
+  - 5.5
+  
 script: phpunit -c tests/phpunit.xml

@@ -24,7 +24,7 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
-class Test extends AbstractResultStore
+class Test implements ResultStoreInterface
 {
 
     protected $nextResult;
