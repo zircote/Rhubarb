@@ -26,9 +26,9 @@ namespace RhubarbTests;
  * @package     Rhubarb
  * @category    Tests
  * @subcategory Rhubarb
- * @group Amqp
+ * @group Mongo
  */
-class AmqpTest extends \PHPUnit_Framework_TestCase
+class MongoTest extends \PHPUnit_Framework_TestCase
 {
     
     /**
@@ -36,35 +36,30 @@ class AmqpTest extends \PHPUnit_Framework_TestCase
      */
     public function testJobSubmit()
     {
-        if (!defined('CONNECTOR') || CONNECTOR != 'amqp') {
-            $this->markTestSkipped('skipped requires AMQP celery workers');
+        if (!defined('CONNECTOR') || CONNECTOR != 'mongo') {
+            $this->markTestSkipped('skipped requires `MongoDB` celery workers');
         }
         $options = array(
             'broker' => array(
-                'type' => 'Amqp',
+                'type' => 'Mongo',
                 'options' => array(
                     'exchange' => 'celery',
-                    'queue' => array(
-                        'arguments' => array('x-ha-policy' => array('S', 'all'))
-                    ),
-                    'uri' => 'amqp://guest:guest@localhost:5672//celery'
                 )
             ),
             'result_store' => array(
-                'type' => 'Amqp',
+                'type' => 'Mongo',
                 'options' => array(
                     'exchange' => 'celery',
-                    'uri' => 'amqp://guest:guest@localhost:5672//celery'
                 )
             )
         );
         $rhubarb = new \Rhubarb\Rhubarb($options);
 
-        $res = $rhubarb->sendTask('phpamqp.add', array(2, 3));
+        $res = $rhubarb->sendTask('mongo.add', array(2, 3));
         $res->delay();
         $result = $res->get(2);
         $this->assertEquals(5, $result);
-        $res = $rhubarb->sendTask('phpamqp.add', array(2102, 3));
+        $res = $rhubarb->sendTask('mongo.add', array(2102, 3));
         $res->delay();
         $this->assertEquals(2105, $res->get());
     }

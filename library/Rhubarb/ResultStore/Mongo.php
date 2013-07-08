@@ -20,14 +20,19 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
+use Rhubarb\Connector\Mongo as MongoConnection;
+
 /**
  * @package     Rhubarb
  * @category    ResultStore
  */
-class MongoDb extends AbstractResultStore
+class Mongo extends MongoConnection implements ResultStoreInterface
 {
+    
     public function getTaskResult(\Rhubarb\Task $task)
     {
-
+        $collection = $this->getConnection()->selectCollection(self::CELERY_TASK_META);
+        $result = $collection->findOne(array('_id' => $task->getId()));
+        return (object) $result;
     }
 }

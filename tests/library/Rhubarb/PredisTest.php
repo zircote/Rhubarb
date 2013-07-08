@@ -55,11 +55,11 @@ class PredisTest extends \PHPUnit_Framework_TestCase
         );
         $rhubarb = new \Rhubarb\Rhubarb($options);
 
-        $res = $rhubarb->sendTask('tasks1.add', array(2, 3));
+        $res = $rhubarb->sendTask('predis.add', array(2, 3));
         $res->delay();
         $result = $res->get(2);
         $this->assertEquals(5, $result);
-        $res = $rhubarb->sendTask('tasks1.add', array(2102, 3));
+        $res = $rhubarb->sendTask('predis.add', array(2102, 3));
         $res->delay();
         $this->assertEquals(2105, $res->get());
     }
