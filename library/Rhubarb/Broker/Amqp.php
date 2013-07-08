@@ -39,13 +39,27 @@ class Amqp extends AmqpConnector implements BrokerInterface
     public function publishTask(\Rhubarb\Task $task)
     {
         $channel = $this->getConnection()->channel();
-        //  array('x-ha-policy' => array('S', 'all')
+        
         $channel->queueDeclare(
-            array('queue' => $task->message->getQueue(), 'durable' => true,'auto_delete' => false,
-                  'arguments' => array('x-ha-policy' => array('S', 'all')))
+            array(
+                'queue' => $task->message->getQueue(),
+                'durable' => true,
+                'auto_delete' => false,
+                'arguments' => $task->getMessage()->getPropQueueArgs()
+            )
         );
-        $channel->exchangeDeclare($task->message->getPropExchange(), 'direct',array('passive' => true, 'durable' => true));
-        $channel->queueBind('celery', $task->message->getPropExchange(), array('routing_key' => $task->getId()));
+        
+        $channel->exchangeDeclare(
+            $task->message->getPropExchange(),
+            'direct',
+            array('passive' => true, 'durable' => true)
+        );
+        
+        $channel->queueBind(
+            $task->getMessage()->getQueue(),
+            $task->message->getPropExchange(),
+            array('routing_key' => $task->getId())
+        );
         
         $msgProperties =  array('content_type' => Rhubarb::RHUBARB_CONTENT_TYPE);
         if($task->getPriority()){
@@ -53,11 +67,15 @@ class Amqp extends AmqpConnector implements BrokerInterface
         }
 
         $task->message->setPropBodyEncoding(null);
+        
         $taskArray = $task->toArray();
         
         $channel->basicPublish(
             new AmqpMessage(json_encode($taskArray['body']), $msgProperties),
-            array('exchange' => $task->message->getPropExchange(), 'routing_key' => $task->getId())
+            array(
+                'exchange' => $task->message->getPropExchange(),
+                'routing_key' => $task->getId()
+            )
         );
         
         $channel->close();

@@ -45,8 +45,7 @@ class AmqpTest extends \PHPUnit_Framework_TestCase
                 'options' => array(
                     'exchange' => 'celery',
                     'queue' => array(
-                        'arguments' => array(
-                        )
+                        'arguments' => array('x-ha-policy' => array('S', 'all'))
                     ),
                     'uri' => 'amqp://guest:guest@localhost:5672//celery'
                 )

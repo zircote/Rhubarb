@@ -66,8 +66,8 @@ class Message
                 'delivery_mode'     => 2,
                 'no_ack'            => null,
                 'alias'             => null,
-                'queue_arguments'   => null,
-                'binding_arguments' => null,
+                'queue_arguments'   => array(),
+                'binding_arguments' => array(),
                 'delivery_tag'      => null,
                 'auto_delete'       => null,
             ),
@@ -125,7 +125,7 @@ class Message
      */
     public function setPropQueueArgs($propQueueArgs)
     {
-        $this->message['queue_arguments'] = $propQueueArgs;
+        $this->message['properties']['queue_arguments'] = $propQueueArgs;
         return $this;
     }
 
@@ -134,7 +134,7 @@ class Message
      */
     public function getPropQueueArgs()
     {
-        return$this->message['queue_arguments'];
+        return$this->message['properties']['queue_arguments'];
     }
 
     /**

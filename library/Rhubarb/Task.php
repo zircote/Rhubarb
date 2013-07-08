@@ -116,12 +116,21 @@ class Task
         if(!$id){
            $id = (string) Uuid::uuid1();
         }
+        $rhubarbOptions = $rhubarb->getOptions();
         $this->setId($id)
             ->setArgs($args)
             ->setName($name)
             ->setRhubarb($rhubarb);
         $this->message = new Message();
-
+        if (isset($rhubarbOptions['broker']['options']['queue']['name'])) {
+            $this->message->setQueue($rhubarbOptions['broker']['options']['queue']['name']);
+        }
+        if (isset($rhubarbOptions['broker']['options']['queue']['arguments'])) {
+            $this->message->setPropQueueArgs($rhubarbOptions['broker']['options']['queue']['arguments']);
+        }
+        if (isset($rhubarbOptions['broker']['options']['exchange'])) {
+            $this->message->setPropExchange($rhubarbOptions['broker']['options']['exchange']);
+        }
     }
 
     /**
@@ -552,6 +561,25 @@ class Task
         );
         $this->message->setBody($body);
         return $this->message->toArray();
+    }
+
+    /**
+     *
+     * @param \Rhubarb\Message $message
+     * @return Task
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+        return $this;
+    }
+
+    /**
+     * @return \Rhubarb\Message
+     */
+    public function getMessage()
+    {
+        return $this->message;
     }
 }
 
