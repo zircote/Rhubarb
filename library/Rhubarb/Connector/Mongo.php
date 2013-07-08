@@ -16,7 +16,7 @@ use AMQP\Connection;
 class Mongo implements ConnectorInterface
 {
 
-    const CELERY_MESSAGES_COLLECTION = 'celery';
+    const CELERY_MESSAGES_COLLECTION = 'messages';
     const CELERY_TASK_META = 'celery_taskmeta';
     /**
      * @var \MongoDB

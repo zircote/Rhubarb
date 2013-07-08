@@ -32,7 +32,18 @@ class Mongo extends MongoConnection implements ResultStoreInterface
     public function getTaskResult(\Rhubarb\Task $task)
     {
         $collection = $this->getConnection()->selectCollection(self::CELERY_TASK_META);
-        $result = $collection->findOne(array('_id' => $task->getId()));
-        return (object) $result;
+        $result = $collection->findOne(array('_id' => (string) $task->getId()));
+        if ($result) {
+            foreach ($result as $k => $v) {
+                if ($v instanceof \MongoBinData) {
+                    $v = $v->bin;
+                } elseif ($v instanceof \MongoDate) {
+                    $v = $v->sec;
+                }
+                $result[$k] = $v;
+            }
+            $result = (object) $result;
+        }
+        return $result;
     }
 }
