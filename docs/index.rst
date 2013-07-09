@@ -9,7 +9,9 @@ Welcome to Rhubarb's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+    installation
+    rhubarb
+    connectors/index
 
 
 
