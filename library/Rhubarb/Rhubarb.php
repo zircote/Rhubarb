@@ -69,7 +69,7 @@ class Rhubarb
     /**
      * @var string
      */
-    const RHUBARB_VERSION = '0.0.4';
+    const RHUBARB_VERSION = '$Id$';
     /**
      * @var string
      */
