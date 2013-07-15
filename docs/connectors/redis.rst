@@ -3,7 +3,7 @@ redis
 
 .. topic:: **Rhubarb** currently supports one `**redis** <http://redis.io>`_ connectors:
  
- - `zircote/amqp <https://packagist.org/packages/predis/predis>`_
+ - `predis/predis <https://packagist.org/packages/predis/predis>`_
  
 
 predis/predis
