@@ -134,6 +134,17 @@ class Task
     }
 
     /**
+     * <b> Options:</b>
+     * - countdown: (int) The task is guaranteed to be executed at some time after the specified date and time, but not necessarily at that exact time.
+     * - expires: (int) The expires argument defines an optional expiry time, either as seconds after task publish.
+     * - priority: (int) A number between 0 and 9, where 0 is the highest priority. (Supported by: redis)
+     * - utc: (bool) Timestamps are UTC.
+     * - eta: (int) The ETA (estimated time of arrival) in seconds; lets you set a specific date and time that is the earliest time at which your task will be executed.
+     * - errbacks: TBD
+     * - queue: Simple routing (name <-> name) is accomplished using the queue option.
+     * - queue_args
+     * - exchange: Name of exchange (or a kombu.entity.Exchange) to send the message to.
+     * 
      * @param array $options
      *
      * @return Task

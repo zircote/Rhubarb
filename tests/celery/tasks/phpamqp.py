@@ -10,11 +10,17 @@ celery.conf.update(
     CELERY_ROUTES={
         'phpamqp.subtract': {
             'queue': 'subtract_queue'
+        },
+        'phpamqp.add': {
+            'queue': 'celery'
         }
     },
     CELERY_QUEUES={
         "subtract_queue": {
             "exchange": "subtract_queue"
+        },
+        "celery": {
+            "exchange": "celery"
         }
     }
 )
