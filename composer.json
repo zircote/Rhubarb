@@ -15,10 +15,10 @@
         }
     ],
     "require": {
-        "rhumsaa/uuid": "2.1.0"
+        "rhumsaa/uuid": "~2.1"
     },
     "require-dev":{
-        "phpunit/phpunit": "3.7.19"
+        "phpunit/phpunit": "~3.7.19"
     },
     "suggest": {
         "zircote/amqp": "for php-amqp support and/or TLS AMQP support",
