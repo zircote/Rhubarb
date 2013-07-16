@@ -69,4 +69,39 @@ class AmqpTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2105, $res->get());
     }
 
+    /**
+     * @group queue_change
+     */
+    public function testAlternateQueue()
+    {
+        
+        if (!defined('CONNECTOR') || CONNECTOR != 'amqp') {
+            $this->markTestSkipped('skipped requires AMQP celery workers');
+        }
+        $options = array(
+            'broker' => array(
+                'type' => 'Amqp',
+                'options' => array(
+                    'exchange' => 'celery',
+                    'queue' => array(
+                        'arguments' => array('x-ha-policy' => array('S', 'all'))
+                    ),
+                    'uri' => 'amqp://guest:guest@localhost:5672//celery'
+                )
+            ),
+            'result_store' => array(
+                'type' => 'Amqp',
+                'options' => array(
+                    'exchange' => 'celery',
+                    'uri' => 'amqp://guest:guest@localhost:5672//celery'
+                )
+            )
+        );
+        $rhubarb = new \Rhubarb\Rhubarb($options);
+
+        $res = $rhubarb->sendTask('phpamqp.subtract', array(3, 2));
+        $res->delay(array('queue' => 'subtract_queue', 'exchange' => 'subtract_queue'));
+        $result = $res->get(2);
+        $this->assertEquals(1, $result);
+    }
 }

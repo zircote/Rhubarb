@@ -7,8 +7,22 @@ celery.conf.update(
     CELERY_RESULT_SERIALIZER='json',
     CELERY_TIMEZONE='America/Chicago',
     CELERY_ENABLE_UTC=True,
+    CELERY_ROUTES={
+        'phpamqp.subtract': {
+            'queue': 'subtract_queue'
+        }
+    },
+    CELERY_QUEUES={
+        "subtract_queue": {
+            "exchange": "subtract_queue"
+        }
+    }
 )
 
 @celery.task
 def add(x, y):
     return x + y
+
+@celery.task
+def subtract(x, y):
+    return x - y

@@ -23,26 +23,12 @@ namespace Rhubarb;
 use  Rhubarb\Exception\Exception;
 
 /**
+ * This is the primary class for the utilization of the Rhubarb implementation. It allows a user to create Task objects
+ * and subsequently submit these tasks to a celery cluster for asynchronous execution.
+ * 
  * @package     Rhubarb
  * @category    Rhubarb
- *
- * Use:
- *
- * $options = array(
- *  'broker' => array(
- *      'type' => 'Amqp',
- *      'options' => array(
- *          'uri' => 'amqp://celery:celery@localhost:5672/celery'
- *      )
- *  ),
- *  'result_store' => array(
- *      'type' => 'Amqp',
- *      'options' => array(
- *          'uri' => 'amqp://celery:celery@localhost:5672/celery_results'
- *      )
- *  )
- * );
- * $rhubarb = new \Rhubarb\Rhubarb($options);
+ * 
  */
 class Rhubarb
 {
@@ -69,7 +55,7 @@ class Rhubarb
     /**
      * @var string
      */
-    const RHUBARB_VERSION = '$Id$';
+    const RHUBARB_VERSION = '@package_version@';
     /**
      * @var string
      */
@@ -92,14 +78,23 @@ class Rhubarb
     const NS_SEPERATOR = '\\';
 
     /**
+     * The Result store object which provides the interface to receive the result messages from the celery cluster.
      * @var Broker\BrokerInterface
      */
     protected $resultBroker;
 
     /**
+     * This broker object is responsible for the delivery of tasks and arguments to the celery cluster for execution.
+     * 
      * @var Broker\BrokerInterface
      */
     protected $broker;
+    
+    /**
+     * The default configuration for the Rhubarb interface.
+     * 
+     * @var array
+     */
     protected $options
         = array(
             'broker'       => array(),
@@ -107,6 +102,27 @@ class Rhubarb
         );
 
     /**
+     * Accepts a single argument of configuration options as an array.
+     *
+     * <code>
+     *  <?php
+     *  $options = array(
+     *      'broker' => array(
+     *          'type' => 'Amqp',
+     *          'options' => array(
+     *              'uri' => 'amqp://celery:celery@localhost:5672/celery'
+     *          )
+     *      ),
+     *      'result_store' => array(
+     *          'type' => 'Amqp',
+     *          'options' => array(
+     *              'uri' => 'amqp://celery:celery@localhost:5672/celery_results'
+     *          )
+     *      )
+     *  );
+     *  $rhubarb = new \Rhubarb\Rhubarb($options);
+     * </code>
+     * 
      * @param array $options
      */
     public function __construct(array $options = array())
@@ -115,18 +131,20 @@ class Rhubarb
     }
 
     /**
-     * @param $options
+     * Accepts an array of options enabling the declaration and instantiation of the broker object.
+     * 
+     * @param array $options
      *
      * @return Rhubarb
      * @throws Exception
      */
-    public function setBroker($options)
+    public function setBroker(array $options)
     {
         $namespace = self::RHUBARB_BROKER_NAMESPACE;
         if (isset($options['class_namespace']) && $options['class_namespace']) {
             $namespace = $options['class_namespace'];
         }
-        $namespace = rtrim($namespace,self::NS_SEPERATOR);
+        $namespace = rtrim($namespace, self::NS_SEPERATOR);
         $brokerClass = $namespace . self::NS_SEPERATOR . $options['type'];
         if (!class_exists($brokerClass)) {
             throw new Exception(
@@ -140,6 +158,8 @@ class Rhubarb
     }
 
     /**
+     * Return the broker
+     * 
      * @return \Rhubarb\Broker\BrokerInterface
      */
     public function getBroker()
@@ -148,20 +168,28 @@ class Rhubarb
     }
 
     /**
-     * @param $options
+     * Instantiates the ResultStore object by using user supplied options. Supported options are as follows;
+     * 
+     * - <b>type:</b> the Class Type that will be created
+     * - <b>class_namespace:</b> over-ride the base namespace to a user namespace for custom result-broker classes
+     * - <b>options:</b> result_broker class specific options
+     * 
+     * @param array $options
      *
      * @return Rhubarb
      * @throws Exception
      */
-    public function setResultStore($options)
+    public function setResultStore(array $options)
     {
         if (!isset($options['type'])) {
             return $this;
         }
+        
         $namespace = self::RHUBARB_RESULTSTORE_NAMESPACE;
         if (isset($options['class_namespace'])&& $options['class_namespace']) {
             $namespace = $options['class_namespace'];
         }
+        
         $namespace = rtrim($namespace,self::NS_SEPERATOR);
         $resultStoreClass = $namespace . self::NS_SEPERATOR . $options['type'];
         if (!class_exists($resultStoreClass)) {
@@ -169,12 +197,15 @@ class Rhubarb
                 sprintf('ResultStore class [%s] unknown', $resultStoreClass)
             );
         }
+        
         $reflect = new \ReflectionClass($resultStoreClass);
         $this->resultBroker = $reflect->newInstanceArgs(array((array)@$options['options']));
         return $this;
     }
 
     /**
+     * Returns the result store object if created otherwise false.
+     * 
      * @return \Rhubarb\ResultStore\ResultStoreInterface
      */
     public function getResultStore()
@@ -186,18 +217,22 @@ class Rhubarb
     }
 
     /**
-     * @param $name
-     * @param $args
+     * Prepares a new Task object and returns it for delay utilization
+     * 
+     * @param string $name
+     * @param array $args
      *
      * @return Task
      */
-    public function sendTask($name, $args)
+    public function sendTask($name, array $args)
     {
         $task = new Task($name, $args, $this);
         return $task;
     }
 
     /**
+     * Set the Rhubarb options from an array
+     * 
      * @param array $options
      *
      * @return Rhubarb
@@ -211,6 +246,7 @@ class Rhubarb
     }
 
     /**
+     * Returns the options to the user
      * @return array
      */
     public function getOptions()
@@ -219,9 +255,28 @@ class Rhubarb
     }
 
     /**
-     * @param $name
-     * @param $value
+     * Returns the name options key
+     * 
+     * @param string $name
      *
+     * @return null|array|string|int
+     */
+    public function getOption($name)
+    {
+        $name = strtolower($name);
+        if (array_key_exists($name, $this->options)) {
+            return $this->options[$name];
+        }
+        return null;
+    }
+
+    /**
+     * Allows the implementer to specify a single top level option at runtime.
+     *
+     * @param string $name
+     * @param mixed $value
+     *
+     * @return self
      * @throws Exception
      */
     public function setOption($name, $value)
@@ -236,35 +291,7 @@ class Rhubarb
         } elseif ($name == 'broker') {
             $this->options['broker'] = $value;
             $this->setBroker($value);
-        } else {
-//            if (array_key_exists($name, $this->options)) {
-//                $this->_setOption($name, $value);
-//            }
         }
-    }
-
-    /**
-     * @param $name
-     *
-     * @return null
-     */
-    public function getOption($name)
-    {
-        $name = strtolower($name);
-        if (array_key_exists($name, $this->options)) {
-            return $this->options[$name];
-        }
-        return null;
-    }
-
-    /**
-     * @param $name
-     * @param $value
-     */
-    private function _setOption($name, $value)
-    {
-        if (is_string($name) && array_key_exists($name, $this->options)) {
-            $this->options[$name] = $value;
-        }
+        return $this;
     }
 }

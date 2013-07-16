@@ -158,6 +158,9 @@ class Task
         if (isset($options['errbacks'])) {
             $this->setCallbacks($options['errbacks']);
         }
+        if (isset($options['queue'])) {
+            $this->message->setQueue($options['queue']);
+        }
         if (isset($options['queue_args'])) {
             $this->message->setPropQueueArgs($options['queue_args']);
         }

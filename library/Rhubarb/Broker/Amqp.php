@@ -39,7 +39,6 @@ class Amqp extends AmqpConnector implements BrokerInterface
     public function publishTask(\Rhubarb\Task $task)
     {
         $channel = $this->getConnection()->channel();
-        
         $channel->queueDeclare(
             array(
                 'queue' => $task->message->getQueue(),
