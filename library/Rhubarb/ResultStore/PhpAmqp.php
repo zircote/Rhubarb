@@ -20,13 +20,13 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
-use Rhubarb\Exception\InvalidJsonException;
-use AMQP\Exception\ChannelException;
-use Rhubarb\Connector\Amqp as AmqpConnector;
-use AMQP\Connection;
+use Rhubarb\Connector\PhpAmqp as PhpAmqpConnector;
+use Rhubarb\Exception\Exception;
 use Rhubarb\Rhubarb;
 use Rhubarb\Task;
-use Rhubarb\Exception\CeleryConfigurationException;
+use Rhubarb\Exception\InvalidJsonException;
+use AMQPQueue;
+use AMQPChannel;
 
 /**
  * @package     Rhubarb
@@ -56,47 +56,36 @@ use Rhubarb\Exception\CeleryConfigurationException;
  * );
  * $rhubarb = new \Rhubarb\Rhubarb($options);
  */
-class Amqp extends AmqpConnector implements ResultStoreInterface
+class PhpAmqp extends PhpAmqpConnector implements ResultStoreInterface
 {
 
-    /**
-     * @param Task $task
-     * @return bool|mixed|null|string
-     * @throws InvalidJsonException
-     * @throws CeleryConfigurationException
-     */
     public function getTaskResult(Task $task)
     {
         $result = null;
-
         try {
-            $taskId = str_replace('-', '', $task->getId());
-            $channel = $this->getConnection()->channel();
-
-            if ($message = $channel->basicGet(array('queue' => $taskId))) {
-                $content_type = $message->get('content_type');
-
-                if ($content_type !== 'application/json') {
-                    throw new CeleryConfigurationException("Response's content-type is not application/json. Got: {$content_type}. Make sure, that CELERY_RESULT_SERIALIZER is set to \"json\"");
-                }
-
-                $messageBody = json_decode($message->body);
-
+            $taskId = str_replace('-','', $task->getId());
+            $connection = $this->getConnection();
+            $connection->connect();
+            if (!$connection->isConnected()) {
+                throw new Exception;
+            }
+            $channel  = new AMQPChannel($connection);
+            $queue = new AMQPQueue($channel);
+            $queue->setName($taskId);
+            $queue->setArgument('x-expires', 86400000);
+            $queue->declareQueue();
+            if ($message = $queue->get()) {
+                $messageBody = json_decode($message->getBody());
                 if (json_last_error()) {
                     throw new InvalidJsonException('Serialization Error, result is not valid JSON');
                 }
-
-                $channel->basicAck($message->delivery_info['delivery_tag']);
-                $channel->queueDelete(
-                    array('queue' => $taskId, 'if_unused' => true, 'if_empty' => true, 'no_wait' => true)
-                );
-                $channel->close();
-
+                $queue->ack($message->getDeliveryTag());
                 $result = $messageBody;
+                $queue->delete(AMQP_IFUNUSED|AMQP_IFEMPTY|AMQP_NOWAIT);
+                $connection->disconnect();
             }
-        } catch (ChannelException $e) {
+        } catch (\AMQPChannelException $e){
         }
-
         return $result;
     }
 }

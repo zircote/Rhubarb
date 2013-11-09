@@ -1,10 +1,37 @@
+---
+env:
+  global:
+    - secure: ! 'PBjr3GgU1sHC4yD4Fj0k5nMaX1+li8fw2WHVXR/crDDsgLLV+AgnfWvFCCJXnfvs7ikHG/OfP3IvrTsip6bhIybpfvzI/B3YqPuUgEtfds2mbo2iZVofdaedlTAB5R0wOeQRL5wmQdRNMetaBErhh87biZBX2HW3BLnm85dtH0c='
+  matrix:
+    - CONNECTOR=redis
+    - CONNECTOR=amqp
+    - CONNECTOR=mongo
+
+
+services:
+  - rabbitmq
+  - redis-server
+  - mongodb
+  
 language: php
 
 before_script:
-  - composer install
-
+  - mkdir -p ~/.composer
+  - printf '{"config":{"github-oauth":{"github.com":"%s"}}}' $GITHUB_OAUTH_TOKEN > ~/.composer/config.json
+  - if [ "$CONNECTOR" = "amqp" ]; then echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - if [ "$CONNECTOR" = "mongo" ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - composer require zircote/amqp:* predis/predis:*
+  - if [ "$CONNECTOR" = "amqp" ]; then sudo rabbitmqctl add_vhost /celery; fi
+  - if [ "$CONNECTOR" = "amqp" ]; then sudo rabbitmqctl set_permissions -p /celery guest ".*" ".*"  ".*"; fi
+  - sudo pip install celery celery-with-redis celery-with-mongodb
+  - if [ "$CONNECTOR" = "amqp" ]; then (sudo celery -A phpamqp worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi
+  - if [ "$CONNECTOR" = "redis" ]; then (sudo celery -A predis worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi
+  - if [ "$CONNECTOR" = "mongo" ]; then (sudo celery -A mongo worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi
+  - sleep 3
+  
 php:
   - 5.3
   - 5.4
-
+  - 5.5
+  
 script: phpunit -c tests/phpunit.xml

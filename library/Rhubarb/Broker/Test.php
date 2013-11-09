@@ -22,6 +22,15 @@ class Test implements BrokerInterface
 
     }
 
+    public function setOptions(array $options)
+    {
+        
+    }
+    
+    public function getOptions()
+    {
+        
+    }
     /**
      * @param \Exception $exception
      */
@@ -44,7 +53,9 @@ class Test implements BrokerInterface
      */
     public function publishTask(\Rhubarb\Task $task)
     {
-        $this->published = (string) $task;
+        
+        $taskArray = $task->toArray();
+        $this->published = json_encode($taskArray['body']);
     }
 
     public function getPublishedValues()

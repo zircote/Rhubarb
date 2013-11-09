@@ -5,6 +5,12 @@ namespace Rhubarb\Broker;
  * @package     Rhubarb
  * @category    Broker
  */
+use Rhubarb\Connector\Amqp as AmqpConnector;
+use Rhubarb\Tasks;
+use Rhubarb\Rhubarb;
+use AMQP\Message as AmqpMessage;
+use Rhubarb\Message;
+
 /**
  * @package     Rhubarb
  * @category    Broker
@@ -23,106 +29,55 @@ namespace Rhubarb\Broker;
  * );
  * $rhubarb = new \Rhubarb\Rhubarb($options);
  */
-class Amqp extends AbstractBroker
+class Amqp extends AmqpConnector implements BrokerInterface
 {
 
+
     /**
-     * @var \AMQP\Connection
+     * @param \Rhubarb\Task $task
      */
-    protected $connection;
-    /**
-     * @var array
-     */
-    protected $options = array(
-        'uri' => 'amqp://guest:guest@localhost:5672/',
-        'options' => array()
-    );
-
-    protected $message = null;
-
-    public function __construct(array $options = array())
-    {
-        $this->setOptions($options);
-    }
-
     public function publishTask(\Rhubarb\Task $task)
     {
-//        array('x-ha-policy' => array('S', 'nodes'),
-//              'x-ha-policy-params' => array('A', array('rabbit@host','fox@host'))
-//        );
-//        array('x-ha-policy' => array('S', 'all'));
         $channel = $this->getConnection()->channel();
         $channel->queueDeclare(
-            array('queue' => 'celery', 'durable' => true,'auto_delete' => false,
-                  'arguments' => array('x-ha-policy' => array('S', 'all')))
+            array(
+                'queue' => $task->message->getQueue(),
+                'durable' => true,
+                'auto_delete' => false,
+                'arguments' => $task->getMessage()->getPropQueueArgs()
+            )
         );
-        $channel->exchangeDeclare($this->exchange, 'direct',array('passive' => true, 'durable' => true));
-        $channel->queueBind('celery', $this->exchange, array('routing_key' => $task->getId()));
-        $msgProperties =  array('content_type' => \Rhubarb\Rhubarb::RHUBARB_CONTENT_TYPE);
+        
+        $channel->exchangeDeclare(
+            $task->message->getPropExchange(),
+            'direct',
+            array('passive' => true, 'durable' => true)
+        );
+        
+        $channel->queueBind(
+            $task->getMessage()->getQueue(),
+            $task->message->getPropExchange(),
+            array('routing_key' => $task->getId())
+        );
+        
+        $msgProperties =  array('content_type' => Rhubarb::RHUBARB_CONTENT_TYPE);
         if($task->getPriority()){
             $msgProperties['priority'] = $task->getPriority();
         }
 
+        $task->message->setPropBodyEncoding(null);
+        
+        $taskArray = $task->toArray();
+        
         $channel->basicPublish(
-            new \AMQP\Message((string) $task, $msgProperties),
-            array('exchange' => $this->exchange, 'routing_key' => $task->getId())
+            new AmqpMessage(json_encode($taskArray['body']), $msgProperties),
+            array(
+                'exchange' => $task->message->getPropExchange(),
+                'routing_key' => $task->getId()
+            )
         );
+        
         $channel->close();
         $channel = null;
-    }
-
-    /**
-     * @return \AMQP\Connection
-     */
-    public function getConnection()
-    {
-        if(!$this->connection){
-            $options = $this->getOptions();
-            $connection = new \AMQP\Connection($options['uri'], @$options['options'] ?: array());
-            $this->setConnection($connection);
-        }
-        return $this->connection;
-    }
-
-    /**
-     * @param \AMQP\Connection $connection
-     *
-     * @return AMQP
-     */
-    public function setConnection(\AMQP\Connection $connection)
-    {
-        $this->connection = $connection;
-        return $this;
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return AMQP
-     *
-     * @throws \UnexpectedValueException
-     */
-    public function setOptions(array $options)
-    {
-        if(isset($options['exchange'])){
-            $this->exchange = $options['exchange'];
-        }
-        if(isset($options['exchange'])){
-            if(!is_string($options['exchange'])){
-                throw new \UnexpectedValueException('exchange value is not a string, a string is required');
-            }
-            $this->exchange = $options['exchange'];
-            unset($options['exchange']);
-        }
-        if(isset($options['queue'])){
-            if(isset($options['queue']['arguments'])){
-                $this->queueOptions = $options['queue'];
-            }
-            unset($options['queue']);
-        }
-        $merged = array('uri' => isset($options['uri']) ? $options['uri'] : $this->options['uri']);
-        $merge['options'] = array_merge($this->options['options'], (array) @$options['options']);
-        $this->options = $merged;
-        return $this;
     }
 }

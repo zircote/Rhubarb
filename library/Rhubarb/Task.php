@@ -101,23 +101,10 @@ class Task
     protected $kwargs = array();
 
     /**
-     * @return array
+     * @var Message
      */
-    public function toArray()
-    {
-        return array(
-            'id'        => $this->id,
-            'task'      => $this->name,
-            'args'      => $this->args,
-            'kwargs'    => (object) $this->kwargs,
-            'expires'   => ($this->expires instanceof \DateTime) ? $this->expires->format(\DateTime::ISO8601) : null,
-            'utc'       => (bool) $this->utc,
-            'callbacks' => $this->callbacks,
-            'eta'       => ($this->eta instanceof \DateTime) ? $this->eta->format(\DateTime::ISO8601) : null,
-            'errbacks'  => $this->errbacks
-        );
-    }
-
+    public $message;
+    
     /**
      * @param string      $name
      * @param array       $args
@@ -129,14 +116,35 @@ class Task
         if(!$id){
            $id = (string) Uuid::uuid1();
         }
+        $rhubarbOptions = $rhubarb->getOptions();
         $this->setId($id)
             ->setArgs($args)
             ->setName($name)
             ->setRhubarb($rhubarb);
-
+        $this->message = new Message();
+        if (isset($rhubarbOptions['broker']['options']['queue']['name'])) {
+            $this->message->setQueue($rhubarbOptions['broker']['options']['queue']['name']);
+        }
+        if (isset($rhubarbOptions['broker']['options']['queue']['arguments'])) {
+            $this->message->setPropQueueArgs($rhubarbOptions['broker']['options']['queue']['arguments']);
+        }
+        if (isset($rhubarbOptions['broker']['options']['exchange'])) {
+            $this->message->setPropExchange($rhubarbOptions['broker']['options']['exchange']);
+        }
     }
 
     /**
+     * <b> Options:</b>
+     * - countdown: (int) The task is guaranteed to be executed at some time after the specified date and time, but not necessarily at that exact time.
+     * - expires: (int) The expires argument defines an optional expiry time, either as seconds after task publish.
+     * - priority: (int) A number between 0 and 9, where 0 is the highest priority. (Supported by: redis)
+     * - utc: (bool) Timestamps are UTC.
+     * - eta: (int) The ETA (estimated time of arrival) in seconds; lets you set a specific date and time that is the earliest time at which your task will be executed.
+     * - errbacks: TBD
+     * - queue: Simple routing (name <-> name) is accomplished using the queue option.
+     * - queue_args
+     * - exchange: Name of exchange (or a kombu.entity.Exchange) to send the message to.
+     * 
      * @param array $options
      *
      * @return Task
@@ -160,6 +168,17 @@ class Task
         }
         if (isset($options['errbacks'])) {
             $this->setCallbacks($options['errbacks']);
+        }
+        if (isset($options['queue'])) {
+            $this->message->setQueue($options['queue']);
+        }
+        if (isset($options['queue_args'])) {
+            $this->message->setPropQueueArgs($options['queue_args']);
+        }
+        if (isset($options['exchange'])) {
+            $this->message->setPropExchange($options['exchange']);
+        } else {
+            $this->message->setPropExchange(Rhubarb::RHUBARB_DEFAULT_EXCHANGE_NAME);
         }
         $this->taskSent = true;
         $this->getRhubarb()->getBroker()->publishTask($this);
@@ -536,6 +555,45 @@ class Task
     public function getTaskSent()
     {
         return $this->taskSent;
+    }
+    
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        $body = array(
+            'id'        => $this->id,
+            'task'      => $this->name,
+            'args'      => $this->args,
+            'kwargs'    => (object) $this->kwargs,
+            'expires'   => ($this->expires instanceof \DateTime) ? $this->expires->format(\DateTime::ISO8601) : null,
+            'utc'       => (bool) $this->utc,
+            'callbacks' => $this->callbacks,
+            'eta'       => ($this->eta instanceof \DateTime) ? $this->eta->format(\DateTime::ISO8601) : null,
+            'errbacks'  => $this->errbacks
+        );
+        $this->message->setBody($body);
+        return $this->message->toArray();
+    }
+
+    /**
+     *
+     * @param \Rhubarb\Message $message
+     * @return Task
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+        return $this;
+    }
+
+    /**
+     * @return \Rhubarb\Message
+     */
+    public function getMessage()
+    {
+        return $this->message;
     }
 }
 
