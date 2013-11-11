@@ -28,8 +28,20 @@ use Rhubarb\Connector\Predis as PredisConnector;
  */
 class Predis extends PredisConnector implements ResultStoreInterface
 {
+    /**
+     * @param \Rhubarb\Task $task
+     * @return bool|mixed|string
+     */
     public function getTaskResult(\Rhubarb\Task $task)
     {
-        return json_decode($this->getConnection()->get('celery-task-meta-' . $task->getId()));
+        $pubsub = $this->getConnection()->pubSub();
+        $pubsub->subscribe('celery-task-meta-' . $task->getId());
+        foreach ($pubsub as $message) {
+            if ($message->kind == 'message'){
+                $message = json_decode($message->payload);
+                $pubsub->unsubscribe();
+                return $message;
+            }
+        }
     }
 }
