@@ -20,6 +20,7 @@ before_script:
   - printf '{"config":{"github-oauth":{"github.com":"%s"}}}' $GITHUB_OAUTH_TOKEN > ~/.composer/config.json
   - if [ "$CONNECTOR" = "amqp" ]; then echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
   - if [ "$CONNECTOR" = "mongo" ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - sudo composer self-update
   - composer require zircote/amqp:* predis/predis:*
   - if [ "$CONNECTOR" = "amqp" ]; then sudo rabbitmqctl add_vhost /celery; fi
   - if [ "$CONNECTOR" = "amqp" ]; then sudo rabbitmqctl set_permissions -p /celery guest ".*" ".*"  ".*"; fi
