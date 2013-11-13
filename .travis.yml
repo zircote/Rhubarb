@@ -18,16 +18,17 @@ language: php
 before_script:
   - mkdir -p ~/.composer
   - printf '{"config":{"github-oauth":{"github.com":"%s"}}}' $GITHUB_OAUTH_TOKEN > ~/.composer/config.json
+  - sudo pip install celery
   - if [ "$CONNECTOR" = "amqp" ]; then echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
-  - if [ "$CONNECTOR" = "mongo" ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
-  - sudo composer self-update
-  - composer require zircote/amqp:* predis/predis:*
   - if [ "$CONNECTOR" = "amqp" ]; then sudo rabbitmqctl add_vhost /celery; fi
   - if [ "$CONNECTOR" = "amqp" ]; then sudo rabbitmqctl set_permissions -p /celery guest ".*" ".*"  ".*"; fi
-  - sudo pip install celery celery-with-redis celery-with-mongodb
-  - if [ "$CONNECTOR" = "amqp" ]; then (sudo celery -A phpamqp worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi
-  - if [ "$CONNECTOR" = "redis" ]; then (sudo celery -A predis worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi
-  - if [ "$CONNECTOR" = "mongo" ]; then (sudo celery -A mongo worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi
+  - if [ "$CONNECTOR" = "amqp" ]; then (celery -A phpamqp worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi 
+  - if [ "$CONNECTOR" = "mongo" ]; then echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - if [ "$CONNECTOR" = "mongo" ]; then sudo pip install celery-with-mongodb
+  - if [ "$CONNECTOR" = "mongo" ]; then (celery -A mongo worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi\
+  - if [ "$CONNECTOR" = "redis" ]; then zircote/amqp:* predis/predis:*
+  - if [ "$CONNECTOR" = "redis" ]; then sudo pip install celery-with-redis
+  - if [ "$CONNECTOR" = "redis" ]; then (celery -A predis worker --workdir=$(pwd)/tests/celery/tasks/ > /dev/null 2>&1 &); fi
   - sleep 3
   
 php:
