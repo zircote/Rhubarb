@@ -25,7 +25,7 @@ class Amqp implements ConnectorInterface
      * @var array
      */
     protected $options = array(
-        'uri' => 'amqp://guest:guest@localhost:5672/',
+        'uri' => 'amqp://guest:guest@localhost:5672/celery',
         'options' => array()
     );
 
@@ -67,7 +67,7 @@ class Amqp implements ConnectorInterface
             }
             unset($options['queue']);
         }
-        $merged = array('uri' => isset($options['uri']) ? $options['uri'] : $this->options['uri']);
+        $merged = array('uri' => isset($options['connection']) ? $options['connection'] : $this->options['uri']);
         $merge['options'] = array_merge($this->options['options'], (array) @$options['options']);
         $this->options = $merged;
         return $this;

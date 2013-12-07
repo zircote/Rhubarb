@@ -21,6 +21,7 @@ namespace RhubarbTests;
  * @category    Tests
  * @subcategory Task
  */
+use PHPUnit_Framework_Error_Deprecated;
 
 /**
  * @package     Rhubarb
@@ -49,14 +50,14 @@ class PhpAmqpTest  extends \PHPUnit_Framework_TestCase
                         'arguments' => array(
                         )
                     ),
-                    'uri' => 'amqp://guest:guest@localhost:5672/celery'
+                    'connection' => 'amqp://guest:guest@localhost:5672/celery'
                 )
             ),
             'result_store' => array(
                 'type' => 'PhpAmqp',
                 'options' => array(
                     'exchange' => 'celery',
-                    'uri' => 'amqp://guest:guest@localhost:5672/celery'
+                    'connection' => 'amqp://guest:guest@localhost:5672/celery'
                 )
             )
         );
@@ -79,6 +80,45 @@ class PhpAmqpTest  extends \PHPUnit_Framework_TestCase
     public function testAlternateQueue()
     {
         
+        if (!defined('CONNECTOR') || CONNECTOR != 'amqp') {
+            $this->markTestSkipped('skipped requires AMQP celery workers');
+        }
+        
+        $options = array(
+            'broker' => array(
+                'type' => 'PhpAmqp',
+                'options' => array(
+                    'exchange' => 'celery',
+                    'queue' => array(
+                        'arguments' => array(
+                        )
+                    ),
+                    'connection' => 'amqp://guest:guest@localhost:5672/celery'
+                )
+            ),
+            'result_store' => array(
+                'type' => 'PhpAmqp',
+                'options' => array(
+                    'exchange' => 'celery',
+                    'connection' => 'amqp://guest:guest@localhost:5672/celery'
+                )
+            )
+        );
+        $rhubarb = new \Rhubarb\Rhubarb($options);
+
+
+        $res = $rhubarb->sendTask('phpamqp.subtract', array(3, 2));
+        $res->delay(array('queue' => 'subtract_queue', 'exchange' => 'subtract_queue'));
+        $result = $res->get(2);
+        $this->assertEquals(1, $result);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Deprecated
+     */
+    public function testDeprecatedWarning()
+    {
+     
         if (!defined('CONNECTOR') || CONNECTOR != 'amqp') {
             $this->markTestSkipped('skipped requires AMQP celery workers');
         }

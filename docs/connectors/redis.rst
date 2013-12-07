@@ -33,7 +33,7 @@ predis/predis
             'type' => 'Predis',
             'options' => array(
                 'exchange' => 'celery',
-                'uri' => 'redis://localhost:6379/1'
+                'connection' => 'redis://localhost:6379/1'
             )
         ),
         'result_store' => array(

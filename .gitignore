@@ -3,4 +3,5 @@ LICENSE.txt
 README.txt
 demos/
 extras/documentation
-
+nohup.out
+*.dump

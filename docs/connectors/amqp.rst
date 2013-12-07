@@ -45,14 +45,14 @@ zircote/amqp
                       'x-ha-policy' => array('S', 'all')
                   )
               ),
-              'uri' => 'amqp://guest:guest@localhost:5672/celery'
+              'connection' => 'amqp://guest:guest@localhost:5672/celery'
           )
       ),
       'result_store' => array(
           'type' => 'Amqp',
           'options' => array(
               'exchange' => 'celery',
-              'uri' => 'amqp://guest:guest@localhost:5672/celery'
+              'connection' => 'amqp://guest:guest@localhost:5672/celery'
           )
       )
   );
@@ -96,14 +96,14 @@ ext-amqp
                   'arguments' => array(
                   )
               ),
-              'uri' => 'amqp://guest:guest@localhost:5672/celery'
+              'connection' => 'amqp://guest:guest@localhost:5672/celery'
           )
       ),
       'result_store' => array(
           'type' => 'PhpAmqp',
           'options' => array(
               'exchange' => 'celery',
-              'uri' => 'amqp://guest:guest@localhost:5672/celery'
+              'connection' => 'amqp://guest:guest@localhost:5672/celery'
           )
       )
   );

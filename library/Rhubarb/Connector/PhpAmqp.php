@@ -76,14 +76,30 @@ class PhpAmqp implements ConnectorInterface
             }
             unset($options['queue']);
         }
-        if (isset($options['uri'])) {
-            $uri = parse_url($options['uri']);
+        /*
+         * @deprecated use of $options['uri'] is deprecated in favor of $options['connection']
+         * this block is meant to provide reverse comparability 
+         */
+        if (!isset($options['connection']) && isset($options['uri'])) {
+            trigger_error(
+                'the use of `uri` in config options is no longer support for Rhubarb version >= 3.1',
+                E_USER_DEPRECATED
+            );
+            $options['connection'] = $options['uri'];
+            unset($options['connection']);
+        } elseif (isset($options['uri'])) {
+            trigger_error('as of Rhubarb version >= 3.1 `uri` config options is unsupported, you must not implement ' .
+                '`connection` and `uri` together', E_NOTICE);
+            unset($options['connection']);
+        }
+        if (isset($options['connection'])) {
+            $uri = parse_url($options['connection']);
             if (!isset($uri['port'])) {
                 $uri['scheme'] == 'amqps' ? 5673 : $this->options['connection']['port'];
             } else {
                 $port = isset($uri['port']) ? $uri['port'] : $this->options['connection']['port'];
             }
-            unset($options['uri']);
+            unset($options['connection']);
             $options['connection']['host'] = $uri['host'];
             $options['connection']['port'] = $port;
             $options['connection']['vhost'] = isset($uri['path']) ? $uri['path'] : $this->options['connection']['path'];

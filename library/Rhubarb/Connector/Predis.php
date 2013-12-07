@@ -26,7 +26,7 @@ class Predis
      * @var array
      */
     protected $options = array(
-        'uri' => 'redis://localhost:6379/0',
+        'connection' => 'redis://localhost:6379/0',
         'options' => array()
     );
 
@@ -71,10 +71,9 @@ class Predis
             }
             unset($options['queue']);
         }
-
-        if (isset($options['uri'])) {
-            $uri = parse_url($options['uri']);
-            unset($options['uri']);
+        if (isset($options['connection'])) {
+            $uri = parse_url($options['connection']);
+            unset($options['connection']);
             if (isset($uri['scheme']) && $uri['scheme'] === 'redis') {
                 $uri['scheme'] = $uri['scheme'] == 'unix' ? : 'tcp';
             }
@@ -99,8 +98,8 @@ class Predis
     {
         if (!$this->connection) {
             $options = $this->getOptions();
-            $options['uri'] = preg_replace('/redis\:/', 'tcp:', $options['uri']);
-            $connection = new Client($options['uri'], @$options['options'] ? : array());
+            $options['connection'] = preg_replace('/redis\:/', 'tcp:', $options['connection']);
+            $connection = new Client($options['connection'], @$options['options'] ? : array());
             $this->setConnection($connection);
         }
         return $this->connection;
