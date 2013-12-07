@@ -47,14 +47,14 @@ class AmqpTest extends \PHPUnit_Framework_TestCase
                     'queue' => array(
                         'arguments' => array('x-ha-policy' => array('S', 'all'))
                     ),
-                    'uri' => 'amqp://guest:guest@localhost:5672//celery'
+                    'uri' => 'amqp://guest:guest@localhost:5672/celery'
                 )
             ),
             'result_store' => array(
                 'type' => 'Amqp',
                 'options' => array(
                     'exchange' => 'celery',
-                    'uri' => 'amqp://guest:guest@localhost:5672//celery'
+                    'uri' => 'amqp://guest:guest@localhost:5672/celery'
                 )
             )
         );
@@ -86,14 +86,14 @@ class AmqpTest extends \PHPUnit_Framework_TestCase
                     'queue' => array(
                         'arguments' => array('x-ha-policy' => array('S', 'all'))
                     ),
-                    'uri' => 'amqp://guest:guest@localhost:5672//celery'
+                    'uri' => 'amqp://guest:guest@localhost:5672/celery'
                 )
             ),
             'result_store' => array(
                 'type' => 'Amqp',
                 'options' => array(
                     'exchange' => 'celery',
-                    'uri' => 'amqp://guest:guest@localhost:5672//celery'
+                    'uri' => 'amqp://guest:guest@localhost:5672/celery'
                 )
             )
         );
