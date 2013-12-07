@@ -24,8 +24,7 @@
     "suggest": {
         "zircote/amqp": "for php-amqp support and/or TLS AMQP support",
         "ext-amqp": "for rabbitmq-c/pecl-amqp support",
-        "predis/predis": "for redis broker support",
-        "ext-mongo": "for MongoDB broker/result store support"
+        "predis/predis": "for redis broker support"
     },
     "autoload":{
         "psr-0":{
