@@ -1,4 +1,4 @@
-<phpunit bootstrap="./bootstrap.php"
+<phpunit bootstrap="tests/bootstrap.php"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="false"
@@ -21,10 +21,10 @@
             <directory suffix=".php">../</directory>
         </blacklist>
         <whitelist>
-            <directory suffix=".php">../library/Rhubarb</directory>
+            <directory suffix=".php">library/Rhubarb</directory>
             <exclude>
                 <directory suffix=".phtml">../</directory>
-                <file>./bootstrap.php</file>
+                <file>tests/bootstrap.php</file>
             </exclude>
         </whitelist>
     </filter>
