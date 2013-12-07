@@ -1,7 +1,7 @@
 Rhubarb
 =======
  - [![Master Build Status](https://secure.travis-ci.org/zircote/Rhubarb.png?branch=master)](http://travis-ci.org/zircote/Rhubarb) `master`
- - [![0.2.x Development Build Status](https://api.travis-ci.org/zircote/Rhubarb.png?branch=0.2)](http://travis-ci.org/zircote/Rhubarb) `0.2.*@dev`
+ - [![3.1.x Development Build Status](https://api.travis-ci.org/zircote/Rhubarb.png?branch=3.1)](http://travis-ci.org/zircote/Rhubarb) `3.1.*@dev`
 
 A PHP Job Submission library for [Celery](http://celeryproject.org/)
 

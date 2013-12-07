@@ -2,16 +2,16 @@
 namespace Rhubarb\Connector;
 
 /**
- * @package     
- * @category    
- * @subcategory 
+ * @package
+ * @category
+ * @subcategory
  */
 use AMQPConnection;
 
 /**
- * @package     
- * @category    
- * @subcategory 
+ * @package
+ * @category
+ * @subcategory
  */
 class PhpAmqp implements ConnectorInterface
 {
@@ -33,7 +33,7 @@ class PhpAmqp implements ConnectorInterface
         ),
         'options' => array()
     );
-    
+
     /**
      * @param array $options
      */
@@ -49,7 +49,7 @@ class PhpAmqp implements ConnectorInterface
     {
         return $this->options;
     }
-    
+
 
     /**
      * @param array $options
@@ -87,13 +87,15 @@ class PhpAmqp implements ConnectorInterface
             $options['connection']['host'] = $uri['host'];
             $options['connection']['port'] = $port;
             $options['connection']['vhost'] = isset($uri['path']) ? $uri['path'] : $this->options['connection']['path'];
+            /* I don't like it but to ensure that all parties are happy this is necasary */
+            $options['connection']['vhost'] = preg_replace('#^/#', null, $options['connection']['vhost']);
             $options['connection']['login'] = isset($uri['username']) ? $uri['username'] : $this->options['connection']['login'];
             $options['connection']['password'] = isset($uri['pass']) ? $uri['pass'] : $this->options['connection']['password'];
             $this->options['connection'] = $options['connection'];
         }
         return $this;
     }
-    
+
 
     /**
      * @return AMQPConnection
