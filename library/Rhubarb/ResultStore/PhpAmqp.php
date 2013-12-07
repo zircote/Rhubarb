@@ -72,7 +72,6 @@ class PhpAmqp extends PhpAmqpConnector implements ResultStoreInterface
             $channel  = new AMQPChannel($connection);
             $queue = new AMQPQueue($channel);
             $queue->setName($taskId);
-            $queue->setFlags(AMQP_DURABLE|AMQP_AUTODELETE);
             $queue->setArgument('x-expires', 86400000);
             $queue->declareQueue();
             if ($message = $queue->get()) {
