@@ -55,7 +55,7 @@ class Test implements BrokerInterface
     {
         
         $taskArray = $task->toArray();
-        $this->published = json_encode($taskArray['body']);
+        $this->published = json_encode($taskArray);
     }
 
     public function getPublishedValues()

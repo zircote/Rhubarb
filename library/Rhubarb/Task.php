@@ -146,11 +146,14 @@ class Task
      * - exchange: Name of exchange (or a kombu.entity.Exchange) to send the message to.
      * 
      * @param array $options
-     *
+     * @throws \RuntimeException
      * @return Task
      */
     public function delay($options = array())
     {
+        if ($this->getTaskSent()) {
+            throw new \RuntimeException('Task has been sent');
+        }
         if (isset($options['countdown'])) {
             $this->setCountdown($options['countdown']);
         }
@@ -159,6 +162,16 @@ class Task
         }
         if (isset($options['priority'])) {
             $this->setPriority($options['priority']);
+            $this->getMessage()->setPropPriority($options['priority']);
+        }
+        if (isset($options['no_ack'])) {
+            $this->getMessage()->setPropNoAck($options['no_ack']);
+        }
+        if (isset($options['delivery_tag'])) {
+            $this->getMessage()->setPropDeliveryTag($options['delivery_tag']);
+        }
+        if (isset($options['delivery_mode'])) {
+            $this->getMessage()->setPropDeliveryMode($options['delivery_mode']);
         }
         if (isset($options['utc'])) {
             $this->setUtc((bool)$options['utc']);
@@ -175,12 +188,15 @@ class Task
         if (isset($options['queue_args'])) {
             $this->message->setPropQueueArgs($options['queue_args']);
         }
+        if (isset($options['routing_key'])) {
+            $this->message->setPropRoutingKey($options['routing_key']);
+        }
         if (isset($options['exchange'])) {
             $this->message->setPropExchange($options['exchange']);
         } else {
             $this->message->setPropExchange(Rhubarb::RHUBARB_DEFAULT_EXCHANGE_NAME);
         }
-        $this->taskSent = true;
+        $this->setTaskSent(true);
         $this->getRhubarb()->getBroker()->publishTask($this);
         return $this;
     }
@@ -472,15 +488,6 @@ class Task
     }
 
     /**
-     * @return string
-     */
-    public function __toString()
-    {
-        $encodedJson = json_encode($this->toArray());
-        return (string)$encodedJson;
-    }
-
-    /**
      *
      * @param int $countdown
      *
@@ -573,8 +580,23 @@ class Task
             'eta'       => ($this->eta instanceof \DateTime) ? $this->eta->format(\DateTime::ISO8601) : null,
             'errbacks'  => $this->errbacks
         );
-        $this->message->setBody($body);
-        return $this->message->toArray();
+        $encoding = ($this->getMessage()->getBodyEncoding() || $this->getMessage()->getContentEncoding()); 
+        switch ($encoding) {
+            case Rhubarb::CONTENT_ENCODING_BASE64:
+                $body = base64_encode(json_encode($body, JSON_UNESCAPED_SLASHES));
+                break;
+        }
+        $this->getMessage()->setBody($body);
+        return $body;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        $encodedJson = json_encode($this->toArray(), JSON_UNESCAPED_SLASHES);
+        return (string)$encodedJson;
     }
 
     /**

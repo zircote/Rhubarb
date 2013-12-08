@@ -35,16 +35,6 @@ use Rhumsaa\Uuid\Uuid;
  */
 class Message 
 {
-    const BODY_ENCODING_BASE64 = 'base64';
-    
-    /**
-     * @return array
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
     /**
      * @var array
      */
@@ -53,10 +43,13 @@ class Message
             'body'             => null,
             'headers'          => array(),
             'content-type'     => Rhubarb::RHUBARB_CONTENT_TYPE,
+            'content-encoding' => Rhubarb::RHUBARB_DEFAULT_CONTENT_ENCODING,
             'properties'       => array(
+                'correlation_id'    => null,
+                'reply_to'          => null,
+                'body_encoding'     => null,
                 'exclusive'         => null,
                 'name'              => Rhubarb::RHUBARB_DEFAULT_TASK_QUEUE,
-                'body_encoding'     => null,
                 'delivery_info'     => array(
                     'priority'    => 0,
                     'routing_key' => null,
@@ -69,9 +62,8 @@ class Message
                 'queue_arguments'   => array(),
                 'binding_arguments' => array(),
                 'delivery_tag'      => null,
-                'auto_delete'       => null,
-            ),
-            'content-encoding' => Rhubarb::RHUBARB_DEFAULT_CONTENT_ENCODING
+                'auto_delete'       => false,
+            )
         );
 
     /**
@@ -81,6 +73,22 @@ class Message
 
     public function __construct()
     {
+    }
+    public function setReplyTo($reply_to)
+    {
+        $this->message['properties']['reply_to'] = $reply_to;
+    }
+    public function getReplyTo()
+    {
+        return $this->message['properties']['reply_to'];
+    }
+    public function setCorrelationId($correlation_id)
+    {
+        $this->message['properties']['correlation_id'] = $correlation_id;
+    }
+    public function getCorrelationId()
+    {
+        return $this->message['properties']['correlation_id'];
     }
     /**
      *
@@ -282,24 +290,6 @@ class Message
     }
 
     /**
-     * @param string $propBodyEncoding
-     * @return self
-     */
-    public function setPropBodyEncoding($propBodyEncoding)
-    {
-        $this->message['properties']['body_encoding'] = $propBodyEncoding;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPropBodyEncoding()
-    {
-        return $this->message['properties']['body_encoding'];
-    }
-
-    /**
      * @param array $propBindingArgs
      * @return self
      */
@@ -393,6 +383,24 @@ class Message
      * @param string $contentEncoding
      * @return self
      */
+    public function setBodyEncoding($contentEncoding)
+    {
+        $this->message['properties']['body_encoding'] = $contentEncoding;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBodyEncoding()
+    {
+        return $this->message['properties']['body_encoding'];
+    }
+
+    /**
+     * @param string $contentEncoding
+     * @return self
+     */
     public function setContentEncoding($contentEncoding)
     {
         $this->message['content-encoding'] = $contentEncoding;
@@ -430,11 +438,9 @@ class Message
      */
     public function toArray()
     {
-       $message = $this->message;
-        switch (strtolower($message['properties']['body_encoding'])) {
-            case self::BODY_ENCODING_BASE64:
-                $message['body'] = base64_encode(json_encode($message['body']));
-                break;
+        $message = $this->message;
+        if (isset($message['properties'])) {
+            $message['properties'] = array_filter($message['properties']);
         }
         return $message;
     }
@@ -445,6 +451,6 @@ class Message
     public function __toString()
     {
         $message = $this->toArray();
-        return json_encode($message);
+        return json_encode($message, JSON_UNESCAPED_SLASHES);
     }
 }

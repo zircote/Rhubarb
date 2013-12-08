@@ -43,11 +43,15 @@ class Rhubarb
     /**
      * @var string
      */
-    const RHUBARB_DEFAULT_CONTENT_ENCODING = 'utf-8';
+    const CONTENT_ENCODING_BASE64 = 'base64';
     /**
      * @var string
      */
-    const RHUBARB_DEFAULT_BODY_ENCODING = 'base64';
+    const CONTENT_ENCODING_UTF8 = 'utf-8';
+    /**
+     * @var string
+     */
+    const RHUBARB_DEFAULT_CONTENT_ENCODING = null;
     /**
      * @var string
      */

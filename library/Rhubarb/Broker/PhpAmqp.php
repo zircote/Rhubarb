@@ -64,16 +64,16 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
         $queue->bind($task->message->getPropExchange(), $task->getId());
         
         $msgProperties = array(
-            'content_type' => $task->message->getContentType()
+            'content_type' => $task->getMessage()->getContentType(),
+            'content_encoding' => $task->getMessage()->getContentEncoding(),
+            'encoding' => $task->getMessage()->getContentEncoding()
         );
         
         if ($task->getPriority()) {
             $msgProperties['priority'] = $task->getPriority();
         }
-        $task->message->setPropBodyEncoding(null);
-        $taskArray = $task->toArray();
         $exchange->publish(
-            json_encode($taskArray['body']), 
+            (string) $task, 
             $task->getId(), 
             AMQP_NOPARAM,
             $msgProperties

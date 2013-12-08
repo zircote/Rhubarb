@@ -1,0 +1,18 @@
+{
+    "body": "eyJleHBpcmVzIjogbnVsbCwgInV0YyI6IHRydWUsICJhcmdzIjogWzIsIDJdLCAiY2hvcmQiOiBudWxsLCAiY2FsbGJhY2tzIjogbnVsbCwgImVycmJhY2tzIjogbnVsbCwgInRhc2tzZXQiOiBudWxsLCAiaWQiOiAiNjJlODMzMTYtMTg1Ny00N2ZmLTkyNzYtNmQ5MzRiZjhhNjBlIiwgInJldHJpZXMiOiAwLCAidGFzayI6ICJwcmVkaXMuYWRkIiwgInRpbWVsaW1pdCI6IFtudWxsLCBudWxsXSwgImV0YSI6IG51bGwsICJrd2FyZ3MiOiB7fX0=",
+    "headers": {},
+    "content-type": "application/json",
+    "properties": {
+        "body_encoding": "base64",
+        "correlation_id": "62e83316-1857-47ff-9276-6d934bf8a60e",
+        "reply_to": "d6422edb-425a-3b86-86d8-fb1112a10a54",
+        "delivery_info": {
+            "priority": 0,
+            "routing_key": "celery",
+            "exchange": "celery"
+        },
+        "delivery_mode": 2,
+        "delivery_tag": 2
+    },
+    "content-encoding": "utf-8"
+}

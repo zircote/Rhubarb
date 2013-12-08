@@ -1,0 +1,18 @@
+{
+    "body": "ddd==",
+    "headers": [],
+    "content_type": "application/json",
+    "properties": {
+        "correlation_id": "6cca25f2-5fa8-11e3-904c-e4ce8f2261f0",
+        "reply_to": "6cca25f2-5fa8-11e3-904c-e4ce8f2261f0",
+        "body_encoding": "base64",
+        "name": "celery",
+        "delivery_info": {
+            "priority": 0,
+            "routing_key": "celery",
+            "exchange": "celery"
+        },
+        "durable": true,
+        "delivery_mode": 2,
+        "delivery_tag": 2
+    }}

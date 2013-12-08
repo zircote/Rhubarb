@@ -38,42 +38,42 @@ class Amqp extends AmqpConnector implements BrokerInterface
      */
     public function publishTask(\Rhubarb\Task $task)
     {
+        if (!$task->getMessage()->getPropRoutingKey()) {
+            $task->getMessage()->setPropRoutingKey($task->getId());
+        }
         $channel = $this->getConnection()->channel();
         $channel->queueDeclare(
             array(
-                'queue' => $task->message->getQueue(),
-                'durable' => true,
-                'auto_delete' => false,
+                'queue' => $task->getMessage()->getQueue(),
+                'durable' => $task->getMessage()->getPropDurable(),
+                'auto_delete' => $task->getMessage()->getPropAutoDelete(),
                 'arguments' => $task->getMessage()->getPropQueueArgs()
             )
         );
         
         $channel->exchangeDeclare(
-            $task->message->getPropExchange(),
+            $task->getMessage()->getPropExchange(),
             'direct',
             array('passive' => true, 'durable' => true)
         );
         
         $channel->queueBind(
             $task->getMessage()->getQueue(),
-            $task->message->getPropExchange(),
-            array('routing_key' => $task->getId())
+            $task->getMessage()->getPropExchange(),
+            array('routing_key' => $task->getMessage()->getPropRoutingKey())
         );
         
-        $msgProperties =  array('content_type' => Rhubarb::RHUBARB_CONTENT_TYPE);
-        if($task->getPriority()){
-            $msgProperties['priority'] = $task->getPriority();
-        }
+        $msgProperties =  array(
+            'content_type' => Rhubarb::RHUBARB_CONTENT_TYPE,
+            'content_encoding' => $task->getMessage()->getContentEncoding(),
+            'priority' => $task->getMessage()->getPropPriority()
+        );
 
-        $task->message->setPropBodyEncoding(null);
-        
-        $taskArray = $task->toArray();
-        
         $channel->basicPublish(
-            new AmqpMessage(json_encode($taskArray['body']), $msgProperties),
+            new AmqpMessage((string) $task, $msgProperties),
             array(
-                'exchange' => $task->message->getPropExchange(),
-                'routing_key' => $task->getId()
+                'exchange' => $task->getMessage()->getPropExchange(),
+                'routing_key' => $task->getMessage()->getPropRoutingKey()
             )
         );
         
