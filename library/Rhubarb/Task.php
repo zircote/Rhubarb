@@ -583,7 +583,7 @@ class Task
         $encoding = ($this->getMessage()->getBodyEncoding() || $this->getMessage()->getContentEncoding()); 
         switch ($encoding) {
             case Rhubarb::CONTENT_ENCODING_BASE64:
-                $body = base64_encode(json_encode($body, JSON_UNESCAPED_SLASHES));
+                $body = base64_encode(json_encode($body));
                 break;
         }
         $this->getMessage()->setBody($body);
@@ -595,7 +595,7 @@ class Task
      */
     public function __toString()
     {
-        $encodedJson = json_encode($this->toArray(), JSON_UNESCAPED_SLASHES);
+        $encodedJson = json_encode($this->toArray());
         return (string)$encodedJson;
     }
 

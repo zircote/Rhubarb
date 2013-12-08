@@ -451,6 +451,6 @@ class Message
     public function __toString()
     {
         $message = $this->toArray();
-        return json_encode($message, JSON_UNESCAPED_SLASHES);
+        return json_encode($message);
     }
 }
