@@ -121,7 +121,7 @@ class Task
             ->setArgs($args)
             ->setName($name)
             ->setRhubarb($rhubarb);
-        $this->message = new Message();
+        $this->message = new Message($this);
         if (isset($rhubarbOptions['broker']['options']['queue']['name'])) {
             $this->message->setQueue($rhubarbOptions['broker']['options']['queue']['name']);
         }

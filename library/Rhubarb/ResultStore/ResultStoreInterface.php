@@ -20,6 +20,8 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
+use \Rhubarb\Task;
+
 /**
  * @package     Rhubarb
  * @category    ResultStore
@@ -33,5 +35,5 @@ interface ResultStoreInterface
      *
      * @return string|bool
      */
-    public function getTaskResult(\Rhubarb\Task $task);
+    public function getTaskResult(Task $task);
 }

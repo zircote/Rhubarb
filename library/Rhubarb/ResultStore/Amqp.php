@@ -21,11 +21,11 @@ namespace Rhubarb\ResultStore;
  * @category    ResultStore
  */
 use Rhubarb\Exception\InvalidJsonException;
+use AMQP\Connection;
 use AMQP\Exception\ChannelException;
 use Rhubarb\Connector\Amqp as AmqpConnector;
-use AMQP\Connection;
-use Rhubarb\Rhubarb;
 use Rhubarb\Task;
+use Rhubarb\Message;
 use Rhubarb\Exception\CeleryConfigurationException;
 
 /**

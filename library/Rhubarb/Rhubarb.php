@@ -25,13 +25,14 @@ use  Rhubarb\Exception\Exception;
 /**
  * This is the primary class for the utilization of the Rhubarb implementation. It allows a user to create Task objects
  * and subsequently submit these tasks to a celery cluster for asynchronous execution.
- * 
+ *
  * @package     Rhubarb
  * @category    Rhubarb
- * 
+ *
  */
 class Rhubarb
 {
+    const VERSION = '3.2-dev';
     /**
      * @var string
      */
@@ -89,20 +90,38 @@ class Rhubarb
 
     /**
      * This broker object is responsible for the delivery of tasks and arguments to the celery cluster for execution.
-     * 
+     *
      * @var Broker\BrokerInterface
      */
     protected $broker;
-    
+
+    /**
+     * @var \Logger
+     */
+    protected $logger;
+
     /**
      * The default configuration for the Rhubarb interface.
-     * 
+     *
      * @var array
      */
     protected $options
         = array(
-            'broker'       => array(),
-            'result_store' => array()
+            'broker' => array(),
+            'result_store' => array(),
+            'logger' => array(
+                'loggers' => array(
+                    'dev' => array(
+                        'level' => 'DEBUG',
+                        'appenders' => array(__NAMESPACE__),
+                    ),
+                ),
+                'appenders' => array(
+                    __NAMESPACE__ => array(
+                        'class' => 'LoggerAppenderNull'
+                    )
+                )
+            )
         );
 
     /**
@@ -126,17 +145,26 @@ class Rhubarb
      *  );
      *  $rhubarb = new \Rhubarb\Rhubarb($options);
      * </code>
-     * 
+     *
      * @param array $options
      */
     public function __construct(array $options = array())
     {
         $this->setOptions($options);
+        \Logger::configure($this->getOption('logger'));
+    }
+
+    /**
+     * @return \Logger
+     */
+    public function getLogger()
+    {
+        return \Logger::getLogger(__NAMESPACE__);
     }
 
     /**
      * Accepts an array of options enabling the declaration and instantiation of the broker object.
-     * 
+     *
      * @param array $options
      *
      * @return Rhubarb
@@ -156,14 +184,14 @@ class Rhubarb
             );
         }
         $reflect = new \ReflectionClass($brokerClass);
-        $this->broker = $reflect->newInstanceArgs(array((array)@$options['options']));
+        $this->broker = $reflect->newInstanceArgs($this, array((array)@$options['options']));
 
         return $this;
     }
 
     /**
      * Return the broker
-     * 
+     *
      * @return \Rhubarb\Broker\BrokerInterface
      */
     public function getBroker()
@@ -173,11 +201,11 @@ class Rhubarb
 
     /**
      * Instantiates the ResultStore object by using user supplied options. Supported options are as follows;
-     * 
+     *
      * - <b>type:</b> the Class Type that will be created
      * - <b>class_namespace:</b> over-ride the base namespace to a user namespace for custom result-broker classes
      * - <b>options:</b> result_broker class specific options
-     * 
+     *
      * @param array $options
      *
      * @return Rhubarb
@@ -188,28 +216,28 @@ class Rhubarb
         if (!isset($options['type'])) {
             return $this;
         }
-        
+
         $namespace = self::RHUBARB_RESULTSTORE_NAMESPACE;
-        if (isset($options['class_namespace'])&& $options['class_namespace']) {
+        if (isset($options['class_namespace']) && $options['class_namespace']) {
             $namespace = $options['class_namespace'];
         }
-        
-        $namespace = rtrim($namespace,self::NS_SEPERATOR);
+
+        $namespace = rtrim($namespace, self::NS_SEPERATOR);
         $resultStoreClass = $namespace . self::NS_SEPERATOR . $options['type'];
         if (!class_exists($resultStoreClass)) {
             throw new Exception(
                 sprintf('ResultStore class [%s] unknown', $resultStoreClass)
             );
         }
-        
+
         $reflect = new \ReflectionClass($resultStoreClass);
-        $this->resultBroker = $reflect->newInstanceArgs(array((array)@$options['options']));
+        $this->resultBroker = $reflect->newInstanceArgs($this, array((array)@$options['options']));
         return $this;
     }
 
     /**
      * Returns the result store object if created otherwise false.
-     * 
+     *
      * @return \Rhubarb\ResultStore\ResultStoreInterface
      */
     public function getResultStore()
@@ -222,7 +250,7 @@ class Rhubarb
 
     /**
      * Prepares a new Task object and returns it for delay utilization
-     * 
+     *
      * @param string $name
      * @param array $args
      *
@@ -236,7 +264,7 @@ class Rhubarb
 
     /**
      * Set the Rhubarb options from an array
-     * 
+     *
      * @param array $options
      *
      * @return Rhubarb
@@ -260,7 +288,7 @@ class Rhubarb
 
     /**
      * Returns the name options key
-     * 
+     *
      * @param string $name
      *
      * @return null|array|string|int
@@ -295,6 +323,8 @@ class Rhubarb
         } elseif ($name == 'broker') {
             $this->options['broker'] = $value;
             $this->setBroker($value);
+        } elseif ($name == 'logger') {
+            $this->options['logger'] = $value;
         }
         return $this;
     }

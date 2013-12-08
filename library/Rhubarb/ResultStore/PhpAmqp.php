@@ -22,8 +22,8 @@ namespace Rhubarb\ResultStore;
  */
 use Rhubarb\Connector\PhpAmqp as PhpAmqpConnector;
 use Rhubarb\Exception\Exception;
-use Rhubarb\Rhubarb;
 use Rhubarb\Task;
+use Rhubarb\Message;
 use Rhubarb\Exception\InvalidJsonException;
 use AMQPQueue;
 use AMQPChannel;

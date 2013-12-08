@@ -21,6 +21,7 @@ namespace Rhubarb\ResultStore;
  * @category    ResultStore
  */
 use Rhubarb\Connector\Predis as PredisConnector;
+use Rhubarb\Task;
 
 /**
  * @package     Rhubarb
@@ -32,7 +33,7 @@ class Predis extends PredisConnector implements ResultStoreInterface
      * @param \Rhubarb\Task $task
      * @return bool|mixed|string
      */
-    public function getTaskResult(\Rhubarb\Task $task)
+    public function getTaskResult(Task $task)
     {
         $pubsub = $this->getConnection()->pubSub();
         $pubsub->subscribe('celery-task-meta-' . $task->getId());

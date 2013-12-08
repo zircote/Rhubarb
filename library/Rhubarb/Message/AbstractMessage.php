@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Broker;
+namespace Rhubarb\Message;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
@@ -17,29 +17,17 @@ namespace Rhubarb\Broker;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * 
- * @package     Rhubarb
- * @category    Broker
+ * @package     
+ * @category    
+ * @subcategory 
  */
 /**
- * @package     Rhubarb
- * @category    Broker
+ * @package     
+ * @category    
+ * @subcategory 
  */
-abstract class AbstractBroker implements BrokerInterface
+class AbstractMessage 
 {
-    protected $options = array();
 
-    /**
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return AMQP
-     */
-    abstract public function setOptions(array $options);
 }
+ 
