@@ -3,7 +3,7 @@ namespace Rhubarb\Broker;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ namespace Rhubarb\Broker;
  * @package     Rhubarb
  * @category    Broker
  */
+use Rhubarb\Message\Message;
+use Rhubarb\Task\AsyncResult;
+
 /**
  * @package     Rhubarb
  * @category    Broker
@@ -28,31 +31,6 @@ class Test implements BrokerInterface
 {
     protected $exception;
     protected $published;
-
-    /**
-     * @param array $options
-     */
-    public function __construct(array $options)
-    {
-
-    }
-
-    public function setOptions(array $options)
-    {
-        
-    }
-    
-    public function getOptions()
-    {
-        
-    }
-    /**
-     * @param \Exception $exception
-     */
-    public function throwExceptionOnNextRequest(\Exception $exception)
-    {
-        $this->exception = $exception;
-    }
 
     /**
      *
@@ -64,17 +42,32 @@ class Test implements BrokerInterface
     }
 
     /**
-     * @param \Rhubarb\Task $task
+     * @param \Rhubarb\Message\Message $message
+     * @return AsyncResult
      */
-    public function publishTask(\Rhubarb\Task $task)
+    public function publishTask(Message  $message)
     {
-        
-        $taskArray = $task->toArray();
-        $this->published = json_encode($taskArray);
     }
 
     public function getPublishedValues()
     {
         return $this->published;
     }
+
+    /**
+     * @return array
+     */
+    public function getHeaders()
+    {
+        // TODO: Implement getHeaders() method.
+    }
+
+    /**
+     * @return array
+     */
+    public function getProperties()
+    {
+        // TODO: Implement getProperties() method.
+    }
+
 }

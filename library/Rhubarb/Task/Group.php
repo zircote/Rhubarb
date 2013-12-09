@@ -1,9 +1,9 @@
 <?php
-namespace Rhubarb\Message;
+namespace Rhubarb\Task;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ namespace Rhubarb\Message;
  * @category    
  * @subcategory 
  */
-class Group {
+class Group
+{
 
 }
  

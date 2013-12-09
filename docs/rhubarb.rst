@@ -5,7 +5,7 @@ Rhubarb
     
     Use of Rhubarb is outlined as follows.
 
-**Send Task and Wait For Result**
+**Send AsyncResult and Wait For Result**
  
 .. code-block:: php
  
@@ -21,7 +21,7 @@ Rhubarb
         $log->error('task failed to return in default timelimit [10] seconds');
      }
  
-**Fire And Forget Task**
+**Fire And Forget AsyncResult**
  
 .. code-block:: php
  
@@ -37,7 +37,7 @@ Rhubarb
         $log->error('task failed to return in default timelimit [10] seconds');
      }
  
-**Getting Task Status**
+**Getting AsyncResult Status**
  
 .. code-block:: php
  
@@ -49,7 +49,7 @@ Rhubarb
         
      $result = $task->delay();
      
-     while (!$task->successful()) {
+     while (!$task->isSuccess()) {
         echo $task->state(), PHP_EOL;
         // You should have some time based break; statement here
      }
@@ -80,7 +80,7 @@ Rhubarb
      $rhubarb = new \Rhubarb\Rhubarb($options);
      try {
         $task = $rhubarb->sendTask('task.add', array('arg1' => 2, 'arg2' => 2));
-        $task->getMessage()
+        $task->getPayload()
             ->setPropQueue('priority.high')
             ->setPropExchange('queue.other');
         $result = $task->delay();
@@ -89,7 +89,7 @@ Rhubarb
         $log->error('task failed to return in default timelimit [10] seconds');
      }
  
-**Advanced Task Options**
+**Advanced AsyncResult Options**
  At runtime it may become necessary to utilize a different queue, exchange or various runtime options. These options may
  be passed to the __delay__ method when called:
  
@@ -104,7 +104,7 @@ Rhubarb
  - errbacks: TBD
  - queue: (string) Simple routing (name <-> name) is accomplished using the queue option.
  - queue_args: (array) Key-Value option pairs for the queue arguments.
- - exchange: (string) Name of exchange (or a kombu.entity.Exchange) to send the message to.
+ - exchange: (string) Name of exchange (or a kombu.entity.Exchange) to send the payload to.
  
  **Example**
  

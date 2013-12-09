@@ -3,7 +3,7 @@ namespace Rhubarb\Broker;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Rhubarb\Broker;
  * @package     Rhubarb
  * @category    Broker
  */
+use Rhubarb\Message\Message;
 
 /**
  * @package     Rhubarb
@@ -28,10 +29,19 @@ namespace Rhubarb\Broker;
 interface BrokerInterface
 {
     /**
-     * @param \Rhubarb\Task $task
-     *
-     * @return void
+     * @param \Rhubarb\Message\Message $message
+     * @returns \Rhubarb\Task\AsyncResult
      */
-    public function publishTask(\Rhubarb\Task $task);
+    public function publishTask(Message $message);
+
+    /**
+     * @return array
+     */
+    public function getProperties();
+
+    /**
+     * @return array
+     */
+    public function getHeaders();
 
 }

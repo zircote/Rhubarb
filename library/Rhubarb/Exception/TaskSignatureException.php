@@ -1,9 +1,10 @@
 <?php
-namespace Rhubarb\Broker;
+namespace Rhubarb\Exception;
 
 /**
+ * 
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,28 +19,15 @@ namespace Rhubarb\Broker;
  * limitations under the License.
  * 
  * @package     Rhubarb
- * @category    Broker
+ * @category    Rhubarb\Exception
  */
+
 /**
  * @package     Rhubarb
- * @category    Broker
+ * @category    Rhubarb\Exception
  */
-abstract class AbstractBroker implements BrokerInterface
+class TaskSignatureException extends Exception 
 {
-    protected $options = array();
 
-    /**
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * @param array $options
-     *
-     * @return AMQP
-     */
-    abstract public function setOptions(array $options);
 }
+ 

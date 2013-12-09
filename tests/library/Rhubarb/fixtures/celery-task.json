@@ -1,0 +1,13 @@
+{
+    "headers": {
+        "lang": "py",
+        "c_type": "app.add",
+        "timelimit": [5, 10]
+    },
+    "properties": {
+        "content_type": "application/json",
+        "content_encoding": "base64",
+        "correlation_id": "45f78281-8a16-4914-8dd9-fc0aee916a72"
+    },
+    "body": "eyJhcmdzIjpbMSwyXSwia3dhcmdzIjp7ImFyZzEiOjEsImFyZzIiOjJ9fQ=="
+}

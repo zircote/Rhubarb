@@ -3,7 +3,7 @@ namespace Rhubarb\Connector;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@ namespace Rhubarb\Connector;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package
  * @category
  * @subcategory
  */
-use AMQPConnection;
+use Rhubarb\Exception\ConnectionException;
 
 /**
  * @package
@@ -32,106 +32,127 @@ class PhpAmqp extends AbstractConnector
 {
 
     /**
-     * @var AmqpConnection
+     * @var \AmqpConnection
      */
     protected $connection;
     /**
      * @var array
      */
     protected $options = array(
-        'connection' => array(
-            'host' => '127.0.0.1',
-            'port' => 5672,
-            'vhost' => '/',
-            'login' => 'guest',
-            'password' => 'guest'
-        ),
-        'options' => array()
+        'connection' => 'amqp://guest:guest@127.0.0.1:5682/celery',
     );
-
 
     /**
      * @param array $options
-     *
-     * @return self
-     *
+     * @return $this|AbstractConnector
+     * @throws \Rhubarb\Exception\ConnectionException
      * @throws \UnexpectedValueException
      */
     public function setOptions(array $options)
     {
-        if (isset($options['exchange'])) {
-            $this->exchange = $options['exchange'];
-        }
-        if (isset($options['exchange'])) {
-            if (!is_string($options['exchange'])) {
-                throw new \UnexpectedValueException('exchange value is not a string, a string is required');
-            }
-            $this->exchange = $options['exchange'];
-            unset($options['exchange']);
-        }
-        if (isset($options['queue'])) {
-            if (isset($options['queue']['arguments'])) {
-                $this->queueOptions = $options['queue'];
-            }
-            unset($options['queue']);
-        }
-        /*
-         * @deprecated use of $options['uri'] is deprecated in favor of $options['connection']
-         * this block is meant to provide reverse comparability 
-         */
-        if (!isset($options['connection']) && isset($options['uri'])) {
-            trigger_error(
-                'the use of `uri` in config options is no longer support for Rhubarb version >= 3.1',
-                E_USER_DEPRECATED
-            );
-            $options['connection'] = $options['uri'];
-            unset($options['connection']);
-        } elseif (isset($options['uri'])) {
-            trigger_error('as of Rhubarb version >= 3.1 `uri` config options is unsupported, you must not implement ' .
-                '`connection` and `uri` together', E_NOTICE);
-            unset($options['connection']);
-        }
         if (isset($options['connection'])) {
-            $uri = parse_url($options['connection']);
-            if (!isset($uri['port'])) {
-                $uri['scheme'] == 'amqps' ? 5673 : $this->options['connection']['port'];
+            if ($options['connection'] instanceof \AMQPConnection) {
+                $this->setConnection($options['connection']);
+            } elseif (is_string($options['connection'])) {
+                $this->options['connection'] = $options['connection'];
+                return $this->setOptions($this->parseUri($options['connection']));
+            } elseif (is_array($options['connection'])) {
+                unset($this->options['connection']);
+                $this->options['connection'] = array();
+                $connection = $options['connection'];
+                if (isset($connection['host'])) {
+                    $this->options['connection']['host'] = $connection['host'];
+                }
+                if (isset($connection['port'])) {
+                    $this->options['connection']['port'] = (int)$connection['port'];
+                }
+                if (isset($connection['vhost'])) {
+                    $this->options['connection']['vhost'] = preg_replace('#^/#', null, $connection['vhost']);
+                }
+                if (isset($connection['login'])) {
+                    $this->options['connection']['login'] = $connection['login'];
+                }
+                if (isset($connection['password'])) {
+                    $this->options['connection']['password'] = $connection['password'];
+                }
+                if (isset($connection['connect_timeout'])) {
+                    $this->options['connection']['connect_timeout'] = $connection['connect_timeout'];
+                }
+                if (isset($connection['write_timeout'])) {
+                    $this->options['connection']['write_timeout'] = $connection['write_timeout'];
+                }
+                if (isset($connection['read_timeout'])) {
+                    $this->options['connection']['read_timeout'] = $connection['read_timeout'];
+                }
             } else {
-                $port = isset($uri['port']) ? $uri['port'] : $this->options['connection']['port'];
+                throw new ConnectionException(
+                    sprintf(
+                        'options passed to %s are invalid [uri:string, array, or \AMQPConnection] expected',
+                        __METHOD__
+                    )
+                );
             }
-            unset($options['connection']);
-            $options['connection']['host'] = $uri['host'];
-            $options['connection']['port'] = $port;
-            $options['connection']['vhost'] = isset($uri['path']) ? $uri['path'] : $this->options['connection']['path'];
-            /* I don't like it but to ensure that all parties are happy this is necasary */
-            $options['connection']['vhost'] = preg_replace('#^/#', null, $options['connection']['vhost']);
-            $options['connection']['login'] = isset($uri['username']) ? $uri['username'] : $this->options['connection']['login'];
-            $options['connection']['password'] = isset($uri['pass']) ? $uri['pass'] : $this->options['connection']['password'];
-            $this->options['connection'] = $options['connection'];
         }
         return $this;
     }
 
 
     /**
-     * @return AMQPConnection
+     * @return \AMQPConnection
      */
     public function getConnection()
     {
         if (!$this->connection) {
             $options = $this->getOptions();
-            $connection = new AMQPConnection($options['connection']);
+            if (is_string($options['connection'])) {
+                $this->setOptions($options);
+                $options = $this->getOptions();
+            }
+            $connection = new \AMQPConnection($options['connection']);
             $this->setConnection($connection);
         }
         return $this->connection;
     }
 
     /**
-     * @param AMQPConnection $connection
-     * @return self
+     * @param \AMQPConnection $connection
+     * @return $this
      */
-    public function setConnection(AMQPConnection $connection)
+    public function setConnection(\AMQPConnection $connection)
     {
         $this->connection = $connection;
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function disconnect()
+    {
+        return $this->getConnection()->disconnect();
+    }
+
+    /**
+     * @return bool
+     */
+    public function connect()
+    {
+        return $this->getConnection()->connect();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isConnected()
+    {
+        return $this->getConnection()->isConnected();
+    }
+
+    /**
+     * @return bool
+     */
+    public function reconnect()
+    {
+        return $this->getConnection()->reconnect();
     }
 }

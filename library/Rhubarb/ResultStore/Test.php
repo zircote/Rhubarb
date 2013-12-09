@@ -3,7 +3,7 @@ namespace Rhubarb\ResultStore;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
+use Rhubarb\Rhubarb;
+use Rhubarb\Task\AsyncResult;
+
 /**
  * @package     Rhubarb
  * @category    ResultStore
@@ -71,22 +74,17 @@ class Test implements ResultStoreInterface
     }
 
     /**
-     * @param \Rhubarb\Task $task
-     *
-     * @return bool|string
+     * @param AsyncResult $task
+     * @return AsyncResult
      */
-    public function getTaskResult(\Rhubarb\Task $task)
+    public function getTaskResult(AsyncResult $task)
     {
         if(!$this->timer){
             $this->timer = time() + $this->wait;
         }
         if($this->timer <= time()){
-            return json_decode($this->nextResult);
+            return json_decode($this->nextResult, Rhubarb::$jsonOptions);
         }
-        return null;
-    }
-    public function setOptions(array $options)
-    {
-
+        return $task;
     }
 }

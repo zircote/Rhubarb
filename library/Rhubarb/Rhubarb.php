@@ -3,7 +3,7 @@ namespace Rhubarb;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,19 @@ namespace Rhubarb;
  * @package     Rhubarb
  * @category    Rhubarb
  */
-use  Rhubarb\Exception\Exception;
+use Rhubarb\Broker\BrokerInterface;
+use Rhubarb\Exception\Exception;
+use Rhubarb\Exception\MessageUnserializeException;
+use Rhubarb\Exception\TaskSignatureException;
+use Rhubarb\Task\AsyncResult;
+use Rhubarb\Message\Message;
+use Rhubarb\Task\Body\BodyInterface;
+use Rhubarb\ResultStore\ResultStoreInterface;
+use Rhubarb\Task\Signature;
+use Rhubarb\Exception\EncodingException;
 
 /**
- * This is the primary class for the utilization of the Rhubarb implementation. It allows a user to create Task objects
+ * This is the primary class for the utilization of the Rhubarb implementation. It allows a user to create AsyncResult objects
  * and subsequently submit these tasks to a celery cluster for asynchronous execution.
  *
  * @package     Rhubarb
@@ -32,15 +41,14 @@ use  Rhubarb\Exception\Exception;
  */
 class Rhubarb
 {
-    const VERSION = '3.2-dev';
     /**
      * @var string
      */
-    const RHUBARB_USER_AGENT = 'rhubarb';
+    const USER_AGENT = 'rhubarb';
     /**
      * @var string
      */
-    const RHUBARB_DEFAULT_TASK_QUEUE = 'celery';
+    const VERSION = '@package_version@';
     /**
      * @var string
      */
@@ -52,41 +60,86 @@ class Rhubarb
     /**
      * @var string
      */
-    const RHUBARB_DEFAULT_CONTENT_ENCODING = null;
+    const CONTENT_ENCODING_RAW = 'raw';
     /**
      * @var string
      */
-    const RHUBARB_CONTENT_TYPE = 'application/json';
+    const CONTENT_TYPE_JSON = 'application/json';
     /**
      * @var string
      */
-    const RHUBARB_VERSION = '@package_version@';
+    const CONTENT_TYPE_PROTOBUF = 'application/x-protobuf';
     /**
      * @var string
      */
-    const RHUBARB_DEFAULT_EXCHANGE_NAME = 'celery';
+    const CONTENT_TYPE_YAML = 'application/x-yaml';
     /**
      * @var string
      */
-    const RHUBARB_RESULTS_EXCHANGE_NAME = 'celery';
+    const CONTENT_TYPE_MSGPACK = 'application/x-msgpack';
     /**
      * @var string
      */
-    const RHUBARB_BROKER_NAMESPACE = '\\Rhubarb\\Broker';
-    /**
-     * @var string
-     */
-    const RHUBARB_RESULTSTORE_NAMESPACE = '\\Rhubarb\\ResultStore';
+    const CONTENT_TYPE_PICKLE = 'application/x-python-serialize';
     /**
      * @var string
      */
     const NS_SEPERATOR = '\\';
+    /**
+     * @var string
+     */
+    const BROKER_NAMESPACE = '\Rhubarb\Broker';
+    /**
+     * @var string
+     */
+    const RESULTSTORE_NAMESPACE = '\Rhubarb\ResultStore';
+    /**
+     * @var string
+     */
+    const DEFAULT_TASK_QUEUE = 'celery';
+    /**
+     * @var string
+     */
+    const RESULTS_EXCHANGE_NAME = 'celeryresults';
+    /**
+     * @var string
+     */
+    const EVENTS_EXCHANGE_NAME = 'celeryev';
+    /**
+     *
+     */
+    const CELERY_DIRECT_WORKER_QUEUE = 'C.dq';
+    /**
+     * 
+     */
+    const KOMBU_BINDING_CELERY_ = '_kombu.binding.celery';
+    /**
+     * @var string
+     */
+    const DEFAULT_EXCHANGE_NAME = 'celery';
+    /**
+     * @var string
+     */
+    const DEFAULT_CONTENT_TYPE = self::CONTENT_TYPE_JSON;
+    /**
+     * @var string
+     */
+    const DEFAULT_CONTENT_ENCODING = self::CONTENT_ENCODING_UTF8;
+    /**
+     *  JSON_BIGINT_AS_STRING|JSON_NUMERIC_CHECK|JSON_UNESCAPED_SLASHES
+     * @var int
+     */
+    static public $jsonOptions;
+    /**
+     * @var array
+     */
+    protected $taskRegistry = array();
 
     /**
      * The Result store object which provides the interface to receive the result messages from the celery cluster.
-     * @var Broker\BrokerInterface
+     * @var ResultStore\ResultStoreInterface
      */
-    protected $resultBroker;
+    protected $resultStore;
 
     /**
      * This broker object is responsible for the delivery of tasks and arguments to the celery cluster for execution.
@@ -99,6 +152,20 @@ class Rhubarb
      * @var \Logger
      */
     protected $logger;
+    private $decoders = array(
+        self::CONTENT_ENCODING_UTF8 => 'utf8_decode',
+        self::CONTENT_ENCODING_BASE64 => 'base64_decode'
+    );
+    private $encoders = array(
+        self::CONTENT_ENCODING_UTF8 => 'utf8_decode',
+        self::CONTENT_ENCODING_BASE64 => 'base64_encode'
+    );
+    private $serializers = array(
+        self::CONTENT_TYPE_JSON => 'json_encode'
+    );
+    private $unserializers = array(
+        self::CONTENT_TYPE_JSON => 'json_decode'
+    );
 
     /**
      * The default configuration for the Rhubarb interface.
@@ -123,34 +190,40 @@ class Rhubarb
                 )
             )
         );
+    /**
+     * @var array
+     */
+    protected $state = array();
 
     /**
      * Accepts a single argument of configuration options as an array.
-     *
-     * <code>
-     *  <?php
-     *  $options = array(
-     *      'broker' => array(
-     *          'type' => 'Amqp',
-     *          'options' => array(
-     *              'uri' => 'amqp://celery:celery@localhost:5672/celery'
-     *          )
-     *      ),
-     *      'result_store' => array(
-     *          'type' => 'Amqp',
-     *          'options' => array(
-     *              'uri' => 'amqp://celery:celery@localhost:5672/celery_results'
-     *          )
-     *      )
-     *  );
-     *  $rhubarb = new \Rhubarb\Rhubarb($options);
-     * </code>
      *
      * @param array $options
      */
     public function __construct(array $options = array())
     {
+        $this->serializers[self::CONTENT_TYPE_JSON] = function($payload) {
+            return json_encode($payload, JSON_BIGINT_AS_STRING | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES);
+        };
+        $this->unserializers[self::CONTENT_TYPE_JSON] = function($payload) {
+            return json_decode($payload, JSON_BIGINT_AS_STRING | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES);
+        };
+        $this->encoders[self::CONTENT_ENCODING_BASE64] = function($payload) {
+            return base64_encode($payload);
+        };
+        $this->decoders[self::CONTENT_ENCODING_BASE64] = function($payload) {
+            return base64_decode($payload);
+        };
+        $this->encoders[self::CONTENT_ENCODING_UTF8] = function($payload) {
+            return $payload;
+        };
+        $this->decoders[self::CONTENT_ENCODING_UTF8] = function($payload) {
+            return $payload;
+        };
+        /* I would prefer this was a class constant; however PHP will not allow bitwise assignments in the class body */
+        static::$jsonOptions = JSON_BIGINT_AS_STRING | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES;
         $this->setOptions($options);
+
         \Logger::configure($this->getOption('logger'));
     }
 
@@ -165,27 +238,30 @@ class Rhubarb
     /**
      * Accepts an array of options enabling the declaration and instantiation of the broker object.
      *
-     * @param array $options
+     * @param array|BrokerInterface $broker
      *
      * @return Rhubarb
      * @throws Exception
      */
-    public function setBroker(array $options)
+    public function setBroker($broker)
     {
-        $namespace = self::RHUBARB_BROKER_NAMESPACE;
-        if (isset($options['class_namespace']) && $options['class_namespace']) {
-            $namespace = $options['class_namespace'];
+        if ($broker instanceof BrokerInterface) {
+            $this->broker = $broker;
+        } elseif (is_array($broker)) {
+            $namespace = self::BROKER_NAMESPACE;
+            if (isset($broker['class_namespace']) && $broker['class_namespace']) {
+                $namespace = $broker['class_namespace'];
+            }
+            $namespace = rtrim($namespace, self::NS_SEPERATOR);
+            $brokerClass = $namespace . self::NS_SEPERATOR . $broker['type'];
+            if (!class_exists($brokerClass)) {
+                throw new Exception(
+                    sprintf('Broker class [%s] unknown', $brokerClass)
+                );
+            }
+            $reflect = new \ReflectionClass($brokerClass);
+            $this->broker = $reflect->newInstanceArgs(array($this, (array)@$broker['options']));
         }
-        $namespace = rtrim($namespace, self::NS_SEPERATOR);
-        $brokerClass = $namespace . self::NS_SEPERATOR . $options['type'];
-        if (!class_exists($brokerClass)) {
-            throw new Exception(
-                sprintf('Broker class [%s] unknown', $brokerClass)
-            );
-        }
-        $reflect = new \ReflectionClass($brokerClass);
-        $this->broker = $reflect->newInstanceArgs($this, array((array)@$options['options']));
-
         return $this;
     }
 
@@ -206,35 +282,58 @@ class Rhubarb
      * - <b>class_namespace:</b> over-ride the base namespace to a user namespace for custom result-broker classes
      * - <b>options:</b> result_broker class specific options
      *
-     * @param array $options
+     * @param array|ResultStoreInterface $options
      *
      * @return Rhubarb
      * @throws Exception
+     * @throws \InvalidArgumentException
      */
-    public function setResultStore(array $options)
+    public function setResultStore($options)
     {
-        if (!isset($options['type'])) {
-            return $this;
-        }
+        if ($options instanceof ResultStoreInterface) {
+            $this->resultStore = $options;
+        } else {
 
-        $namespace = self::RHUBARB_RESULTSTORE_NAMESPACE;
-        if (isset($options['class_namespace']) && $options['class_namespace']) {
-            $namespace = $options['class_namespace'];
-        }
+            if (!is_array($options)) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        '%s expects type array or ResultStoreInterface [%s] provided',
+                        __METHOD__,
+                        gettype($options)
+                    )
+                );
+            }
+            if (!isset($options['type'])) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        '%s expects array to provide a classname of type: ResultStoreInterface key:type is not set',
+                        __METHOD__,
+                        gettype($options)
+                    )
+                );
+            }
 
-        $namespace = rtrim($namespace, self::NS_SEPERATOR);
-        $resultStoreClass = $namespace . self::NS_SEPERATOR . $options['type'];
-        if (!class_exists($resultStoreClass)) {
-            throw new Exception(
-                sprintf('ResultStore class [%s] unknown', $resultStoreClass)
-            );
-        }
+            $namespace = self::RESULTSTORE_NAMESPACE;
+            if (isset($options['class_namespace']) && $options['class_namespace']) {
+                $namespace = $options['class_namespace'];
+            }
+            $namespace = rtrim($namespace, self::NS_SEPERATOR);
+            $resultStoreClass = $namespace . self::NS_SEPERATOR . $options['type'];
+            if (!class_exists($resultStoreClass)) {
+                throw new Exception(
+                    sprintf('ResultStore class [%s] not found', $resultStoreClass)
+                );
+            }
 
-        $reflect = new \ReflectionClass($resultStoreClass);
-        $this->resultBroker = $reflect->newInstanceArgs($this, array((array)@$options['options']));
+            $reflect = new \ReflectionClass($resultStoreClass);
+            if (!isset($options['options'])) {
+                $options['options'] = array();
+            }
+            $this->resultStore = $reflect->newInstanceArgs(array($this, (array)@$options['options']));
+        }
         return $this;
     }
-
+    
     /**
      * Returns the result store object if created otherwise false.
      *
@@ -242,24 +341,10 @@ class Rhubarb
      */
     public function getResultStore()
     {
-        if ($this->resultBroker) {
-            return $this->resultBroker;
+        if ($this->resultStore) {
+            return $this->resultStore;
         }
         return false;
-    }
-
-    /**
-     * Prepares a new Task object and returns it for delay utilization
-     *
-     * @param string $name
-     * @param array $args
-     *
-     * @return Task
-     */
-    public function sendTask($name, array $args)
-    {
-        $task = new Task($name, $args, $this);
-        return $task;
     }
 
     /**
@@ -291,7 +376,7 @@ class Rhubarb
      *
      * @param string $name
      *
-     * @return null|array|string|int
+     * @return void|array|string|int
      */
     public function getOption($name)
     {
@@ -299,7 +384,6 @@ class Rhubarb
         if (array_key_exists($name, $this->options)) {
             return $this->options[$name];
         }
-        return null;
     }
 
     /**
@@ -325,7 +409,174 @@ class Rhubarb
             $this->setBroker($value);
         } elseif ($name == 'logger') {
             $this->options['logger'] = $value;
+        } elseif ($name == 'tasks') {
+            $this->setTasks($value);
         }
         return $this;
+    }
+
+    /**
+     * @param array $tasks
+     * @return $this
+     */
+    public function setTasks(array $tasks)
+    {
+        foreach ($tasks as $task) {
+            $this->addTask($task);
+        }
+        return $this;
+    }
+
+    /**
+     * @param $task
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function addTask($task)
+    {
+        $taskTemplate = array(
+            'name' => null,
+            'properties' => array(),
+            'headers' => array()
+        );
+        if (!isset($task['name'])) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'task name must be declared in declaration [%s] of type [%s] given',
+                    $task['name'],
+                    gettype($task['name'])
+                )
+            );
+        }
+        $taskTemplate['name'] = $task['name'];
+        
+        if (isset($task['properties'])) {
+            $taskTemplate['properties'] = array_merge($taskTemplate['properties'], (array)$task['properties']);
+        }
+        if (isset($task['headers'])) {
+            $taskTemplate['headers'] = array_merge($taskTemplate['headers'], (array)$task['headers']);
+        }
+        $this->taskRegistry[$task['name']] = $taskTemplate;
+        return $this;
+    }
+
+    /**
+     * @param $task
+     */
+    public function delTask($task)
+    {
+        unset($this->taskRegistry[$task]);
+    }
+
+    /**
+     * @param Message $message
+     * @return AsyncResult
+     */
+    public function dispatch(Message $message)
+    {
+        $this->state[$message->getId()] = $message;
+        $this->getBroker()->publishTask($message);
+        $result = new AsyncResult($this, $message);
+        return $result;
+    }
+
+    /**
+     * @param $name
+     * @return Signature
+     */
+    public function t($name)
+    {
+        return $this->task($name);
+    }
+
+    /**
+     * @throws TaskSignatureException
+     * @param $name
+     * @param BodyInterface $body
+     * @param array $properties
+     * @param array $headers
+     * @return Signature
+     */
+    public function task($name, BodyInterface $body = null, $properties = array(), $headers = array())
+    {
+        if (!array_key_exists($name, $this->taskRegistry)) {
+            throw new TaskSignatureException(sprintf('Task [%s] is not in registered', $name));
+        }
+        return new Signature(
+            $this,
+            $this->taskRegistry[$name]['name'],
+            $body,
+            array_merge((array)$this->taskRegistry[$name]['properties'], $properties),
+            array_merge((array)$this->taskRegistry[$name]['headers'], $headers)
+        );
+    }
+
+    /**
+     * @param string $payload
+     * @param string $type
+     * @return mixed
+     * @throws \Rhubarb\Exception\EncodingException
+     */
+    final public function decode($payload, $type = 'utf-8')
+    {
+        $type = strtolower($type);
+        if (isset($this->decoders[$type]) && is_callable($this->decoders[$type])) {
+            return call_user_func($this->decoders[$type], $payload);
+        } else {
+            throw new EncodingException(
+                sprintf('failed to decode payload of type [%s] ensure it is declared in your configuration', $type)
+            );
+        }
+    }
+
+    /**
+     * @param $payload
+     * @param string $type
+     * @return mixed
+     * @throws \Rhubarb\Exception\EncodingException
+     */
+    final public function encode($payload, $type = 'raw')
+    {
+        if (isset($this->encoders[$type]) && is_callable($this->encoders[$type])) {
+            return call_user_func($this->encoders[$type], $payload);
+        } else {
+            throw new EncodingException(
+                sprintf('failed to encode payload of type [%s] ensure it is declared in your configuration', $type)
+            );
+        }
+    }
+
+    /**
+     * @param $payload
+     * @param string $type
+     * @return mixed
+     * @throws \Rhubarb\Exception\MessageUnserializeException
+     */
+    final public function serialize($payload, $type = 'application/json')
+    {
+        if (isset($this->serializers[$type]) && is_callable($this->serializers[$type])) {
+            return call_user_func($this->serializers[$type], $payload);
+        } else {
+            throw new MessageUnserializeException(
+                sprintf('failed to serialize payload of type [%s] ensure it is declared in your configuration', $type)
+            );
+        }
+    }
+
+    /**
+     * @param $payload
+     * @param string $type
+     * @return mixed
+     * @throws \Rhubarb\Exception\MessageUnserializeException
+     */
+    final public function unserialize($payload, $type = 'application/json')
+    {
+        if (isset($this->unserializers[$type]) && is_callable($this->unserializers[$type])) {
+            return call_user_func($this->unserializers[$type], $payload);
+        } else {
+            throw new MessageUnserializeException(
+                sprintf('failed to unserialize payload of type [%s] ensure it is declared in your configuration', $type)
+            );
+        }
     }
 }

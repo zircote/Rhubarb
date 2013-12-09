@@ -3,7 +3,7 @@ namespace Rhubarb\ResultStore;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,72 +21,81 @@ namespace Rhubarb\ResultStore;
  * @category    ResultStore
  */
 use Rhubarb\Connector\PhpAmqp as PhpAmqpConnector;
-use Rhubarb\Exception\Exception;
-use Rhubarb\Task;
-use Rhubarb\Message;
+use Rhubarb\Task\AsyncResult;
+use Rhubarb\Task\ResultBody;
 use Rhubarb\Exception\InvalidJsonException;
-use AMQPQueue;
-use AMQPChannel;
 
 /**
  * @package     Rhubarb
  * @category    ResultStore
  *
- * Use:
- *
- * $options = array(
- *  'broker' => array(
- *  ...
- *  ),
- *  'result_store' => array(
- *      'type' => 'Amqp',
- *      'options' => array(
- *          'uri' => 'amqps://celery:celery@localhost:5671/celery_results',
- *          'options' => array(
- *              'ssl_options' => array(
- *                  'verify_peer' => true,
- *                  'allow_self_signed' => true,
- *                  'cafile' => 'some_ca_file'
- *                  'capath' => '/etc/ssl/ca,
- *                  'local_cert' => /etc/ssl/self/key.pem'
- *              ),
- *          )
- *      )
- *  )
- * );
- * $rhubarb = new \Rhubarb\Rhubarb($options);
  */
 class PhpAmqp extends PhpAmqpConnector implements ResultStoreInterface
 {
 
-    public function getTaskResult(Task $task)
+    protected $channel;
+    protected $queue;
+
+    /**
+     * @param AsyncResult $task
+     * @return AsyncResult
+     * @throws InvalidJsonException
+     */
+    public function getTaskResult(AsyncResult $task)
     {
         $result = null;
         try {
-            $taskId = str_replace('-','', $task->getId());
-            $connection = $this->getConnection();
-            $connection->connect();
-            if (!$connection->isConnected()) {
-                throw new Exception;
+            $taskId = str_replace('-', '', $task->getId());
+            if (!$this->getConnection()->isConnected()) {
+                $this->getConnection()->connect();
             }
-            $channel  = new AMQPChannel($connection);
-            $queue = new AMQPQueue($channel);
-            $queue->setName($taskId);
-            $queue->setFlags(AMQP_DURABLE|AMQP_AUTODELETE);
-            $queue->setArgument('x-expires', 86400000);
-            $queue->declareQueue();
+            $queue = $this->declareQueue($task);
             if ($message = $queue->get()) {
-                $messageBody = json_decode($message->getBody());
-                if (json_last_error()) {
-                    throw new InvalidJsonException('Serialization Error, result is not valid JSON');
-                }
                 $queue->ack($message->getDeliveryTag());
-                $result = $messageBody;
-                $queue->delete(AMQP_IFUNUSED|AMQP_IFEMPTY|AMQP_NOWAIT);
-                $connection->disconnect();
+                $queue->delete(AMQP_IFUNUSED | AMQP_IFEMPTY | AMQP_NOWAIT);
+                $this->getConnection()->disconnect();
+                $task->setResult(ResultBody::fromString(
+                        $message->getBody(),
+                        $message->getHeader('content_type'),
+                        $message->getHeader('content_encoding')
+                    )
+                );
             }
-        } catch (\AMQPChannelException $e){
+        } catch (\AMQPChannelException $e) {
         }
-        return $result;
+        return $task;
+    }
+
+    /**
+     * @param AsyncResult $result
+     * @return \AMQPQueue
+     */
+    protected function declareQueue(AsyncResult $result)
+    {
+        if (!$this->getConnection()->isConnected()) {
+            $this->getConnection()->reconnect();
+        }
+        $taskId = str_replace('-', '', $result->getId());
+        $queue = new \AMQPQueue($this->getChannel());
+        $queue->setName($taskId);
+        $queue->setFlags(AMQP_DURABLE | AMQP_AUTODELETE);
+        $queue->setArgument('x-expires', 86400000);
+        $queue->declareQueue();
+        return $queue;
+    }
+
+    /**
+     * @return \AMQPChannel
+     */
+    protected function getChannel()
+    {
+        if (!$this->channel) {
+            if (!$this->getConnection()->isConnected()) {
+                $this->getConnection()->reconnect();
+            }
+            $this->channel = new \AMQPChannel($this->getConnection());
+        }
+
+        return $this->channel;
     }
 }

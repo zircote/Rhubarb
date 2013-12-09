@@ -1,9 +1,9 @@
 <?php
-namespace RhubarbTests;
+namespace Rhubarb;
 
     /**
      * @license http://www.apache.org/licenses/LICENSE-2.0
-     * Copyright [2012] [Robert Allen]
+     * Copyright [2013] [Robert Allen]
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
@@ -19,15 +19,17 @@ namespace RhubarbTests;
      *
      * @package     Rhubarb
      * @category    Tests
-     * @subcategory Task
+     * @subcategory AsyncResult
      */
 
 /**
  * @package     Rhubarb
  * @category    Tests
  * @subcategory Rhubarb
+ * @group Rhubarb
+ * @group Rhubarb\Rhubarb
  */
-class RhubarbTest extends \PHPUnit_Framework_TestCase
+class RhubarbTest extends RhubarbTestCase
 {
     /**
      * @var \Rhubarb\Broker\Test
@@ -48,33 +50,45 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
     public function setup()
     {
         $options = array(
-            'broker' => array(
-                'type' => 'Test'
-            ),
-            'result_store' => array(
-                'type' => 'Test'
-            ),
-            'logger' => array(
-                'loggers' => array(
-                    'Rhubarb' => array(
-                        'level' => 'ERROR',
-                        'appenders' => array('Rhubarb'),
-                    ),
-                ),
-                'appenders' => array(
-                    'Rhubarb' => array(
-                        'class' => 'LoggerAppenderConsole',
-                        'layout' => array(
-                            'class' => 'LoggerLayoutSimple'
-                        )
+            'tasks' => array(
+                array(
+                    'name' => 'app.add', // c_type
+                    'headers' => array(
+                        'timelimit' => array(30, 90)
                     )
-                )
+                ),
             )
         );
-        $this->rhubarb = new \Rhubarb\Rhubarb($options);
-        /* @var \Rhubarb\Broker\Test $broker */
-        $this->broker = $this->rhubarb->getBroker();
-        $this->resultStore = $this->rhubarb->getResultStore();
+        $this->rhubarb = new Rhubarb($options);
+        $brokerMock = $this->getBrokerMock(array(), array());
+        $resultStoreMock = $this->getResultStoreMock();
+        $this->rhubarb->setBroker($brokerMock);
+        $this->rhubarb->setResultStore($resultStoreMock);
+
+    }
+
+    /**
+     * 
+     */
+    public function testTask()
+    {
+        $expected = 'app.add';
+        $asyncResult = $this->rhubarb->task($expected, null, array('content_encoding' => 'base64'));
+        $this->assertInstanceOf('\Rhubarb\Task\Signature', $asyncResult);
+        $this->assertEquals($expected, $asyncResult->getName());
+        $this->assertEquals('base64', $asyncResult->getProperty('content_encoding'));
+        $this->assertEquals(array(30,90), $asyncResult->getHeader('timelimit'));
+    }
+
+    /**
+     * 
+     */
+    public function testT()
+    {
+        $expected = 'app.add';
+        $asyncResult = $this->rhubarb->t($expected);
+        $this->assertInstanceOf('\Rhubarb\Task\Signature', $asyncResult);
+        $this->assertEquals($expected, $asyncResult->getName());
     }
 
     /**
@@ -88,85 +102,76 @@ class RhubarbTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $status
-     * @param        $taskId
-     *
-     * @return string
-     */
-    protected function getSuccesfulResult($status = 'SUCCESS', $taskId)
-    {
-        $resultExpected = sprintf(
-            '{"status": "%s", "traceback": null, "result": 2105, "task_id": "%s", "children": []}',
-            $status,
-            $taskId
-        );
-        return $resultExpected;
-    }
-
-    /**
-     *
-     */
-    public function testRhubarb()
-    {
-        $this->resultStore->setNextResult(false);
-        $task = $this->rhubarb->sendTask('test.task', array(2, 2));
-        $task->delay();
-        $expectedArgs = sprintf('{"id":"%s","task":"test.task","args":[2,2],"kwargs":{},"expires":null,"utc":true,' .
-            '"callbacks":null,"eta":null,"errbacks":null}', $task->getId());
-        $expected = $this->getSuccesfulResult('SUCCESS', $task->getId());
-        $this->resultStore->setNextResult($expected);
-        $this->assertEquals($expectedArgs, $this->broker->getPublishedValues());
-        $this->assertEquals(2105, $task->get());
-        $this->assertEquals('SUCCESS', $task->state());
-        $this->assertNull($task->traceback());
-        $this->assertFalse($task->failed());
-        $this->assertTrue($task->successful());
-    }
-
-    public function testKwargsArePassed()
-    {
-
-        $this->resultStore->setNextResult(false);
-        $res = $this->rhubarb->sendTask('test.task', array('arg1' => 2, 'arg2' => 2));
-        $expected = sprintf(
-            '{"id":"%s","task":"test.task","args":[],"kwargs":{"arg1":2,"arg2":2},"expires":null,"utc":true,' .
-            '"callbacks":null,"eta":null,"errbacks":null}',
-            $res->getId()
-        );
-        $res->delay();
-        $this->assertEquals($expected, $this->broker->getPublishedValues());
-    }
-
-    /**
-     * @expectedException \Rhubarb\Exception\TimeoutException
-     */
-    public function testTimeout()
-    {
-        $this->resultStore->setWait(4);
-        $res = $this->rhubarb->sendTask('test.task', array(2, 2));
-        $res->delay();
-        $this->resultStore->setNextResult($this->getSuccesfulResult('SUCCESS', $res->getId()));
-        $res->get(1);
-    }
-
-    /**
-     *
-     */
-    public function testTimeWaits()
-    {
-        $this->resultStore->setWait(4);
-        $task = $this->rhubarb->sendTask('test.task', array(2, 2));
-        $this->resultStore->setNextResult($this->getSuccesfulResult('SUCCESS', $task->getId()));
-        $task->delay();
-        $this->assertEquals(2105, $task->get());
-    }
-
-    /**
      * @group logger
      */
     public function testLogging()
     {
         $logger = $this->rhubarb->getLogger();
         $this->assertEquals('Rhubarb', $logger->getName());
+    }
+    public function testSetOptions()
+    {
+        
+    }
+    public function testGetOptions()
+    {
+        
+    }
+    public function testGetOption()
+    {
+        
+    }
+    public function testSetOption()
+    {
+        
+    }
+    public function testSetTasks()
+    {
+        
+    }
+    public function testAddTask()
+    {
+        
+    }
+    public function testGetTask()
+    {
+        
+    }
+    public function testDelTask()
+    {
+        
+    }
+    public function testDispatch()
+    {
+        
+    }
+    public function testDecode()
+    {
+        $encodedBody = 'eyJkZXN0aW5hdGlvbiI6IG51bGwsICJtZXRob2QiOiAicmV2b2tlIiwgImFyZ3VtZW50cyI6IHsic2lnbmFsIjogbnVsbCwgInRlcm1pbmF0ZSI6IGZhbHNlLCAidGFza19pZCI6ICJjNzJlOTlkZC0xM2FhLTQ3OTEtOGIyMS02YWU5NDU5NDk3MmIifX0=';
+        $actual = $this->rhubarb->decode($encodedBody, Rhubarb::CONTENT_ENCODING_BASE64);
+        $expected = '{"destination": null, "method": "revoke", "arguments": {"signal": null, "terminate": false, "task_id": "c72e99dd-13aa-4791-8b21-6ae94594972b"}}';
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
+    }
+    public function testUnserialize()
+    {
+        $json = '{"test": "win"}';
+        $expected = array('test' => 'win');
+        $actual = $this->rhubarb->unserialize($json, Rhubarb::CONTENT_TYPE_JSON);
+        $this->assertEquals($expected, $actual);
+    }
+    
+    public function testSerialize()
+    {
+        $expected = '{"test":"win"}';
+        $json = array('test' => 'win');
+        $actual = $this->rhubarb->serialize($json, Rhubarb::CONTENT_TYPE_JSON);
+        $this->assertEquals($expected, $actual);
+    }
+    public function testEncode()
+    {
+        $body = '{"destination": null, "method": "revoke", "arguments": {"signal": null, "terminate": false, "task_id": "c72e99dd-13aa-4791-8b21-6ae94594972b"}}';
+        $expected = 'eyJkZXN0aW5hdGlvbiI6IG51bGwsICJtZXRob2QiOiAicmV2b2tlIiwgImFyZ3VtZW50cyI6IHsic2lnbmFsIjogbnVsbCwgInRlcm1pbmF0ZSI6IGZhbHNlLCAidGFza19pZCI6ICJjNzJlOTlkZC0xM2FhLTQ3OTEtOGIyMS02YWU5NDU5NDk3MmIifX0=';
+        $actual = $this->rhubarb->encode($body, Rhubarb::CONTENT_ENCODING_BASE64);
+        $this->assertEquals($expected, $actual);
     }
 }

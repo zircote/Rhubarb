@@ -15,6 +15,7 @@
         }
     ],
     "require": {
+        "php": ">=5.4",
         "rhumsaa/uuid": "~2.1",
         "apache/log4php": "2.3.*"
     },
@@ -22,14 +23,12 @@
         "phpunit/phpunit": "~3.7.19"
     },
     "suggest": {
-        "zircote/amqp": "for php-amqp support and/or TLS AMQP support",
         "ext-amqp": "for rabbitmq-c/pecl-amqp support",
         "predis/predis": "for redis broker support"
     },
     "autoload":{
         "psr-0":{
-            "Rhubarb":"library",
-            "RhubarbTests":"tests/library"
+            "Rhubarb": ["library", "tests/library"]
         }
     }
 }

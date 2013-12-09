@@ -3,7 +3,7 @@ namespace Rhubarb\ResultStore;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,29 +20,21 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
-use Rhubarb\Connector\Predis as PredisConnector;
-use Rhubarb\Task;
+use Rhubarb\Connector\Predis as PredisConnection;
+use Rhubarb\Task\AsyncResult;
 
 /**
  * @package     Rhubarb
  * @category    ResultStore
  */
-class Predis extends PredisConnector implements ResultStoreInterface
+class Predis extends PredisConnection implements ResultStoreInterface
 {
     /**
-     * @param \Rhubarb\Task $task
-     * @return bool|mixed|string
+     * @param AsyncResult $task
+     * @return Asyncresult
      */
-    public function getTaskResult(Task $task)
+    public function getTaskResult(AsyncResult $task)
     {
-        $pubsub = $this->getConnection()->pubSub();
-        $pubsub->subscribe('celery-task-meta-' . $task->getId());
-        foreach ($pubsub as $message) {
-            if ($message->kind == 'message'){
-                $message = json_decode($message->payload);
-                $pubsub->unsubscribe('celery-task-meta-' . $task->getId());
-                return $message;
-            }
-        }
+        return $this->getConnection()->get(PredisConnection::TASK_KEY_PREFIX . $task->getId());
     }
 }

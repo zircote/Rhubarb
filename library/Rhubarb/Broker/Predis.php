@@ -3,7 +3,7 @@ namespace Rhubarb\Broker;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ namespace Rhubarb\Broker;
  * @category    Broker
  */
 use Rhubarb\Connector\Predis as PredisConnection;
-use Rhubarb\Message;
+use Rhubarb\Exception\ConnectionException;
+use Rhubarb\Message\Message;
 use Rhubarb\Rhubarb;
-use Rhumsaa\Uuid\Uuid;
 
 /**
  * @package     Rhubarb
@@ -32,23 +32,17 @@ use Rhumsaa\Uuid\Uuid;
 class Predis extends PredisConnection implements BrokerInterface
 {
     /**
-     * @param \Rhubarb\Task $task
+     * @param Message $message
+     * @return \Rhubarb\Task\AsyncResult
+     * @throws \Rhubarb\Exception\ConnectionException
      */
-    public function publishTask(\Rhubarb\Task $task)
+    public function publishTask(Message $message)
     {
-        $task->getMessage()->setContentEncoding(Rhubarb::CONTENT_ENCODING_UTF8);
-        if (!$task->getMessage()->getPropRoutingKey()) {
-            $task->getMessage()->setPropRoutingKey('celery');
+        if (!$this->getConnection()) {
+            throw new ConnectionException(sprintf('Connection is not defined in [%s]', __METHOD__));
         }
-        if (!$task->getMessage()->getCorrelationId()){
-            $task->getMessage()->setCorrelationId($task->getId());
-        }
-        if (!$task->getMessage()->getReplyTo()){
-            $task->getMessage()->setReplyTo($task->getId());
-        }
-        $task->getMessage()->setPropDeliveryMode(2)->setPropDeliveryTag(2);
-        $task->getMessage()->setBodyEncoding(Rhubarb::CONTENT_ENCODING_BASE64);
-        $task->toArray();
-        $this->getConnection()->lpush($task->getMessage()->getPropExchange(), (string) $task->getMessage());
+        return $this->getConnection()
+            ->lpush($message->getHeader('exchange') ?: Rhubarb::DEFAULT_EXCHANGE_NAME, $message->serialize());
     }
+
 }

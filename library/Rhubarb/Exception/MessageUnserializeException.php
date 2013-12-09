@@ -1,9 +1,10 @@
 <?php
-namespace Rhubarb;
+namespace Rhubarb\Exception;
 
 /**
+ * 
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,50 +19,43 @@ namespace Rhubarb;
  * limitations under the License.
  * 
  * @package     Rhubarb
- * @category    Rhubarb
- * @subcategory Message
+ * @category    Rhubarb\Exception
  */
 
 /**
  * @package     Rhubarb
- * @category    Rhubarb
- * @subcategory Message
+ * @category    Rhubarb\Exception
  */
-class Message
+class MessageUnserializeException extends \Exception
 {
-    const MESSAGE_V1 = '\Rhubarb\Message\V1';
-    const MESSAGE_V2 = '\Rhubarb\Message\V2';
 
     /**
-     * @var \Rhubarb\Message\AbstractMessage
+     * @var string
      */
-    protected $message;
-
-    /**
-     * @param Rhubarb $rhubarb
-     * @param string $messageClass
-     */
-    public function __construct(Rhubarb $rhubarb, $messageClass=self::MESSAGE_V1)
+    protected $payload;
+    public function __construct($message, $payload = null)
     {
-        
+        $this->setPayload($payload);
+        parent::__construct($message);
     }
 
     /**
      *
-     * @param \Rhubarb\Message\V1|\Rhubarb\Message\V2 $message
-     * @return Message
+     * @param string $payload
+     * @return MessageUnserializeException
      */
-    public function setMessage($message)
+    public function setPayload($payload)
     {
-        $this->message = $message;
+        $this->payload = $payload;
         return $this;
     }
 
     /**
-     * @return \Rhubarb\Message\V1|\Rhubarb\Message\V2
+     * @return string
      */
-    public function getMessage()
+    public function getPayload()
     {
-        return $this->message;
+        return $this->payload;
     }
 }
+ 

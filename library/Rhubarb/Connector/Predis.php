@@ -3,7 +3,7 @@ namespace Rhubarb\Connector;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,83 +22,78 @@ namespace Rhubarb\Connector;
  * @subcategory
  */
 use Predis\Client;
-use Rhubarb\Exception\CeleryConfigurationException;
-
+use Rhubarb\Exception\ConnectionException;
+use Rhubarb\Rhubarb;
 /**
  * @package
  * @category
  * @subcategory
  */
-class Predis
+class Predis extends AbstractConnector
 {
 
+    const TASK_KEY_PREFIX = 'celery-task-meta-';
+    const GROUP_KEY_PREFIX = 'celery-taskset-meta-';
+    const CHORD_KEY_PREFIX = 'chord-unlock-';
     /**
-     * @var \Predis\Client
+     * @var Client
      */
     protected $connection;
 
     /**
+     * @link https://github.com/nrk/predis/wiki/Connection-Parameters
+     * 
+     * Predis Options:
+     *  - scheme [string - default: tcp] [tcp, unix, http]
+     *  - host [string - default: 127.0.0.1]
+     *  - port [integer - default: 6379]
+     *  - path [string - default: not set]
+     *  - database [integer - default: not set]
+     *  - password [string - default: not set]
+     *  - connection_async [boolean - default: false]
+     *  - connection_persistent [boolean - default: false]
+     *  - connection_timeout [float - default: 5.0]
+     *  - read_write_timeout [float - default: not set]
+     *  - alias [string - default: not set]
+     *  - weight [integer - default: not set]
+     *  - iterable_multibulk [boolean - default: false]
+     *  - throw_errors [boolean - default: true]
+     * 
+     * Example URI Usage:
+     * tcp://host:port?password=54321&database=0&connection_async=false&connection_persistent=false\
+     *      &connection_timeout=5.0&read_write_timeout=&alias=&weight=&iterable_multiblock=false&throw_errors=false
+     * unix:///var/run/redis.sock?password=54321&database=0&connection_async=false&connection_persistent=false\
+     *      &connection_timeout=5.0&read_write_timeout=&alias=&weight=&iterable_multiblock=false&throw_errors=false
+     * 
      * @var array
      */
     protected $options = array(
-        'connection' => 'redis://localhost:6379/0',
-        'options' => array()
+        'connection' => 'tcp://localhost:6379?database=0'
+    );
+    protected $properties = array(
+        'content_type'=> Rhubarb::CONTENT_TYPE_JSON,
+        'content_encoding' => Rhubarb::CONTENT_ENCODING_BASE64
     );
 
     /**
      * @param array $options
-     *
-     * @return self
-     *
-     * @throws \UnexpectedValueException
+     * @return $this
+     * @throws ConnectionException
      */
     public function setOptions(array $options)
     {
-        if (isset($options['exchange'])) {
-            $this->exchange = $options['exchange'];
-        }
-        if (isset($options['exchange'])) {
-            if (!is_string($options['exchange'])) {
-                throw new \UnexpectedValueException('exchange value is not a string, a string is required');
-            }
-            $this->exchange = $options['exchange'];
-            unset($options['exchange']);
-        }
-        if (isset($options['queue'])) {
-            if (isset($options['queue']['arguments'])) {
-                $this->queueOptions = $options['queue'];
-            }
-            unset($options['queue']);
-        }
-        if (isset($options['connection'])) {
-            $uri = parse_url($options['connection']);
-            unset($options['connection']);
-            if (isset($uri['scheme']) && $uri['scheme'] === 'redis') {
-                $uri['scheme'] = $uri['scheme'] == 'unix' ? : 'tcp';
-            }
-            if (isset($uri['path'])) {
-                $uri['database'] = trim($uri['path'], '/');
-                $options['connection']['database'] = isset($uri['databsae']) ? $uri['database'] : null;
-            }
-            $options['connection']['host'] = $uri['host'];
-            $options['connection']['port'] = isset($uri['port']) ? $uri['port'] : 6379;
-            $options['connection']['login'] = isset($uri['username']) ? $uri['username'] : null;
-            $options['connection']['password'] = isset($uri['pass']) ? $uri['pass'] : null;
-            $uri = null;
-            $this->options['connection'] = $options['connection'];
-        }
+        $this->options = array_merge($this->options, $options);
         return $this;
     }
 
     /**
-     * @return \Predis\Client
+     * @return Client
      */
     public function getConnection()
     {
         if (!$this->connection) {
             $options = $this->getOptions();
-            $options['connection'] = preg_replace('/redis\:/', 'tcp:', $options['connection']);
-            $connection = new Client($options['connection'], @$options['options'] ? : array());
+            $connection = new Client($options['connection']);
             $this->setConnection($connection);
         }
         return $this->connection;

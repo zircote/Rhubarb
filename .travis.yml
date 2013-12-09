@@ -2,32 +2,16 @@
 env:
   global:
     - secure: ! 'PBjr3GgU1sHC4yD4Fj0k5nMaX1+li8fw2WHVXR/crDDsgLLV+AgnfWvFCCJXnfvs7ikHG/OfP3IvrTsip6bhIybpfvzI/B3YqPuUgEtfds2mbo2iZVofdaedlTAB5R0wOeQRL5wmQdRNMetaBErhh87biZBX2HW3BLnm85dtH0c='
-  matrix:
-    - CONNECTOR=redis
-    - CONNECTOR=amqp
-
-services:
-  - rabbitmq
-  - redis-server
 
 language: php
 
 before_script:
   - mkdir -p ~/.composer
+  - echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - printf '{"config":{"github-oauth":{"github.com":"%s"}}}' $GITHUB_OAUTH_TOKEN > ~/.composer/config.json
-  - sudo pip install celery 
-  - if [ "$CONNECTOR" = "redis" ]; then composer require predis/predis:*; fi
-  - if [ "$CONNECTOR" = "amqp" ]; then composer require zircote/amqp:* ; fi
-  - composer install
-  - if [ "$CONNECTOR" = "amqp" ]; then echo "extension = amqp.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
-  - if [ "$CONNECTOR" = "amqp" ]; then sudo rabbitmqctl add_vhost celery; fi
-  - if [ "$CONNECTOR" = "amqp" ]; then sudo rabbitmqctl set_permissions -p celery guest ".*" ".*"  ".*"; fi
-  - if [ "$CONNECTOR" = "amqp" ]; then (nohup celery -A phpamqp worker --workdir=tests/celery/tasks &); fi
-  - if [ "$CONNECTOR" = "redis" ]; then (nohup celery -A predis worker --workdir=tests/celery/tasks &); fi
-  - sleep 3
+  - composer require predis/predis:* 
 
 php:
-  - 5.3
   - 5.4
   - 5.5
 

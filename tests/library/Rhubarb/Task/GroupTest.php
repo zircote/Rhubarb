@@ -1,9 +1,10 @@
 <?php
-namespace RhubarbTests\Result;
+namespace Rhubarb\Task;
 
 /**
+ * 
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +17,23 @@ namespace RhubarbTests\Result;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * 
  * @package     Rhubarb
- * @category    Tests
- * @subcategory Result
+ * @category    RhubarbTests
  */
+use Rhubarb\RhubarbTestCase;
 
 /**
  * @package     Rhubarb
- * @category    Tests
- * @subcategory Result
+ * @category    RhubarbTests
  */
-class AsyncResultTest extends \PHPUnit_Framework_TestCase
+class GroupTest extends RhubarbTestCase
 {
 
-    public function testResult()
+    public function testApplyAsync()
     {
-        $this->assertTrue(true);
+        $this->markTestIncomplete('This test is not implemented');
     }
-}
 
+}
+ 

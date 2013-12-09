@@ -3,7 +3,7 @@ namespace Rhubarb\ResultStore;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
-use \Rhubarb\Task;
+use \Rhubarb\Task\AsyncResult;
 
 /**
  * @package     Rhubarb
@@ -29,11 +29,8 @@ use \Rhubarb\Task;
 interface ResultStoreInterface
 {
     /**
-     * @abstract
-     *
-     * @param \Rhubarb\Task $task
-     *
-     * @return string|bool
+     * @param AsyncResult $task
+     * @return AsyncResult
      */
-    public function getTaskResult(Task $task);
+    public function getTaskResult(AsyncResult $task);
 }

@@ -3,7 +3,7 @@ namespace Rhubarb\Connector;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2012] [Robert Allen]
+ * Copyright [2013] [Robert Allen]
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ namespace Rhubarb\Connector;
  * @category    
  * @subcategory 
  */
+use Rhubarb\Rhubarb;
+
 /**
  * @package     
  * @category    
@@ -40,8 +42,8 @@ interface ConnectorInterface {
     public function setOptions(array $options);
 
     /**
-     * @param \Rhubarb\Rhubarb $rhubarb
+     * @param Rhubarb $rhubarb
      * @param array $options
      */
-    public function __construct(\Rhubarb\Rhubarb $rhubarb, array $options);
+    public function __construct(Rhubarb $rhubarb, array $options);
 }
