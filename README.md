@@ -12,3 +12,7 @@ Documentation
 
  - [Rhubarb Documentation](docs/)
  - [Rhubarb Connectors Documentation](docs/connectors/)
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/zircote/rhubarb/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
