@@ -6,8 +6,16 @@
     },
     "properties": {
         "content_type": "application/json",
-        "content_encoding": "base64",
-        "correlation_id": "45f78281-8a16-4914-8dd9-fc0aee916a72"
+        "content_encoding": "utf-8",
+        "delivery_mode": 2,
+        "priority": 0,
+        "correlation_id": "7f75aadb-a4bc-45d4-bb87-569c7f3f5986"
     },
-    "body": "eyJhcmdzIjpbMSwyXSwia3dhcmdzIjp7ImFyZzEiOjEsImFyZzIiOjJ9fQ=="
+    "body": {
+        "args": [1, 2],
+        "kwargs": {
+            "arg1": 1,
+            "arg2": 2
+        }
+    }
 }

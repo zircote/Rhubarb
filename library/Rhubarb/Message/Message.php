@@ -60,7 +60,7 @@ class Message implements MessageInterface
         'errbacks' => null,
         'chain' => array(),
         'group' => array(), # group_id
-        'chown' => array(), # chord
+        'chord' => array(), # chord
         'retries' => null,
         'timelimit' => array() # (time_limit, soft_time_limit)
     );
@@ -83,6 +83,14 @@ class Message implements MessageInterface
      * @var bool
      */
     private $isSent = false;
+
+    private function filter($val)
+    {
+        if (is_array($val) || is_object($val)) {
+            return (bool)$val;
+        }
+        return $val !== null && strlen($val) > 0;
+    }
 
     /**
      * @return mixed
@@ -142,7 +150,7 @@ class Message implements MessageInterface
     public function serialize()
     {
         return $this->getRhubarb()
-            ->serialize($this->getPayload(), $this->getProperty('content_type') ?: Rhubarb::DEFAULT_CONTENT_TYPE);
+            ->serialize($this->getPayload(), $this->getProperty('content_type') ? : Rhubarb::DEFAULT_CONTENT_TYPE);
     }
 
     /**
@@ -161,12 +169,14 @@ class Message implements MessageInterface
         $brokerHeaders = array();
         $signatureHeaders = array();
         if ($this->getRhubarb() && $this->getRhubarb()->getBroker() instanceof BrokerInterface) {
-            $brokerHeaders = array_filter($this->getRhubarb()->getBroker()->getHeaders());
+            $brokerHeaders = array_filter($this->getRhubarb()->getBroker()->getHeaders(), array($this, 'filter'));
         }
         if ($this->getSignature() instanceof Signature) {
-            $signatureHeaders = array_filter((array)$this->getSignature()->getHeaders());
+            $signatureHeaders = array_filter((array)$this->getSignature()->getHeaders(), array($this, 'filter'));
         }
-        $this->headers = array_filter(array_merge($brokerHeaders, $this->headers, $signatureHeaders));
+        $this->headers = array_filter(
+            array_merge($brokerHeaders, $this->headers, $signatureHeaders), array($this, 'filter')
+        );
         return $this;
     }
 
@@ -178,12 +188,16 @@ class Message implements MessageInterface
         $brokerProperties = array();
         $signatureProperties = array();
         if ($this->getRhubarb() && $this->getRhubarb()->getBroker() instanceof BrokerInterface) {
-            $brokerProperties = array_filter((array)$this->getRhubarb()->getBroker()->getProperties());
+            $brokerProperties = array_filter(
+                (array)$this->getRhubarb()->getBroker()->getProperties(), array($this, 'filter')
+            );
         }
-        if ($this->getSignature()instanceof Signature) {
-            $signatureProperties = array_filter((array)$this->getSignature()->getProperties());
+        if ($this->getSignature() instanceof Signature) {
+            $signatureProperties = array_filter((array)$this->getSignature()->getProperties(), array($this, 'filter'));
         }
-        $this->properties = array_filter(array_merge($brokerProperties, $this->properties, $signatureProperties));
+        $this->properties = array_filter(
+            array_merge($brokerProperties, $this->properties, $signatureProperties), array($this, 'filter')
+        );
         return $this;
     }
 
@@ -195,14 +209,14 @@ class Message implements MessageInterface
         $this->getSignature()->freeze();
         $this->mergeHeaders()->mergeProperties();
         if (!$this->payload) {
-            if ($this->getProperty('content_encoding') !== Rhubarb::CONTENT_ENCODING_UTF8) { 
+            if ($this->getProperty('content_encoding') !== Rhubarb::CONTENT_ENCODING_UTF8) {
                 $body = $this->getRhubarb()->serialize($this->getBody());
             } else {
                 $body = $this->getBody();
             }
             $body = $this->getRhubarb()->encode(
                 $body,
-                $this->getProperty('content_encoding') ?: Rhubarb::CONTENT_ENCODING_UTF8
+                $this->getProperty('content_encoding') ? : Rhubarb::CONTENT_ENCODING_UTF8
             );
             $this->payload = array(
                 'headers' => $this->getHeaders(),
@@ -224,7 +238,7 @@ class Message implements MessageInterface
             $body = $this->getSignature()
                 ->getBody()
                 ->toArray();
-            return array_filter((array)$body);
+            return array_filter((array)$body, array($this, 'filter'));
         }
         return array();
     }
@@ -258,7 +272,7 @@ class Message implements MessageInterface
         $this->mergeProperties();
         return $this->properties;
     }
-    
+
     /**
      * @param string $property
      * @return string
@@ -320,5 +334,5 @@ class Message implements MessageInterface
         $this->setIsSent();
         return $asyncResult;
     }
-    
+
 }

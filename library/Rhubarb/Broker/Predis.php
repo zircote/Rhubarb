@@ -31,6 +31,7 @@ use Rhubarb\Rhubarb;
  */
 class Predis extends PredisConnection implements BrokerInterface
 {
+    static protected $deliveryTag = 0;
     /**
      * @param Message $message
      * @return \Rhubarb\Task\AsyncResult
@@ -38,6 +39,7 @@ class Predis extends PredisConnection implements BrokerInterface
      */
     public function publishTask(Message $message)
     {
+        $message->setProperty('delivery_tag', ++static::$deliveryTag);
         if (!$this->getConnection()) {
             throw new ConnectionException(sprintf('Connection is not defined in [%s]', __METHOD__));
         }

@@ -1,0 +1,10 @@
+reply_to:	f4d78851-f6d6-35e7-9de1-676bc5d9cea0
+correlation_id:	b250d3ae-9a26-4f98-9775-fda19b4dfb9a
+priority:	0
+delivery_mode:	2
+headers:	
+content_encoding:	utf-8
+content_type:	application/json
+
+
+{"expires": null, "utc": true, "args": [2, 2], "chord": null, "callbacks": null, "errbacks": null, "taskset": null, "id": "b250d3ae-9a26-4f98-9775-fda19b4dfb9a", "retries": 0, "task": "phpamqp.add", "timelimit": [null, null], "eta": null, "kwargs": {}}

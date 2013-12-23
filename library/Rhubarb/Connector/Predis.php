@@ -70,10 +70,6 @@ class Predis extends AbstractConnector
     protected $options = array(
         'connection' => 'tcp://localhost:6379?database=0'
     );
-    protected $properties = array(
-        'content_type'=> Rhubarb::CONTENT_TYPE_JSON,
-        'content_encoding' => Rhubarb::CONTENT_ENCODING_BASE64
-    );
 
     /**
      * @param array $options
