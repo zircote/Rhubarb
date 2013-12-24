@@ -81,5 +81,4 @@ class PredisTest extends PhpPredisTestCase
         );
         $this->fixture->publishTask($message);
     }
-
 }

@@ -89,9 +89,6 @@ class ResultBody
      */
     protected function setResult($result)
     {
-        if (!in_array($result, AsyncResult::$allowedResultStates)) {
-            throw new RuntimeException('status provided is not a known state');
-        }
         $this->result = $result;
         return $this;
     }
@@ -108,9 +105,13 @@ class ResultBody
      *
      * @param string $state
      * @return ResultBody
+     * @throws RuntimeException
      */
     protected function setState($state)
     {
+        if (!in_array($state, AsyncResult::$allowedResultStates)) {
+            throw new RuntimeException('status provided is not a known state');
+        }
         $this->state = $state;
         return $this;
     }

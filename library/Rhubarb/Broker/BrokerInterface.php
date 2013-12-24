@@ -39,9 +39,4 @@ interface BrokerInterface
      */
     public function getProperties();
 
-    /**
-     * @return array
-     */
-    public function getHeaders();
-
 }

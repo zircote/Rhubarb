@@ -68,6 +68,8 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
     }
 
     /**
+     * @codeCoverageIgnore
+     * 
      * @param Message $message
      * @return \AMQPQueue
      */
@@ -86,6 +88,8 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
     }
 
     /**
+     * @codeCoverageIgnore
+     * 
      * @return \AMQPChannel
      */
     protected function getChannel()
@@ -101,6 +105,8 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
     }
 
     /**
+     * @codeCoverageIgnore
+     * 
      * @param \AMQPChannel $amqpChannel
      * @param Message $message
      * @return \AMQPExchange
@@ -118,28 +124,6 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
 
         $amqpExchange->declareExchange();
         return $amqpExchange;
-    }
-
-    /**
-     * @return array
-     */
-    public function getHeaders()
-    {
-        if (isset($this->options['connection']['options']['headers'])) {
-            return (array)$this->options['connection']['options']['headers'];
-        }
-        return array();
-    }
-
-    /**
-     * @return array
-     */
-    public function getProperties()
-    {
-        if (isset($this->options['connection']['options']['properties'])) {
-            return (array)$this->options['connection']['options']['properties'];
-        }
-        return array();
     }
 
 }

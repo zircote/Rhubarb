@@ -74,7 +74,7 @@ class Signature
 
     protected $callbacks = array(
         'on_success' => array(),
-        'on_error' => array(),
+        'on_failure' => array(),
         'on_retry' => array()
     );
 
@@ -233,9 +233,6 @@ class Signature
         if ($this->isFroze()) {
             throw new TaskSignatureException('Signature is Frozen');
         }
-        if (!is_callable($callback)) {
-            throw new TaskSignatureException('callback provided is not callable');
-        }
         array_push($this->callbacks['on_success'], $callback);
         return $this;
     }
@@ -250,9 +247,6 @@ class Signature
         if ($this->isFroze()) {
             throw new TaskSignatureException('Signature is Frozen');
         }
-        if (!is_callable($callback)) {
-            throw new TaskSignatureException('callback provided is not callable');
-        }
         array_push($this->callbacks['on_failure'], $callback);
         return $this;
     }
@@ -266,9 +260,6 @@ class Signature
     {
         if ($this->isFroze()) {
             throw new TaskSignatureException('Signature is Frozen');
-        }
-        if (!is_callable($callback)) {
-            throw new TaskSignatureException('callback provided is not callable');
         }
         array_push($this->callbacks['on_retry'], $callback);
         return $this;
@@ -309,7 +300,7 @@ class Signature
     public function applyAsync(BodyInterface $body = null, array $properties = array(), array $headers = array())
     {
         if ($this->isFroze()) {
-            throw new Exception('Signature is Frozen');
+            throw new TaskSignatureException('Signature is Frozen');
         }
         foreach ($properties as $property => $value) {
             $this->setProperty($property, $value);
@@ -340,6 +331,7 @@ class Signature
     /**
      * @param BodyInterface $args
      * @return $this
+     * @codeCoverageIgnore
      */
     public function map(BodyInterface $args)
     {
@@ -350,6 +342,7 @@ class Signature
     /**
      * @param BodyInterface $args
      * @return $this
+     * @codeCoverageIgnore
      */
     public function starmap(BodyInterface $args)
     {
@@ -365,7 +358,7 @@ class Signature
     public function setName($name)
     {
         if ($this->isFroze()) {
-            throw new Exception('Signature is Frozen');
+            throw new TaskSignatureException('Signature is Frozen');
         }
         $this->name = $name;
         return $this;
@@ -387,13 +380,18 @@ class Signature
      */
     public function setRhubarb($rhubarb)
     {
-        if (!$rhubarb instanceof Rhubarb) {
-            throw new InvalidArgumentException(
-                sprintf('argument must be of type [\Rhubarb\Rhubarb] [%s] given', gettype($rhubarb))
-            );
-        }
         if ($this->isFroze()) {
             throw new TaskSignatureException('Signature is Frozen');
+        }
+        if (!$rhubarb instanceof Rhubarb) {
+            if (is_object($rhubarb)) {
+                $type = get_class($rhubarb);
+            } else {
+                $type = gettype($rhubarb);
+            }
+            throw new InvalidArgumentException(
+                sprintf('argument must be of type [\Rhubarb\Rhubarb] [%s] given', $type)
+            );
         }
         $this->rhubarb = $rhubarb;
         return $this;

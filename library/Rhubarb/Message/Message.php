@@ -22,6 +22,7 @@ namespace Rhubarb\Message;
  */
 use Rhubarb\Broker\BrokerInterface;
 use Rhubarb\Exception\Exception;
+use Rhubarb\Exception\MessageSentException;
 use Rhubarb\Rhubarb;
 use Rhubarb\Task\Body\BodyInterface;
 use Rhubarb\Task\Signature;
@@ -236,15 +237,16 @@ class Message implements MessageInterface
      */
     public function getBody()
     {
+        $body = array();
         if ($this->getSignature() instanceof Signature && $this->getSignature()
                 ->getBody() instanceof BodyInterface
         ) {
             $body = $this->getSignature()
                 ->getBody()
                 ->toArray();
-            return array_filter((array)$body, array($this, 'filter'));
+            $body = array_filter((array)$body, array($this, 'filter'));
         }
-        return array();
+        return $body;
     }
 
     /**
@@ -298,7 +300,7 @@ class Message implements MessageInterface
     public function setProperty($property, $value)
     {
         if ($this->isSent()) {
-            throw new Exception(
+            throw new MessageSentException(
                 sprintf(
                     'message sent, setting properties is not allowed [ %s(%s::%s) ]',
                     __METHOD__,

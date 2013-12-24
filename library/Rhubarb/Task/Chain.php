@@ -27,6 +27,7 @@ use Rhubarb\Exception\TaskSignatureException;
  * @package
  * @category
  * @subcategory
+ * @codeCoverageIgnore
  */
 class Chain
 {

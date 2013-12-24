@@ -21,7 +21,10 @@ namespace Rhubarb\Broker;
  * @category    Tests
  * @subcategory AsyncResult
  */
+use AMQP\Message;
+use Rhubarb\Connector\PhpAmqp;
 use Rhubarb\PhpAmqpTestCase;
+use Rhubarb\Rhubarb;
 
 /**
  * @package     Rhubarb
@@ -65,6 +68,7 @@ class PhpAmqpTest extends PhpAmqpTestCase
 
     /**
      *
+     * 
      */
     public function testPublishTask()
     {
@@ -116,14 +120,26 @@ class PhpAmqpTest extends PhpAmqpTestCase
         /* So many mocks, I dont like it... */
         $this->fixture->publishTask($message);
     }
-
+/**
     public function testGetHeaders()
     {
-        $this->markTestIncomplete();
+        $expected = array();
+        $this->getMockFixture();
+        $this->assertEquals($expected, $this->fixture->getHeaders());
     }
 
+    /**
+     * 
+     */
     public function testGetProperties()
     {
-        $this->markTestIncomplete();
+        $expected = array(
+            'content_type' => Rhubarb::CONTENT_TYPE_JSON,
+            'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
+            'delivery_mode' => PhpAmqp::AMQP_PERSISTENT,
+            'priority' => 0
+        );
+        $this->getMockFixture();
+        $this->assertEquals($expected, $this->fixture->getProperties());
     }
 }

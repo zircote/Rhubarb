@@ -32,13 +32,34 @@ use Rhubarb\Exception\TimeoutException;
  */
 class AsyncResult
 {
+    /**
+     *
+     */
     const PENDING = 'PENDING';
+    /**
+     *
+     */
     const STARTED = 'STARTED';
+    /**
+     *
+     */
     const SUCCESS = 'SUCCESS';
+    /**
+     *
+     */
     const FAILURE = 'FAILURE';
+    /**
+     *
+     */
     const RETRY = 'RETRY';
+    /**
+     *
+     */
     const REVOKED = 'REVOKED';
 
+    /**
+     * @var array
+     */
     static public $allowedResultStates = array(
         AsyncResult::PENDING,
         AsyncResult::FAILURE,
@@ -47,6 +68,9 @@ class AsyncResult
         AsyncResult::STARTED,
         AsyncResult::SUCCESS
     );
+    /**
+     * @var array
+     */
     static public $completedState = array(
         AsyncResult::FAILURE,
         AsyncResult::REVOKED,
@@ -78,6 +102,9 @@ class AsyncResult
         $this->setResult(new ResultBody($result));
     }
 
+    /**
+     *
+     */
     public function revoke()
     {
         //{"destination": null, "method": "revoke", "arguments": {"signal": null, "terminate": false, "task_id": "c72e99dd-13aa-4791-8b21-6ae94594972b"}}

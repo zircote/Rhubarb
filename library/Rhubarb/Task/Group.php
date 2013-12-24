@@ -25,6 +25,7 @@ namespace Rhubarb\Task;
  * @package
  * @category
  * @subcategory
+ * @codeCoverageIgnore
  */
 class Group
 {

@@ -31,8 +31,4 @@ use Rhubarb\RhubarbTestCase;
 class AsyncResultTest extends RhubarbTestCase
 {
 
-    public function testTask()
-    {
-        $this->markTestIncomplete();
-    }
 }

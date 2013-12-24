@@ -22,6 +22,7 @@ namespace Rhubarb\Connector;
  * @subcategory
  */
 use Rhubarb\Exception\ConnectionException;
+use Rhubarb\Rhubarb;
 
 /**
  * @package
@@ -31,6 +32,8 @@ use Rhubarb\Exception\ConnectionException;
 class PhpAmqp extends AbstractConnector
 {
 
+    const DEFAULT_PORT = 5672;
+    const DEFAULT_CONNECTION_STRING = 'amqp://guest:guest@127.0.0.1';
     /**
      * @var \AmqpConnection
      */
@@ -39,8 +42,53 @@ class PhpAmqp extends AbstractConnector
      * @var array
      */
     protected $options = array(
-        'connection' => 'amqp://guest:guest@127.0.0.1:5682/celery',
+        'connection' => self::DEFAULT_CONNECTION_STRING,
     );
+
+
+    /**
+     * @param $connection
+     * @return array
+     * @throws ConnectionException
+     */
+    public function parseUri($connection)
+    {
+        $uri = parse_url($connection);
+        $connection = array();
+        if (!isset($uri['port'])) {
+            switch ($uri['scheme']) {
+                case 'amqp':
+                    $uri['port'] = self::DEFAULT_PORT;
+                    break;
+                case 'amqps':
+                    throw new ConnectionException('AMQP via TLS is not supported currently by ext-amqp');
+                    break;
+                default:
+                    throw new ConnectionException(
+                        sprintf('unknown URI scheme provided [ %s ] expected [ amqp:// ]', $uri['scheme'])
+                    );
+            }
+        } else {
+            $connection['port'] = (integer)$uri['port'];
+        }
+        $connection['host'] = $uri['host'];
+        /* 
+         * I don't like it but to ensure that all parties are happy this is necessary
+         * PECL-AMQP (or rabbitmq-c) seems to do whacky shit with the leading `/` in the vhost that is it seems to 
+         * always prepend it to whatever you pass in however rabbit-mq will allows a vhost with and without. Most 
+         * libraries are quite happy to treat `/celery` as `celery` as seen in the rabbit-mq run-time.
+         */
+        $connection['vhost'] = isset($uri['path']) ?
+            preg_replace('#^/#', null, $uri['path']) : Rhubarb::DEFAULT_EXCHANGE_NAME;
+        $connection['login'] = isset($uri['user']) ? $uri['user'] : null;
+        $connection['password'] = isset($uri['pass']) ? $uri['pass'] : null;
+        if (isset($uri['query'])) {
+            $query = array();
+            parse_str($uri['query'], $query);
+            $connection = array_merge($connection, $query);
+        }
+        return array('connection' => $connection);
+    }
 
     /**
      * @param array $options
@@ -75,22 +123,12 @@ class PhpAmqp extends AbstractConnector
                 if (isset($connection['password'])) {
                     $this->options['connection']['password'] = $connection['password'];
                 }
-                if (isset($connection['connect_timeout'])) {
-                    $this->options['connection']['connect_timeout'] = $connection['connect_timeout'];
-                }
                 if (isset($connection['write_timeout'])) {
                     $this->options['connection']['write_timeout'] = $connection['write_timeout'];
                 }
                 if (isset($connection['read_timeout'])) {
                     $this->options['connection']['read_timeout'] = $connection['read_timeout'];
                 }
-            } else {
-                throw new ConnectionException(
-                    sprintf(
-                        'options passed to %s are invalid [uri:string, array, or \AMQPConnection] expected',
-                        __METHOD__
-                    )
-                );
             }
         }
         return $this;

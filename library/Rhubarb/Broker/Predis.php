@@ -41,9 +41,6 @@ class Predis extends PredisConnection implements BrokerInterface
     public function publishTask(Message $message)
     {
         $message->setProperty('delivery_tag', ++static::$deliveryTag);
-        if (!$this->getConnection()) {
-            throw new ConnectionException(sprintf('Connection is not defined in [%s]', __METHOD__));
-        }
         return $this->getConnection()
             ->lpush($message->getHeader('exchange') ? : Rhubarb::DEFAULT_EXCHANGE_NAME, $message->serialize());
     }

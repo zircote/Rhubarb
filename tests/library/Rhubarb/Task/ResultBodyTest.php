@@ -35,12 +35,16 @@ class ResultBodyTest extends RhubarbTestCase
      */
     protected $fixture;
 
+    protected $body =  array(
+        'state' => AsyncResult::STARTED,
+        'children' => array(1,2),
+        'traceback' => array('trace.me'),
+        'result' => 4
+    );
+    
     public function setUp()
     {
-        $this->rhubarb = $this->getRhubarbMock($this->getBrokerMock());
-        $this->fixture = new ResultBody(
-            array('state' => AsyncResult::STARTED, 'children' => array(), 'traceback' => array(), 'result' => null)
-        );
+        $this->fixture = new ResultBody($this->body);
     }
 
     public function tearDown()
@@ -50,32 +54,20 @@ class ResultBodyTest extends RhubarbTestCase
 
     public function testConstructor()
     {
-
+        $this->assertEquals($this->body['state'], $this->fixture->getState());
+        $this->assertEquals($this->body['children'], $this->fixture->getChildren());
+        $this->assertEquals($this->body['traceback'], $this->fixture->getTraceback());
+        $this->assertEquals($this->body['result'], $this->fixture->getResult());
     }
 
-    public function testGetChildren()
+    /**
+     * @expectedException \Rhubarb\Exception\RuntimeException
+     * @expectedExceptionMessage status provided is not a known state
+     */
+    public function testInvalidStateProvided()
     {
-
-    }
-
-    public function testGetResult()
-    {
-
-    }
-
-    public function testGetState()
-    {
-
-    }
-
-    public function testGetTraceBack()
-    {
-
-    }
-
-    public function testFromString()
-    {
-
+        $this->body['state'] = 'UNKNOWN_STATE_THROW_EXCEPTION';
+        new ResultBody($this->body);
     }
 }
  

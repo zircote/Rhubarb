@@ -26,6 +26,7 @@ use Rhubarb\Task\AsyncResult;
 /**
  * @package     Rhubarb
  * @category    ResultStore
+ * @codeCoverageIgnore
  */
 class Test implements ResultStoreInterface
 {

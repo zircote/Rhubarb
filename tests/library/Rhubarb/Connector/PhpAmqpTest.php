@@ -131,4 +131,28 @@ class PhpAmqpTest extends PhpAmqpTestCase
 
         $this->assertFalse($this->fixture->isConnected());
     }
+
+    /**
+     * @expectedException \Rhubarb\Exception\ConnectionException
+     * @expectedExceptionMessage AMQP via TLS is not supported currently by ext-amqp
+     */
+    public function testAMQPSThrowsException()
+    {
+        new PhpAmqp(
+            $this->rhubarb,
+            array('connection' => 'amqps://guest:guest@localhost')
+        );
+    }
+
+    /**
+     * @expectedException \Rhubarb\Exception\ConnectionException
+     * @expectedExceptionMessage unknown URI scheme provided [ rabbitmq ] expected [ amqp:// ]
+     */
+    public function testUnknownSchemaTypeThrowsException()
+    {
+        new PhpAmqp(
+            $this->rhubarb,
+            array('connection' => 'rabbitmq://guest:guest@localhost')
+        );
+    }
 }

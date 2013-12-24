@@ -19,6 +19,7 @@ namespace Rhubarb\Broker;
  *
  * @package     Rhubarb
  * @category    Broker
+ * 
  */
 use Rhubarb\Message\Message;
 use Rhubarb\Task\AsyncResult;
@@ -26,6 +27,7 @@ use Rhubarb\Task\AsyncResult;
 /**
  * @package     Rhubarb
  * @category    Broker
+ * @codeCoverageIgnore
  */
 class Test implements BrokerInterface
 {

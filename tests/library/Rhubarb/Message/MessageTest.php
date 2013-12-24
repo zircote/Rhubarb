@@ -62,6 +62,23 @@ class MessageTest extends RhubarbTestCase
     }
 
     /**
+     *
+     */
+    protected function buildSimpleMock()
+    {
+        $brokerHeaders = array();
+        $brokerProperties = array('content_type' => 'application/json', 'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8);
+        $signatureHeaders = array('lang' => 'py', 'c_type' => 'test.task');
+        $signatureProperties = array('correlation_id' => 'abcdef0123456789');
+        $body = array('args' => array(1, 2), 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2'));
+
+        $this->buildMocks($brokerHeaders, $brokerProperties, $signatureHeaders, $signatureProperties, $body);
+
+        $this->fixture = new Message($this->rhubarb, $this->signature);
+
+    }
+
+    /**
      * @group V2
      * @group Message
      */
@@ -119,54 +136,63 @@ class MessageTest extends RhubarbTestCase
         $this->assertEquals($expected, $this->fixture->getPayload());
     }
 
-    public function testGetSignature()
-    {
-
-    }
-
-    public function testSetSignature()
-    {
-
-    }
-
     public function testToString()
     {
-
+        $this->buildSimpleMock();
+        $this->assertTrue(is_string((string)$this->fixture));
     }
 
     public function testGetPayLoad()
     {
+        $this->buildSimpleMock();
+        $expected = array(
+            'headers' => array('lang' => 'py', 'c_type' => 'test.task'),
+            'properties' => array(
+                'content_type' => Rhubarb::CONTENT_TYPE_JSON,
+                'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
+                'correlation_id' => 'abcdef0123456789'
+            ),
+            'body' => array(
+                'args' => array(1, 2), 
+                'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
+            )
+        );
+        $actual = $this->fixture->getPayload();
+        $this->assertEquals($expected, $actual);
 
     }
 
-    public function testGetProperties()
+    /**
+     * @expectedException \Rhubarb\Exception\MessageSentException
+     * @expectedExceptionMessage message sent, setting properties is not allowed [ Rhubarb\Message\Message::setProperty(message_property::true) ]
+     */
+    public function testSetPropertyAfterMessageSent()
     {
-
-    }
-
-    public function testGetBody()
-    {
-
+        $this->buildSimpleMock();
+        $this->fixture->getProperties();
+        $this->fixture->getHeaders();
+        $this->fixture->getBody();
+        $this->fixture->setIsSent();
+        $this->fixture->setProperty('message_property', 'true');
     }
 
     public function testGetHeaders()
     {
+        $this->buildSimpleMock();
+        $expected = array('lang' => 'py', 'c_type' => 'test.task');
+        $actual = $this->fixture->getHeaders();
+        $this->assertEquals($expected, $actual);
+        $this->fixture->getPayload();
 
     }
-
-    public function testSetIsSent()
+    public function testGetHeader()
     {
-
-    }
-
-    public function testIsSent()
-    {
-
-    }
-
-    public function testDispatch()
-    {
-
+        
+        $this->buildSimpleMock();
+        $expected = 'py';
+        $actual = $this->fixture->getHeader('lang');
+        $this->assertEquals($expected, $actual);
+        $this->fixture->getPayload();
     }
 }
  

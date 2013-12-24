@@ -1,7 +1,8 @@
 <?php
-namespace Rhubarb\Connector;
+namespace Rhubarb\Exception;
 
 /**
+ * 
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -16,29 +17,17 @@ namespace Rhubarb\Connector;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @package
- * @category
- * @subcategory
+ * 
+ * @package     Rhubarb
+ * @category    Rhubarb\Exception
  */
-use Rhubarb\Rhubarb;
 
 /**
- * @package
- * @category
- * @subcategory
+ * @package     Rhubarb
+ * @category    Rhubarb\Exception
  */
-interface ConnectorInterface
+class MessageSentException extends Exception
 {
 
-    /**
-     * @return mixed
-     */
-    public function getOptions();
-
-    /**
-     * @param Rhubarb $rhubarb
-     * @param array $options
-     */
-    public function __construct(Rhubarb $rhubarb, array $options);
 }
+ 

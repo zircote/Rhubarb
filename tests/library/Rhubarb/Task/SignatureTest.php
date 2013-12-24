@@ -101,6 +101,17 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
+     */
+    public function testSetBodyFrozen()
+    {
+        $this->fixture->freeze();
+        $this->fixture->setBody(new Task\Body\Python());
+
+    }
+
+    /**
      *
      */
     public function testGetBody()
@@ -119,9 +130,35 @@ class SignatureTest extends RhubarbTestCase
         $this->assertEquals($expected, $this->fixture->getHeaders());
     }
 
+    /**
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
+     */
+    public function testSetHeaderFrozen()
+    {
+        $this->fixture->freeze();
+        $this->fixture->setHeader('c_type', 'my_type');
+    }
+    
     public function testGetHeader()
     {
         $this->assertEquals($this->fixtureArgs['headers']['c_meth'], $this->fixture->getHeader('c_meth'));
+    }
+
+    public function testGetHeaderNotExisting()
+    {
+        $this->assertEquals(null, $this->fixture->getHeader('nada'));
+    }
+
+    /**
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
+     */
+    public function testSetHeadersFrozen()
+    {
+        $this->fixture->freeze();
+        $expected = array('lang' => 'py', 'c_type' => 'my_type');
+        $this->fixture->setHeaders($expected);
     }
 
     /**
@@ -145,12 +182,36 @@ class SignatureTest extends RhubarbTestCase
     /**
      *
      */
+    public function testGetHeadersNoBody()
+    {
+        
+        $this->fixture = new Signature(
+            $this->rhubarb,
+            $this->fixtureArgs['name']);
+        $this->assertEquals(array('c_type' => __CLASS__), $this->fixture->getHeaders());
+    }
+
+    /**
+     *
+     */
     public function testSetProperty()
     {
         $additive = array('content_type' => 'application/json');
         $expected = array_merge($this->fixtureArgs['properties'], $additive);
         $this->fixture->setProperty(key($additive), current($additive));
         $this->assertEquals($expected, $this->fixture->getProperties());
+    }
+
+    /**
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
+     */
+    public function testSetPropertyWhileFroze()
+    {
+        $additive = array('content_type' => 'application/json');
+        $expected = array_merge($this->fixtureArgs['properties'], $additive);
+        $this->fixture->freeze();
+        $this->fixture->setProperty(key($additive), current($additive));
     }
 
     /**
@@ -162,6 +223,18 @@ class SignatureTest extends RhubarbTestCase
             $this->fixtureArgs['properties']['content_encoding'],
             $this->fixture->getProperty('content_encoding')
         );
+    }
+
+    /**
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
+     */
+    public function testSetPropertiesWhileFrozen()
+    {
+        $additive = array('content_type' => 'application/json');
+        $expected = array_merge($this->fixtureArgs['properties'], $additive);
+        $this->fixture->freeze();
+        $this->fixture->setProperties($expected);
     }
 
     /**
@@ -182,31 +255,7 @@ class SignatureTest extends RhubarbTestCase
     {
         $this->assertEquals($this->fixtureArgs['properties'], $this->fixture->getProperties());
     }
-
-    /**
-     *
-     */
-    public function testOnSuccess()
-    {
-        $this->markTestIncomplete(sprintf('%s is not complete', __METHOD__));
-    }
-
-    /**
-     *
-     */
-    public function testOnFailure()
-    {
-        $this->markTestIncomplete(sprintf('%s is not complete', __METHOD__));
-    }
-
-    /**
-     *
-     */
-    public function testOnRetry()
-    {
-        $this->markTestIncomplete(sprintf('%s is not complete', __METHOD__));
-    }
-
+    
     /**
      *
      */
@@ -235,10 +284,32 @@ class SignatureTest extends RhubarbTestCase
     /**
      *
      */
+    public function testSWithBody()
+    {
+        $expected = '\Rhubarb\Task\Signature';
+        $actual = $this->fixture->s(new Task\Body\Python(array()));
+        $this->assertInstanceOf($expected, $actual);
+        $this->assertTrue($this->fixture->isMutable());
+    }
+
+    /**
+     *
+     */
     public function testSi()
     {
         $expected = '\Rhubarb\Task\Signature';
         $actual = $this->fixture->si();
+        $this->assertInstanceOf($expected, $actual);
+        $this->assertFalse($this->fixture->isMutable());
+    }
+
+    /**
+     *
+     */
+    public function testSiWithBody()
+    {
+        $expected = '\Rhubarb\Task\Signature';
+        $actual = $this->fixture->si(new Task\Body\Python());
         $this->assertInstanceOf($expected, $actual);
         $this->assertFalse($this->fixture->isMutable());
     }
@@ -257,8 +328,21 @@ class SignatureTest extends RhubarbTestCase
             ->method('dispatch')
             ->will($this->returnValue($asyncMock));
 
-        $actual = $this->fixture->applyAsync();
+        $actual = $this->fixture->applyAsync(null, array('prop' => 1), array('head' => 2));
+        $this->assertArrayHasKey('prop', $this->fixture->getProperties());
+        $this->assertArrayHasKey('head', $this->fixture->getHeaders());
         $this->assertInstanceOf($expected, $actual);
+    }
+
+    /**
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
+     */
+    public function testApplyAsyncWhileFrozen()
+    {
+        $this->fixture->freeze();
+        $this->fixture->applyAsync(null, array('prop' => 1), array('head' => 2));
+        
     }
 
     /**
@@ -281,22 +365,6 @@ class SignatureTest extends RhubarbTestCase
     /**
      *
      */
-    public function testMap()
-    {
-        $this->markTestSkipped('Signature::map is not implemented yet');
-    }
-
-    /**
-     *
-     */
-    public function testStarmap()
-    {
-        $this->markTestSkipped('Signature::starmap is not implemented yet');
-    }
-
-    /**
-     *
-     */
     public function testGetName()
     {
         $this->assertEquals($this->fixtureArgs['name'], $this->fixture->getName());
@@ -313,12 +381,42 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
-     * #expectedExceptionMessage argument must be of type [\Rhubarb\Rhubarb] [stdClass] given
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
      */
-    public function testSetRhubarb()
+    public function testSetNameFrozen()
+    {
+        $expected = 'test.new_name';
+        $this->fixture->freeze();
+        $this->fixture->setName($expected);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage argument must be of type [\Rhubarb\Rhubarb] [stdClass] given
+     */
+    public function testSetRhubarbWithStdClass()
     {
         $this->fixture->setRhubarb(new stdClass());
+    }
+
+    /**
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
+     */
+    public function testSetRhubarbWhenFrozen()
+    {
+        $this->fixture->freeze();
+        $this->fixture->setRhubarb(new stdClass());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage argument must be of type [\Rhubarb\Rhubarb] [integer] given
+     */
+    public function testSetRhubarbNotObject()
+    {
+        $this->fixture->setRhubarb(1);
     }
 
     /**
@@ -380,5 +478,76 @@ class SignatureTest extends RhubarbTestCase
             $this->fixture->getId()
         );
     }
+
+    /**
+     *
+     */
+    public function testMap()
+    {
+        $this->markTestSkipped('Signature::map is not implemented yet');
+    }
+
+    /**
+     *
+     */
+    public function testStarmap()
+    {
+        $this->markTestSkipped('Signature::starmap is not implemented yet');
+    }
+
+    /**
+     *
+     */
+    public function testOnSuccess()
+    {
+        $this->fixture->onSuccess(function($task){ $task->getId();});
+    }
+
+    /**
+     *
+     */
+    public function testOnFailure()
+    {
+        $this->fixture->onFailure(function($task){ $task->getId();});
+    }
+
+    /**
+     *
+     */
+    public function testOnRetry()
+    {
+        $this->fixture->onRetry(function($task){ $task->getId();});
+    }
+
+    /**
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
+     */
+    public function testOnSuccessWhileFrozen()
+    {
+        $this->fixture->freeze();
+        $this->fixture->onSuccess(function($task){ $task->getId();});
+    }
+
+    /**
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
+     */
+    public function testOnFailureWhileFrozen()
+    {
+        $this->fixture->freeze();
+        $this->fixture->onFailure(function($task){ $task->getId();});
+    }
+
+    /**
+     * @expectedException \Rhubarb\Exception\TaskSignatureException
+     * @expectedExceptionMessage Signature is Frozen
+     */
+    public function testOnRetryWhileFrozen()
+    {
+        $this->fixture->freeze();
+        $this->fixture->onRetry(function($task){ $task->getId();});
+    }
+
 }
  
