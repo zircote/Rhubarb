@@ -5,3 +5,4 @@ demos/
 extras/documentation
 nohup.out
 *.dump
+phpunit.xml

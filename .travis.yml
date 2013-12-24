@@ -15,4 +15,4 @@ php:
   - 5.4
   - 5.5
 
-script: phpunit tests
+script: phpunit -c tests/phpunit.xml.travis tests
