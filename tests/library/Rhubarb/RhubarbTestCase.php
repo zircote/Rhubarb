@@ -2,7 +2,7 @@
 namespace Rhubarb;
 
 /**
- * 
+ *
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -17,7 +17,7 @@ namespace Rhubarb;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    RhubarbTests\Mock
  */
@@ -55,21 +55,21 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
         $rhubarb->expects($this->any())
             ->method('getBroker')
             ->will($this->returnValue($brokerMock));
-        
+
         if ($message instanceof Message) {
             $asyncMock = $this->getAsyncResultMock($rhubarb, $message);
             $rhubarb->expects($this->once())
                 ->method('dispatch')
                 ->will($this->returnValue($asyncMock));
-            
+
         }
-        
+
         if ($resultStoreMock) {
-        $rhubarb->expects($this->once())
-            ->method('getResultStore')
-            ->will($this->returnValue($resultStoreMock));
+            $rhubarb->expects($this->once())
+                ->method('getResultStore')
+                ->will($this->returnValue($resultStoreMock));
         }
-        
+
         return $rhubarb;
     }
 
@@ -81,40 +81,40 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
     public function getAsyncResultMock(Rhubarb $rhubarbMock, Message $message)
     {
         $asyncResultMock = $this->getMock('\Rhubarb\Task\AsyncResult', array(), func_get_args());
-        
+
         return $asyncResultMock;
     }
-    
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\ResultStore\ResultStoreInterface
      */
     protected function getResultStoreMock()
     {
         $brokerMock = $this->getMock('\Rhubarb\ResultStore\ResultStoreInterface');
-        
+
         return $brokerMock;
     }
-    
+
     /**
      * @param $brokerHeaders
      * @param $brokerProperties
      * @return \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Broker\BrokerInterface
      */
-    protected function getBrokerMock($brokerHeaders=array(), $brokerProperties=array())
+    protected function getBrokerMock($brokerHeaders = array(), $brokerProperties = array())
     {
         $brokerMock = $this->getMock(
             '\Rhubarb\Broker\BrokerInterface',
             array('getHeaders', 'getProperties', 'publishTask')
         );
-        
+
         $brokerMock->expects($this->any())
             ->method('getHeaders')
             ->will($this->returnValue($brokerHeaders));
-        
+
         $brokerMock->expects($this->any())
             ->method('getProperties')
             ->will($this->returnValue($brokerProperties));
-        
+
         $brokerMock->expects($this->any())
             ->method('publishTask')
             ->will($this->returnSelf());
@@ -135,17 +135,17 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
             array('getProperties', 'getHeaders', 'getBody'),
             array($rhubarb, 'test.task')
         );
-        
+
         $signatureMock->expects($this->atLeastOnce())
             ->method('getProperties')
             ->will($this->returnValue($signatureProperties));
-        
+
         $signatureMock->expects($this->atLeastOnce())
             ->method('getHeaders')
             ->will($this->returnValue($signatureHeaders));
-        
+
         $bodyMock = $this->getBodyMock($body);
-        
+
         $signatureMock->expects($this->atLeastOnce())
             ->method('getBody')
             ->will($this->returnValue($bodyMock));
@@ -175,12 +175,12 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
         $bodyMock->expects($this->any())
             ->method('getHeaders')
             ->will($this->returnValue(array('lang' => 'py')));
-        
+
         $bodyMock->expects($this->any())
             ->method('__toString')
             ->will(
                 $this->returnValue(
-                    json_encode($body, JSON_BIGINT_AS_STRING|JSON_NUMERIC_CHECK|JSON_UNESCAPED_SLASHES)
+                    json_encode($body, JSON_BIGINT_AS_STRING | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES)
                 )
             );
         return $bodyMock;
@@ -197,7 +197,7 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
         $pythonMock->expects($this->any())
             ->method('toArray')
             ->will($this->returnValue(array('args' => $args, 'kwargs' => $this->getKwargsMock($kwargs))));
-        
+
         return $pythonMock;
     }
 
@@ -211,7 +211,7 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
         $kwargsMock->expects($this->any())
             ->method('toArray')
             ->will($this->returnValue($kwargs));
-        
+
         return $kwargsMock;
     }
 
@@ -225,11 +225,12 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
         $messageMock = $this->getMock('\Rhubarb\Message\Message', array(), func_get_args());
         return $messageMock;
     }
-    
+
     public function testGetRhubarb()
     {
-        
+
     }
+
     public function testSetRhubarb()
     {
         if ($this->fixture && method_exists($this->fixture, 'getRhubarb')) {

@@ -18,13 +18,14 @@
  *
  * @package     Rhubarb
  * @category    Examples
- * 
+ *
  */
 use Rhubarb\Rhubarb;
 use Rhubarb\Task\Body\Python as PythonTask;
 use Rhubarb\Task\Body\Python\Kwargs;
 use Rhubarb\Task\Signature;
 
+require dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 $config = include('redis_configuration.php');
 $rhubarb = new Rhubarb($config);
 
@@ -51,4 +52,4 @@ $asyncResult = $add->delay(
     array('routing_key' => 'W1@127.0.0.1', 'exchange' => 'C.dq')
 );
 
-$result = $asyncResult->get();
+//$result = $asyncResult->get();

@@ -41,6 +41,7 @@ class PhpAmqpTest extends PhpAmqpTestCase
     {
         $this->fixture = new PhpAmqp($this->rhubarb);
     }
+
     public function setUp()
     {
         $this->rhubarb = $this->getRhubarbMock($this->getBrokerMock(array(), array()));
@@ -67,10 +68,10 @@ class PhpAmqpTest extends PhpAmqpTestCase
      */
     public function testPublishTask()
     {
-        /* @var \PHPUnit_Framework_MockObject_MockObject|PhpAmqp $mock*/
+        /* @var \PHPUnit_Framework_MockObject_MockObject|PhpAmqp $mock */
         $mock = $this->getMock(
             '\Rhubarb\Broker\PhpAmqp',
-            array('declareQueue','getExchange','getChannel', 'getConnection'),
+            array('declareQueue', 'getExchange', 'getChannel', 'getConnection'),
             array($this->rhubarb, array())
         );
         $amqpConnection = $this->getAMQPConnectionMock(false);
@@ -98,7 +99,7 @@ class PhpAmqpTest extends PhpAmqpTestCase
             array(),
             $this->getBodyMock(array(2, 1))
         );
-        
+
         /* @var $message \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Message\Message */
         $message = $this->getMock(
             '\Rhubarb\Message\Message',
@@ -111,7 +112,7 @@ class PhpAmqpTest extends PhpAmqpTestCase
         $message->expects($this->exactly(2))
             ->method('getHeaders')
             ->will($this->returnValue(array()));
-        
+
         /* So many mocks, I dont like it... */
         $this->fixture->publishTask($message);
     }
@@ -120,6 +121,7 @@ class PhpAmqpTest extends PhpAmqpTestCase
     {
         $this->markTestIncomplete();
     }
+
     public function testGetProperties()
     {
         $this->markTestIncomplete();

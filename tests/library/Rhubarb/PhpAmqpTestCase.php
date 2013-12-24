@@ -1,26 +1,26 @@
 <?php
 namespace Rhubarb;
 
-/**
- *
- * @license http://www.apache.org/licenses/LICENSE-2.0
- * Copyright [2013] [Robert Allen]
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * @package     Rhubarb
- * @category    Rhubarb\Connector
- */
+    /**
+     *
+     * @license http://www.apache.org/licenses/LICENSE-2.0
+     * Copyright [2013] [Robert Allen]
+     *
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     * You may obtain a copy of the License at
+     *
+     *   http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     *
+     * @package     Rhubarb
+     * @category    Rhubarb\Connector
+     */
 
 /**
  * @package     Rhubarb
@@ -48,11 +48,11 @@ class PhpAmqpTestCase extends RhubarbTestCase
      * @return \PHPUnit_Framework_MockObject_MockObject|\AMQPConnection
      */
     public function getAMQPConnectionMock($callOriginalConstructor = true, $methods = array(
-            'connect', 'disconnect', 'getHost', 'getLogin', 'getPassword', 'getPort', 'getVhost',
-            'isConnected', 'reconnect', 'setHost', 'setLogin', 'setPassword', 'setPort', 'setVhost',
-            'setTimeout', 'getTimeout', 'getReadTimeout', 'setReadTimeout', 'getWriteTimeout', 'setWriteTimeout',
-            'pconnect', 'pdisconnect'
-        ), $constructorArguments = array())
+        'connect', 'disconnect', 'getHost', 'getLogin', 'getPassword', 'getPort', 'getVhost',
+        'isConnected', 'reconnect', 'setHost', 'setLogin', 'setPassword', 'setPort', 'setVhost',
+        'setTimeout', 'getTimeout', 'getReadTimeout', 'setReadTimeout', 'getWriteTimeout', 'setWriteTimeout',
+        'pconnect', 'pdisconnect'
+    ), $constructorArguments = array())
     {
         $AMQPConnection = $this->getMock(
             'AMQPConnection', $methods, $constructorArguments, '', $callOriginalConstructor
@@ -69,7 +69,7 @@ class PhpAmqpTestCase extends RhubarbTestCase
      */
     public function setAMQPMethod($mock, $method, $returns, $expects = null)
     {
-        $mock->expects($expects ?: $this->any())
+        $mock->expects($expects ? : $this->any())
             ->method($method)
             ->will($returns);
         return $mock;
@@ -96,9 +96,9 @@ class PhpAmqpTestCase extends RhubarbTestCase
      * @return \PHPUnit_Framework_MockObject_MockObject|\AMQPExchange
      */
     public function getAMQPExchangeMock($callOriginalConstructor = true, $methods = array(
-            'bind', 'declareExchange', 'delete', 'getArgument', 'getArguments', 'getFlags', 'getName',
-            'getType', 'publish', 'setArgument', 'setArguments', 'setFlags', 'setName', 'setType'
-        ), $constructorArguments = array())
+        'bind', 'declareExchange', 'delete', 'getArgument', 'getArguments', 'getFlags', 'getName',
+        'getType', 'publish', 'setArgument', 'setArguments', 'setFlags', 'setName', 'setType'
+    ), $constructorArguments = array())
     {
         $AMQPExchange = $this->getMock('AMQPExchange', $methods, $constructorArguments, '', $callOriginalConstructor);
         return $AMQPExchange;

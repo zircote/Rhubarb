@@ -2,7 +2,7 @@ Rhubarb
 =======
 
 .. topic:: Celery Worker Execution From PHP
-    
+
     Use of Rhubarb is outlined as follows.
 
 **Send AsyncResult and Wait For Result**

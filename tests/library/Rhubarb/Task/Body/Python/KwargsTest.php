@@ -2,7 +2,7 @@
 namespace Rhubarb\Task\Body\Python;
 
 /**
- * 
+ *
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -17,7 +17,7 @@ namespace Rhubarb\Task\Body\Python;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    RhubarbTests\Body\Python
  */
@@ -34,11 +34,11 @@ use Rhubarb\Exception\KwargException;
  */
 class KwargsTest extends PHPUnit_Framework_TestCase
 {
-    
+
     public function testToArray()
     {
         $expected = array('arg1' => 'arg_1', 'arg2' => 'arg_2');
-        $kwargs =  new Kwargs($expected);
+        $kwargs = new Kwargs($expected);
         $this->assertEquals($expected, $kwargs->toArray());
     }
 
@@ -52,11 +52,11 @@ class KwargsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * 
+     *
      */
     public function testArrayAccess()
     {
-        $kwargs =  new Kwargs();
+        $kwargs = new Kwargs();
         $expected = array('assigned_arg1' => 'arg_1', 'assigned_arg2' => 'arg_2');
         $kwargs['assigned_arg1'] = 'arg_1';
         $kwargs['assigned_arg2'] = 'arg_2';
@@ -64,11 +64,11 @@ class KwargsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * 
+     *
      */
     public function testPropertyAccess()
     {
-        $kwargs =  new Kwargs();
+        $kwargs = new Kwargs();
         $expected = array('assigned_arg1' => 'arg_1', 'assigned_arg2' => 'arg_2');
         $kwargs->assigned_arg1 = 'arg_1';
         $kwargs->assigned_arg2 = 'arg_2';
@@ -76,11 +76,11 @@ class KwargsTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * 
+     *
      */
     public function testPropertyAndArrayAccess()
     {
-        $kwargs =  new Kwargs();
+        $kwargs = new Kwargs();
         $expected = array('assigned_arg1' => 'arg_1', 'assigned_arg2' => 'arg_2');
         $kwargs['assigned_arg1'] = 'arg_1';
         $kwargs->assigned_arg2 = 'arg_2';

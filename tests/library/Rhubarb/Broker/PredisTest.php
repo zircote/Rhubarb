@@ -40,12 +40,12 @@ class PredisTest extends PhpPredisTestCase
 
     public function setUp()
     {
-        $this->rhubarb = $this->getRhubarbMock($this->getBrokerMock(array(),$this->getResultStoreMock(), array()));
+        $this->rhubarb = $this->getRhubarbMock($this->getBrokerMock(array(), $this->getResultStoreMock(), array()));
         $this->fixture = new Predis($this->rhubarb);
     }
 
     /**
-     * 
+     *
      */
     public function tearDown()
     {
@@ -54,7 +54,7 @@ class PredisTest extends PhpPredisTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testConstructor()
     {
@@ -63,7 +63,7 @@ class PredisTest extends PhpPredisTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testPublishTask()
     {
@@ -77,7 +77,7 @@ class PredisTest extends PhpPredisTestCase
 
         $message = new Message(
             $this->rhubarb,
-            $this->getSignatureMock($this->rhubarb, array(), array(), $this->getBodyMock(array(2,1)))
+            $this->getSignatureMock($this->rhubarb, array(), array(), $this->getBodyMock(array(2, 1)))
         );
         $this->fixture->publishTask($message);
     }

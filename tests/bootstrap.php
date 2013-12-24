@@ -20,10 +20,10 @@
  */
 
 defined('AMQP_DEBUG')
-    || define('AMQP_DEBUG', (getenv('AMQP_DEBUG') ? getenv('AMQP_DEBUG') : false));
+|| define('AMQP_DEBUG', (getenv('AMQP_DEBUG') ? getenv('AMQP_DEBUG') : false));
 
 defined('CONNECTOR')
-    || define('CONNECTOR', (getenv('CONNECTOR') ? getenv('CONNECTOR') : false));
+|| define('CONNECTOR', (getenv('CONNECTOR') ? getenv('CONNECTOR') : false));
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 

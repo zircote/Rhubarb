@@ -68,7 +68,7 @@ class RhubarbTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testTask()
     {
@@ -77,11 +77,11 @@ class RhubarbTest extends RhubarbTestCase
         $this->assertInstanceOf('\Rhubarb\Task\Signature', $asyncResult);
         $this->assertEquals($expected, $asyncResult->getName());
         $this->assertEquals('base64', $asyncResult->getProperty('content_encoding'));
-        $this->assertEquals(array(30,90), $asyncResult->getHeader('timelimit'));
+        $this->assertEquals(array(30, 90), $asyncResult->getHeader('timelimit'));
     }
 
     /**
-     * 
+     *
      */
     public function testT()
     {
@@ -109,42 +109,52 @@ class RhubarbTest extends RhubarbTestCase
         $logger = $this->rhubarb->getLogger();
         $this->assertEquals('Rhubarb', $logger->getName());
     }
+
     public function testSetOptions()
     {
-        
+
     }
+
     public function testGetOptions()
     {
-        
+
     }
+
     public function testGetOption()
     {
-        
+
     }
+
     public function testSetOption()
     {
-        
+
     }
+
     public function testSetTasks()
     {
-        
+
     }
+
     public function testAddTask()
     {
-        
+
     }
+
     public function testGetTask()
     {
-        
+
     }
+
     public function testDelTask()
     {
-        
+
     }
+
     public function testDispatch()
     {
-        
+
     }
+
     public function testDecode()
     {
         $encodedBody = 'eyJkZXN0aW5hdGlvbiI6IG51bGwsICJtZXRob2QiOiAicmV2b2tlIiwgImFyZ3VtZW50cyI6IHsic2lnbmFsIjogbnVsbCwgInRlcm1pbmF0ZSI6IGZhbHNlLCAidGFza19pZCI6ICJjNzJlOTlkZC0xM2FhLTQ3OTEtOGIyMS02YWU5NDU5NDk3MmIifX0=';
@@ -152,6 +162,7 @@ class RhubarbTest extends RhubarbTestCase
         $expected = '{"destination": null, "method": "revoke", "arguments": {"signal": null, "terminate": false, "task_id": "c72e99dd-13aa-4791-8b21-6ae94594972b"}}';
         $this->assertJsonStringEqualsJsonString($expected, $actual);
     }
+
     public function testUnserialize()
     {
         $json = '{"test": "win"}';
@@ -159,7 +170,7 @@ class RhubarbTest extends RhubarbTestCase
         $actual = $this->rhubarb->unserialize($json, Rhubarb::CONTENT_TYPE_JSON);
         $this->assertEquals($expected, $actual);
     }
-    
+
     public function testSerialize()
     {
         $expected = '{"test":"win"}';
@@ -167,6 +178,7 @@ class RhubarbTest extends RhubarbTestCase
         $actual = $this->rhubarb->serialize($json, Rhubarb::CONTENT_TYPE_JSON);
         $this->assertEquals($expected, $actual);
     }
+
     public function testEncode()
     {
         $body = '{"destination": null, "method": "revoke", "arguments": {"signal": null, "terminate": false, "task_id": "c72e99dd-13aa-4791-8b21-6ae94594972b"}}';

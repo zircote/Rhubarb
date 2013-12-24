@@ -2,7 +2,7 @@
 namespace Rhubarb\Connector;
 
 /**
- * 
+ *
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -17,7 +17,7 @@ namespace Rhubarb\Connector;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    RhubarbTests\Connector
  */
@@ -26,7 +26,7 @@ use Rhubarb\RhubarbTestCase;
 /**
  * @package     Rhubarb
  * @category    RhubarbTests\Connector
- * 
+ *
  * @group Connector\Predis
  */
 class PredisTest extends RhubarbTestCase
@@ -44,7 +44,7 @@ class PredisTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function tearDown()
     {
@@ -53,14 +53,14 @@ class PredisTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testConstructor()
     {
         $predis = $this->fixture->getConnection();
         $this->assertInstanceOf('\Predis\Client', $predis);
     }
-    
+
 
 }
  

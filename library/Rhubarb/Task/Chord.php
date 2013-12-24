@@ -16,17 +16,17 @@ namespace Rhubarb\Task;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
- * @package     
- * @category    
- * @subcategory 
+ *
+ * @package
+ * @category
+ * @subcategory
  */
 use Rhubarb\Exception\TaskSignatureException;
 
 /**
- * @package     
- * @category    
- * @subcategory 
+ * @package
+ * @category
+ * @subcategory
  */
 class Chord
 {

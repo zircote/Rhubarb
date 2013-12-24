@@ -137,7 +137,7 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
     public function getProperties()
     {
         if (isset($this->options['connection']['options']['properties'])) {
-            return (array) $this->options['connection']['options']['properties'];
+            return (array)$this->options['connection']['options']['properties'];
         }
         return array();
     }

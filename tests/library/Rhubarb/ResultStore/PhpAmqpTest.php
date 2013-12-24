@@ -2,7 +2,7 @@
 namespace Rhubarb\ResultStore;
 
 /**
- * 
+ *
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -17,7 +17,7 @@ namespace Rhubarb\ResultStore;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    RhubarbTests\Result
  */
@@ -42,14 +42,14 @@ class PhpAmqpTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function tearDown()
     {
         $this->rhubarb = null;
         $this->fixture = null;
     }
-    
+
     public function testConstructor()
     {
         $this->markTestIncomplete();

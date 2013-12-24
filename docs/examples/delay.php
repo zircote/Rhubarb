@@ -18,12 +18,13 @@
  *
  * @package     Rhubarb
  * @category    Examples
- * 
+ *
  */
 use Rhubarb\Rhubarb;
 use Rhubarb\Task\Body\Python as PythonTask;
 use Rhubarb\Task\Body\Python\Kwargs;
 use Rhubarb\Task\Signature;
+
 require dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 $config = include('redis_configuration.php');
 $rhubarb = new Rhubarb($config);
@@ -34,6 +35,6 @@ $argsPython = new PythonTask(array(1, 2), $kwargs);
 /* @var Signature $add */
 $add = $rhubarb->task('app.add');
 
-$asyncResult = $add->delay($argsPython, array(), array('timelimit' => array(5.0, 10.0)));
+$asyncResult = $add->delay($argsPython, array());
 
 //$result = $asyncResult->get();

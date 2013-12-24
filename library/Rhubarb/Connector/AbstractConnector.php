@@ -16,22 +16,22 @@ namespace Rhubarb\Connector;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
- * @package     
- * @category    
- * @subcategory 
+ *
+ * @package
+ * @category
+ * @subcategory
  */
 use Rhubarb\Exception\ConnectionException;
 use \Rhubarb\Rhubarb;
 
 /**
- * @package     
- * @category    
- * @subcategory 
+ * @package
+ * @category
+ * @subcategory
  */
 class AbstractConnector implements ConnectorInterface
 {
-    
+
     const AMQP_PERSISTENT = 2;
     const AMQP_NON_PERSISTENT = 1;
     /**
@@ -50,7 +50,7 @@ class AbstractConnector implements ConnectorInterface
      * @var array
      */
     protected $properties = array(
-        'content_type'=> Rhubarb::CONTENT_TYPE_JSON,
+        'content_type' => Rhubarb::CONTENT_TYPE_JSON,
         'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
         'delivery_mode' => self::AMQP_PERSISTENT,
         'priority' => 0
@@ -84,6 +84,7 @@ class AbstractConnector implements ConnectorInterface
     {
         $this->options = $options;
     }
+
     /**
      * @param mixed $rhubarb
      * @return AbstractConnector
@@ -127,7 +128,7 @@ class AbstractConnector implements ConnectorInterface
                     throw new ConnectionException('unknown URI scheme provided [redis:// or amqp://] expected');
             }
         } else {
-            $connection['port'] = (integer) $uri['port'];
+            $connection['port'] = (integer)$uri['port'];
         }
         $connection['host'] = $uri['host'];
         $connection['vhost'] = isset($uri['path']) ? $uri['path'] : null;
@@ -147,6 +148,7 @@ class AbstractConnector implements ConnectorInterface
         }
         return array('connection' => $connection);
     }
+
     /**
      * @return array
      */
@@ -154,6 +156,7 @@ class AbstractConnector implements ConnectorInterface
     {
         return $this->properties;
     }
+
     /**
      * @return array
      */

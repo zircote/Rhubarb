@@ -36,8 +36,8 @@ latex_elements = {
 }
 
 latex_documents = [
-  ('index', 'Rhubarb.tex', u'Rhubarb Documentation',
-   u'Robert Allen', 'manual'),
+    ('index', 'Rhubarb.tex', u'Rhubarb Documentation',
+     u'Robert Allen', 'manual'),
 ]
 
 man_pages = [
@@ -46,7 +46,7 @@ man_pages = [
 ]
 
 texinfo_documents = [
-  ('index', 'Rhubarb', u'Rhubarb Documentation',
-   u'Robert Allen', 'Rhubarb', 'One line description of project.',
-   'Miscellaneous'),
+    ('index', 'Rhubarb', u'Rhubarb Documentation',
+     u'Robert Allen', 'Rhubarb', 'One line description of project.',
+     'Miscellaneous'),
 ]

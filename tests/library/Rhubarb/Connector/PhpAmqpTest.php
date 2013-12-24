@@ -2,7 +2,7 @@
 namespace Rhubarb\Connector;
 
 /**
- * 
+ *
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -17,7 +17,7 @@ namespace Rhubarb\Connector;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    RhubarbTests\Connector
  */
@@ -43,7 +43,7 @@ class PhpAmqpTest extends PhpAmqpTestCase
     }
 
     /**
-     * 
+     *
      */
     public function tearDown()
     {
@@ -53,15 +53,15 @@ class PhpAmqpTest extends PhpAmqpTestCase
 
     /**
      * @group AMQP
-     * 
+     *
      * @group ConnectorC
      */
     public function testConstructor()
     {
         $amqp = new PhpAmqp(
             $this->rhubarb,
-            array('connection' => 
-                    'amqp://guest:guest@localhost:5672/celery?read_timeout=2.3&write_timeout=5')
+            array('connection' =>
+                'amqp://guest:guest@localhost:5672/celery?read_timeout=2.3&write_timeout=5')
         );
         $this->assertEquals('localhost', $amqp->getConnection()->getHost());
         $this->assertEquals('guest', $amqp->getConnection()->getLogin());
@@ -78,9 +78,9 @@ class PhpAmqpTest extends PhpAmqpTestCase
         $AMQPConnection->expects($this->once())
             ->method('connect')
             ->will($this->returnValue(true));
-        
+
         $this->fixture->setConnection($AMQPConnection);
-        
+
         $this->assertTrue($this->fixture->connect());
     }
 
@@ -90,9 +90,9 @@ class PhpAmqpTest extends PhpAmqpTestCase
         $AMQPConnection->expects($this->once())
             ->method('connect')
             ->will($this->returnValue(false));
-        
+
         $this->fixture->setConnection($AMQPConnection);
-        
+
         $this->assertFalse($this->fixture->connect());
     }
 
@@ -102,9 +102,9 @@ class PhpAmqpTest extends PhpAmqpTestCase
         $AMQPConnection->expects($this->once())
             ->method('disconnect')
             ->will($this->returnValue(true));
-        
+
         $this->fixture->setConnection($AMQPConnection);
-        
+
         $this->assertTrue($this->fixture->disconnect());
     }
 
@@ -114,9 +114,9 @@ class PhpAmqpTest extends PhpAmqpTestCase
         $AMQPConnection->expects($this->once())
             ->method('reconnect')
             ->will($this->returnValue(true));
-        
+
         $this->fixture->setConnection($AMQPConnection);
-        
+
         $this->assertTrue($this->fixture->reconnect());
     }
 
@@ -126,9 +126,9 @@ class PhpAmqpTest extends PhpAmqpTestCase
         $AMQPConnection->expects($this->once())
             ->method('isConnected')
             ->will($this->returnValue(false));
-        
+
         $this->fixture->setConnection($AMQPConnection);
-        
+
         $this->assertFalse($this->fixture->isConnected());
     }
 }

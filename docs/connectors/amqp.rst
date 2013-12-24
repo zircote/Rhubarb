@@ -66,7 +66,7 @@ ext-amqp
 
 
 .. topic:: Configuration
-   
+
  The configuration of the *ext-amqp* implementation for **Rhubarb** is comprised of the following key hierarchy:
  
     - **broker**

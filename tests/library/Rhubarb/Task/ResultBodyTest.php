@@ -2,7 +2,7 @@
 namespace Rhubarb\Task;
 
 /**
- * 
+ *
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -17,7 +17,7 @@ namespace Rhubarb\Task;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    Rhubarb
  */
@@ -34,7 +34,7 @@ class ResultBodyTest extends RhubarbTestCase
      * @var ResultBody
      */
     protected $fixture;
-    
+
     public function setUp()
     {
         $this->rhubarb = $this->getRhubarbMock($this->getBrokerMock());
@@ -47,29 +47,35 @@ class ResultBodyTest extends RhubarbTestCase
     {
         $this->fixture = null;
     }
+
     public function testConstructor()
     {
-        
+
     }
+
     public function testGetChildren()
     {
-        
+
     }
+
     public function testGetResult()
     {
-        
+
     }
+
     public function testGetState()
     {
-        
+
     }
+
     public function testGetTraceBack()
     {
-        
+
     }
+
     public function testFromString()
     {
-        
+
     }
 }
  

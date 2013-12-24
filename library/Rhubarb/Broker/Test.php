@@ -16,7 +16,7 @@ namespace Rhubarb\Broker;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    Broker
  */
@@ -45,7 +45,7 @@ class Test implements BrokerInterface
      * @param \Rhubarb\Message\Message $message
      * @return AsyncResult
      */
-    public function publishTask(Message  $message)
+    public function publishTask(Message $message)
     {
     }
 

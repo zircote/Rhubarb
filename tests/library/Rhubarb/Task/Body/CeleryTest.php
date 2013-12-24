@@ -2,7 +2,7 @@
 namespace Rhubarb\Task\Body;
 
 /**
- * 
+ *
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -17,7 +17,7 @@ namespace Rhubarb\Task\Body;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    Rhubarb
  */
@@ -37,9 +37,10 @@ class CeleryTest extends PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Task\Body\Celery
      */
     protected $fixture;
+
     protected function setUp()
     {
-       
+
     }
 
     protected function setupMock()
@@ -50,8 +51,9 @@ class CeleryTest extends PHPUnit_Framework_TestCase
         $mock->expects($this->once())->method('toArray')->will($this->returnValue($this->expectedArguments));
         $this->fixture = new Celery('revoke', $mock);
     }
+
     /**
-     * 
+     *
      */
     protected function tearDown()
     {
@@ -59,14 +61,14 @@ class CeleryTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * 
+     *
      */
     public function testConstructor()
     {
         $this->setupMock();
         $this->assertEquals($this->expected, $this->fixture->toArray());
     }
-    
+
     public function testGetHeaders()
     {
         $this->fixture = null;
@@ -74,9 +76,9 @@ class CeleryTest extends PHPUnit_Framework_TestCase
         $mock = $this->getMock('\Rhubarb\Task\Body\Celery\Arguments', array(), array(), '', false);
         $this->fixture = new Celery('revoke', $mock);
         $this->assertEmpty($this->fixture->getHeaders());
-        
+
     }
-    
+
     public function testSerialize()
     {
         $this->setupMock();
@@ -85,13 +87,13 @@ class CeleryTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * 
+     *
      */
     public function testToString()
     {
         $this->setupMock();
         $expected = json_encode($this->expected, Rhubarb::$jsonOptions);
-        $this->assertJsonStringEqualsJsonString($expected, (string) $this->fixture);
+        $this->assertJsonStringEqualsJsonString($expected, (string)$this->fixture);
     }
 
 }

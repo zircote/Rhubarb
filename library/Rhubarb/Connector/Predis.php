@@ -16,7 +16,7 @@ namespace Rhubarb\Connector;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package
  * @category
  * @subcategory
@@ -24,6 +24,7 @@ namespace Rhubarb\Connector;
 use Predis\Client;
 use Rhubarb\Exception\ConnectionException;
 use Rhubarb\Rhubarb;
+
 /**
  * @package
  * @category
@@ -42,7 +43,7 @@ class Predis extends AbstractConnector
 
     /**
      * @link https://github.com/nrk/predis/wiki/Connection-Parameters
-     * 
+     *
      * Predis Options:
      *  - scheme [string - default: tcp] [tcp, unix, http]
      *  - host [string - default: 127.0.0.1]
@@ -58,17 +59,26 @@ class Predis extends AbstractConnector
      *  - weight [integer - default: not set]
      *  - iterable_multibulk [boolean - default: false]
      *  - throw_errors [boolean - default: true]
-     * 
+     *
      * Example URI Usage:
      * tcp://host:port?password=54321&database=0&connection_async=false&connection_persistent=false\
      *      &connection_timeout=5.0&read_write_timeout=&alias=&weight=&iterable_multiblock=false&throw_errors=false
      * unix:///var/run/redis.sock?password=54321&database=0&connection_async=false&connection_persistent=false\
      *      &connection_timeout=5.0&read_write_timeout=&alias=&weight=&iterable_multiblock=false&throw_errors=false
-     * 
+     *
      * @var array
      */
     protected $options = array(
         'connection' => 'tcp://localhost:6379?database=0'
+    );
+    /**
+     * @var array
+     */
+    protected $properties = array(
+        'content_type' => Rhubarb::CONTENT_TYPE_JSON,
+        'content_encoding' => Rhubarb::CONTENT_ENCODING_BASE64,
+        'delivery_mode' => self::AMQP_PERSISTENT,
+        'priority' => 0
     );
 
     /**

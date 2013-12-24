@@ -16,7 +16,7 @@ namespace Rhubarb\Task\Body\Python;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package
  * @category
  * @subcategory
@@ -42,6 +42,7 @@ class Kwargs implements ArrayAccess
             $this->offsetSet($k, $v);
         }
     }
+
     /**
      * @param $name
      * @return null

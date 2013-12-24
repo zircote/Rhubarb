@@ -40,14 +40,14 @@ class SignatureTest extends RhubarbTestCase
      * @var array
      */
     protected $fixtureArgs = array(
-        'body' => array(1,2),
+        'body' => array(1, 2),
         'name' => __CLASS__,
         'headers' => array('lang' => 'py', 'c_meth' => 'my_meth'),
         'properties' => array('content_encoding' => 'UTF-8')
     );
 
     /**
-     * 
+     *
      */
     public function setup()
     {
@@ -61,6 +61,7 @@ class SignatureTest extends RhubarbTestCase
             $this->fixtureArgs['headers']
         );
     }
+
     public function testGetLang()
     {
         $this->fixture->applyAsync();
@@ -68,7 +69,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function tearDown()
     {
@@ -76,7 +77,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testConstructor()
     {
@@ -88,19 +89,19 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testSetBody()
     {
-        $expected = array(2,1);
+        $expected = array(2, 1);
         $bodyMock = $this->getBodyMock($expected);
         $this->fixture->setBody($bodyMock);
         $this->assertEquals($expected, $this->fixture->getBody()->toArray());
-        
+
     }
 
     /**
-     * 
+     *
      */
     public function testGetBody()
     {
@@ -108,11 +109,11 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testSetHeader()
     {
-        $additive = array('lang'=> 'py', 'c_type' => 'my_type');
+        $additive = array('lang' => 'py', 'c_type' => 'my_type');
         $expected = array_merge($this->fixtureArgs['headers'], $additive);
         $this->fixture->setHeader('c_type', 'my_type');
         $this->assertEquals($expected, $this->fixture->getHeaders());
@@ -124,17 +125,17 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testSetHeaders()
     {
-        $expected = array('lang'=> 'py', 'c_type' => 'my_type');
+        $expected = array('lang' => 'py', 'c_type' => 'my_type');
         $this->fixture->setHeaders($expected);
         $this->assertEquals($expected, $this->fixture->getHeaders());
     }
 
     /**
-     * 
+     *
      */
     public function testGetHeaders()
     {
@@ -142,7 +143,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testSetProperty()
     {
@@ -153,7 +154,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testGetProperty()
     {
@@ -164,7 +165,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testSetProperties()
     {
@@ -175,7 +176,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testGetProperties()
     {
@@ -183,7 +184,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testOnSuccess()
     {
@@ -191,7 +192,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testOnFailure()
     {
@@ -199,7 +200,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testOnRetry()
     {
@@ -207,7 +208,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testFreeze()
     {
@@ -221,7 +222,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testS()
     {
@@ -232,7 +233,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testSi()
     {
@@ -243,25 +244,25 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testApplyAsync()
     {
         $expected = '\Rhubarb\Task\AsyncResult';
-        
+
         $messageMock = $this->getMessageMock($this->rhubarb, $this->fixture);
         $asyncMock = $this->getAsyncResultMock($this->rhubarb, $messageMock);
 
         $this->rhubarb->expects($this->once())
             ->method('dispatch')
             ->will($this->returnValue($asyncMock));
-        
+
         $actual = $this->fixture->applyAsync();
         $this->assertInstanceOf($expected, $actual);
     }
 
     /**
-     * 
+     *
      */
     public function testDelay()
     {
@@ -272,13 +273,13 @@ class SignatureTest extends RhubarbTestCase
         $this->rhubarb->expects($this->once())
             ->method('dispatch')
             ->will($this->returnValue($asyncMock));
-        
+
         $actual = $this->fixture->delay();
         $this->assertInstanceOf($expected, $actual);
     }
 
     /**
-     * 
+     *
      */
     public function testMap()
     {
@@ -286,7 +287,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testStarmap()
     {
@@ -294,7 +295,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testGetName()
     {
@@ -302,7 +303,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testSetName()
     {
@@ -321,7 +322,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testGetRhubarb()
     {
@@ -329,7 +330,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testIsMutable()
     {
@@ -338,7 +339,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testCopy()
     {
@@ -353,7 +354,7 @@ class SignatureTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testInvoke()
     {
@@ -364,13 +365,13 @@ class SignatureTest extends RhubarbTestCase
         $this->rhubarb->expects($this->once())
             ->method('dispatch')
             ->will($this->returnValue($asyncMock));
-        
+
         $actual = $this->fixture;
         $this->assertInstanceOf($expected, $actual());
     }
 
     /**
-     * 
+     *
      */
     public function testGetId()
     {

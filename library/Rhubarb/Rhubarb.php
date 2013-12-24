@@ -110,7 +110,7 @@ class Rhubarb
      */
     const CELERY_DIRECT_WORKER_QUEUE = 'C.dq';
     /**
-     * 
+     *
      */
     const KOMBU_BINDING_CELERY_ = '_kombu.binding.celery';
     /**
@@ -202,22 +202,22 @@ class Rhubarb
      */
     public function __construct(array $options = array())
     {
-        $this->serializers[self::CONTENT_TYPE_JSON] = function($payload) {
+        $this->serializers[self::CONTENT_TYPE_JSON] = function ($payload) {
             return json_encode($payload, JSON_BIGINT_AS_STRING | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES);
         };
-        $this->unserializers[self::CONTENT_TYPE_JSON] = function($payload) {
+        $this->unserializers[self::CONTENT_TYPE_JSON] = function ($payload) {
             return json_decode($payload, JSON_BIGINT_AS_STRING | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES);
         };
-        $this->encoders[self::CONTENT_ENCODING_BASE64] = function($payload) {
+        $this->encoders[self::CONTENT_ENCODING_BASE64] = function ($payload) {
             return base64_encode($payload);
         };
-        $this->decoders[self::CONTENT_ENCODING_BASE64] = function($payload) {
+        $this->decoders[self::CONTENT_ENCODING_BASE64] = function ($payload) {
             return base64_decode($payload);
         };
-        $this->encoders[self::CONTENT_ENCODING_UTF8] = function($payload) {
+        $this->encoders[self::CONTENT_ENCODING_UTF8] = function ($payload) {
             return $payload;
         };
-        $this->decoders[self::CONTENT_ENCODING_UTF8] = function($payload) {
+        $this->decoders[self::CONTENT_ENCODING_UTF8] = function ($payload) {
             return $payload;
         };
         /* I would prefer this was a class constant; however PHP will not allow bitwise assignments in the class body */
@@ -333,7 +333,7 @@ class Rhubarb
         }
         return $this;
     }
-    
+
     /**
      * Returns the result store object if created otherwise false.
      *
@@ -449,7 +449,7 @@ class Rhubarb
             );
         }
         $taskTemplate['name'] = $task['name'];
-        
+
         if (isset($task['properties'])) {
             $taskTemplate['properties'] = array_merge($taskTemplate['properties'], (array)$task['properties']);
         }

@@ -24,9 +24,11 @@ celery.conf.update(
     }
 )
 
+
 @celery.task
 def add(x, y):
     return x + y
+
 
 @celery.task
 def subtract(x, y):

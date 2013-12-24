@@ -52,7 +52,9 @@ class Signature
     /**
      * @var array
      */
-    protected $properties = array();
+    protected $properties = array(
+        'timelimit' => array(null, null)
+    );
     /**
      * @var BodyInterface
      */
@@ -385,7 +387,7 @@ class Signature
      */
     public function setRhubarb($rhubarb)
     {
-        if(!$rhubarb instanceof Rhubarb) {
+        if (!$rhubarb instanceof Rhubarb) {
             throw new InvalidArgumentException(
                 sprintf('argument must be of type [\Rhubarb\Rhubarb] [%s] given', gettype($rhubarb))
             );

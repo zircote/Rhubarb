@@ -82,6 +82,7 @@ class AsyncResult
     {
         //{"destination": null, "method": "revoke", "arguments": {"signal": null, "terminate": false, "task_id": "c72e99dd-13aa-4791-8b21-6ae94594972b"}}
     }
+
     /**
      * @return string
      */
@@ -232,12 +233,12 @@ class AsyncResult
      */
     public function getResult()
     {
-        if (!in_array($this->result->getState(),self::$completedState)) {
+        if (!in_array($this->result->getState(), self::$completedState)) {
             $this->getRhubarb()->getResultStore()
                 ->getTaskResult($this);
         }
         return $this->result;
     }
-    
+
 }
 

@@ -2,7 +2,7 @@
 namespace Rhubarb\Task\Body;
 
 /**
- * 
+ *
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -17,7 +17,7 @@ namespace Rhubarb\Task\Body;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    Rhubarb\Task\Body
  */
@@ -31,7 +31,7 @@ use Rhubarb\Task\Body\Python\Kwargs;
 class Python implements BodyInterface
 {
     const LANG = 'py';
-    
+
     /**
      * @var array
      */
@@ -55,6 +55,7 @@ class Python implements BodyInterface
             $this->setKwargs($kwargs);
         }
     }
+
     /**
      *
      * @param array $args
@@ -100,6 +101,7 @@ class Python implements BodyInterface
             'kwargs' => $this->kwargs->toArray()
         );
     }
+
     /**
      * @return string
      */
@@ -113,7 +115,7 @@ class Python implements BodyInterface
      */
     public function __toString()
     {
-        return (string) $this->serialize();
+        return (string)$this->serialize();
     }
 
     /**

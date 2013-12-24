@@ -16,7 +16,7 @@ namespace Rhubarb\Broker;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    Broker
  */
@@ -32,6 +32,7 @@ use Rhubarb\Rhubarb;
 class Predis extends PredisConnection implements BrokerInterface
 {
     static protected $deliveryTag = 0;
+
     /**
      * @param Message $message
      * @return \Rhubarb\Task\AsyncResult
@@ -44,7 +45,7 @@ class Predis extends PredisConnection implements BrokerInterface
             throw new ConnectionException(sprintf('Connection is not defined in [%s]', __METHOD__));
         }
         return $this->getConnection()
-            ->lpush($message->getHeader('exchange') ?: Rhubarb::DEFAULT_EXCHANGE_NAME, $message->serialize());
+            ->lpush($message->getHeader('exchange') ? : Rhubarb::DEFAULT_EXCHANGE_NAME, $message->serialize());
     }
 
 }

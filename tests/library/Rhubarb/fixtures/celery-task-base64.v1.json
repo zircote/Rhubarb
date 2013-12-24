@@ -1,0 +1,38 @@
+{
+    "headers": {},
+    "content-type": "application/json",
+    "content-encoding": "utf-8",
+    "properties": {
+        "body_encoding": "base64",
+        "correlation_id": "57a768e9-50b2-4bfa-95f0-2f28338b31cb",
+        "reply_to": "bc4f1a6a-a51e-3f84-ad9c-872555a6be96",
+        "delivery_info": {
+            "priority": 0,
+            "routing_key": "celery",
+            "exchange": "celery"
+        },
+        "delivery_mode": 2,
+        "delivery_tag": 1
+    },
+    "body": {
+        "expires": null,
+        "utc": true,
+        "args": [2, 2],
+        "chord": null,
+        "callbacks": null,
+        "errbacks": null,
+        "taskset": null,
+        "id": "57a768e9-50b2-4bfa-95f0-2f28338b31cb",
+        "retries": 0,
+        "task": "predis.add",
+        "timelimit": [null, null],
+        "eta": null,
+        "kwargs": {}
+    }
+}
+/**
+ * "body":
+ * "eyJleHBpcmVzIjogbnVsbCwgInV0YyI6IHRydWUsICJhcmdzIjogWzIsIDJdLCAiY2hvcmQiOiBudWxsLCAiY2FsbGJhY2tzIjogbnVsbCwgImVycm\
+ * JhY2tzIjogbnVsbCwgInRhc2tzZXQiOiBudWxsLCAiaWQiOiAiNTdhNzY4ZTktNTBiMi00YmZhLTk1ZjAtMmYyODMzOGIzMWNiIiwgInJldHJpZXMiO\
+ * iAwLCAidGFzayI6ICJwcmVkaXMuYWRkIiwgInRpbWVsaW1pdCI6IFtudWxsLCBudWxsXSwgImV0YSI6IG51bGwsICJrd2FyZ3MiOiB7fX0=",
+ */

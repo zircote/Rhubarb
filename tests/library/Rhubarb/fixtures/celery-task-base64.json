@@ -1,0 +1,16 @@
+{
+    "headers": {
+        "lang": "py",
+        "c_type": "app.add",
+        "timelimit": [5, 10]
+    },
+    "properties": {
+        "content_type": "application/json",
+        "content_encoding": "base64",
+        "delivery_mode": 2,
+        "priority": 0,
+        "correlation_id": "a4df66ad-cd8d-4f6e-99af-6258a0973973",
+        "delivery_tag": 1
+    },
+    "body": "eyJhcmdzIjpbMSwyXSwia3dhcmdzIjp7ImFyZzEiOjEsImFyZzIiOjJ9fQ=="
+}

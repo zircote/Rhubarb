@@ -84,6 +84,10 @@ class Message implements MessageInterface
      */
     private $isSent = false;
 
+    /**
+     * @param mixed $val
+     * @return bool
+     */
     private function filter($val)
     {
         if (is_array($val) || is_object($val)) {

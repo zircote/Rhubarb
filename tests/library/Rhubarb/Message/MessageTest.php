@@ -60,6 +60,7 @@ class MessageTest extends RhubarbTestCase
         $this->rhubarb = null;
         $this->signature = null;
     }
+
     /**
      * @group V2
      * @group Message
@@ -117,45 +118,55 @@ class MessageTest extends RhubarbTestCase
 
         $this->assertEquals($expected, $this->fixture->getPayload());
     }
+
     public function testGetSignature()
     {
-        
+
     }
+
     public function testSetSignature()
     {
-        
+
     }
+
     public function testToString()
     {
-        
+
     }
+
     public function testGetPayLoad()
     {
-        
+
     }
+
     public function testGetProperties()
     {
-        
+
     }
+
     public function testGetBody()
     {
-        
+
     }
+
     public function testGetHeaders()
     {
-        
+
     }
+
     public function testSetIsSent()
     {
-        
+
     }
+
     public function testIsSent()
     {
-        
+
     }
+
     public function testDispatch()
     {
-        
+
     }
 }
  

@@ -9,6 +9,7 @@ celery.conf.update(
     CELERY_ENABLE_UTC=True,
 )
 
+
 @celery.task
 def add(x, y):
     return x + y

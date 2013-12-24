@@ -48,6 +48,7 @@ class Test implements ResultStoreInterface
     {
         $this->wait = $wait;
     }
+
     /**
      * @param $result
      */
@@ -79,10 +80,10 @@ class Test implements ResultStoreInterface
      */
     public function getTaskResult(AsyncResult $task)
     {
-        if(!$this->timer){
+        if (!$this->timer) {
             $this->timer = time() + $this->wait;
         }
-        if($this->timer <= time()){
+        if ($this->timer <= time()) {
             return json_decode($this->nextResult, Rhubarb::$jsonOptions);
         }
         return $task;
