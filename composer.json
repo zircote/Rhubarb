@@ -19,9 +19,6 @@
         "rhumsaa/uuid": "~2.1",
         "apache/log4php": "2.3.*"
     },
-    "require-dev": {
-        "phpunit/phpunit": "~3.7.19"
-    },
     "suggest": {
         "ext-amqp": "for rabbitmq-c/pecl-amqp support",
         "predis/predis": "for redis broker support"

@@ -32,7 +32,6 @@ class ChainTest extends RhubarbTestCase
 
     public function testApplyAsync()
     {
-        $this->markTestIncomplete('This test is not implemented');
     }
 }
  

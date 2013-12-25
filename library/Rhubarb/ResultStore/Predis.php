@@ -21,7 +21,9 @@ namespace Rhubarb\ResultStore;
  * @category    ResultStore
  */
 use Rhubarb\Connector\Predis as PredisConnection;
+use Rhubarb\Rhubarb;
 use Rhubarb\Task\AsyncResult;
+use Rhubarb\Task\ResultBody;
 
 /**
  * @package     Rhubarb
@@ -31,10 +33,11 @@ class Predis extends PredisConnection implements ResultStoreInterface
 {
     /**
      * @param AsyncResult $task
-     * @return Asyncresult
+     * @return ResultBody
      */
     public function getTaskResult(AsyncResult $task)
     {
-        return $this->getConnection()->get(PredisConnection::TASK_KEY_PREFIX . $task->getId());
+        $result = $this->getConnection()->get(PredisConnection::TASK_KEY_PREFIX . $task->getId());
+        return new ResultBody($this->getRhubarb()->unserialize($result));
     }
 }

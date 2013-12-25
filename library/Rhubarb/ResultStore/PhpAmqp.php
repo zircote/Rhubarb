@@ -38,14 +38,13 @@ class PhpAmqp extends PhpAmqpConnector implements ResultStoreInterface
 
     /**
      * @param AsyncResult $task
-     * @return AsyncResult
+     * @return ResultBody
      * @throws InvalidJsonException
      */
     public function getTaskResult(AsyncResult $task)
     {
-        $result = null;
+        $result = $task->getResult();
         try {
-            $taskId = str_replace('-', '', $task->getId());
             if (!$this->getConnection()->isConnected()) {
                 $this->getConnection()->connect();
             }
@@ -53,22 +52,20 @@ class PhpAmqp extends PhpAmqpConnector implements ResultStoreInterface
             if ($message = $queue->get()) {
                 $queue->ack($message->getDeliveryTag());
                 $queue->delete(AMQP_IFUNUSED | AMQP_IFEMPTY | AMQP_NOWAIT);
-                $this->getConnection()->disconnect();
-                $task->setResult(ResultBody::fromString(
-                        $message->getBody(),
-                        $message->getHeader('content_type'),
-                        $message->getHeader('content_encoding')
-                    )
+                $result = new ResultBody(
+                    $this->getRhubarb()->unserialize($message->getBody(), $message->getHeader('content_type'))
                 );
             }
         } catch (\AMQPChannelException $e) {
+            $this->getRhubarb()->getLogger()->warn($e);
         }
-        return $task;
+        return $result;
     }
 
     /**
      * @param AsyncResult $result
      * @return \AMQPQueue
+     * @codeCoverageIgnore
      */
     protected function declareQueue(AsyncResult $result)
     {
@@ -79,6 +76,7 @@ class PhpAmqp extends PhpAmqpConnector implements ResultStoreInterface
         $queue = new \AMQPQueue($this->getChannel());
         $queue->setName($taskId);
         $queue->setFlags(AMQP_DURABLE | AMQP_AUTODELETE);
+        /* @todo Fix this to be configurable */
         $queue->setArgument('x-expires', 86400000);
         $queue->declareQueue();
         return $queue;
@@ -86,6 +84,7 @@ class PhpAmqp extends PhpAmqpConnector implements ResultStoreInterface
 
     /**
      * @return \AMQPChannel
+     * @codeCoverageIgnore
      */
     protected function getChannel()
     {

@@ -1,8 +1,8 @@
 <?php
-namespace Rhubarb\Task;
+namespace Rhubarb\Connector;
 
 /**
- *
+ * 
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -17,22 +17,25 @@ namespace Rhubarb\Task;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * 
  * @package     Rhubarb
- * @category    RhubarbTests
+ * @category    Rhubarb\Connector
  */
-use Rhubarb\RhubarbTestCase;
 
 /**
  * @package     Rhubarb
- * @category    RhubarbTests
+ * @category    Rhubarb\Connector
  */
-class ChordTest extends RhubarbTestCase
+class AbstractTestConnector extends AbstractConnector
 {
+    static protected $nextResult;
 
-    public function testApplyAsync()
+    /**
+     * @param string $result
+     */
+    static public function setNextResult($result)
     {
+        self::$nextResult = $result;
     }
-
 }
  

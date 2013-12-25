@@ -27,10 +27,11 @@ use Rhubarb\RhubarbTestCase;
 /**
  * @package     Rhubarb
  * @category    RhubarbTests\Body
- *
- * @group Task
- * @group Body
- * @group Python
+ * 
+ * @group \Rhubarb\
+ * @group \Rhubarb\Task
+ * @group \Rhubarb\Task\Body
+ * @group \Rhubarb\Task\Body\Python
  */
 class PythonTest extends RhubarbTestCase
 {
@@ -41,7 +42,7 @@ class PythonTest extends RhubarbTestCase
 
     public function setUp()
     {
-        $this->fixture = new Python(array(), $this->getKwargsMock(array('arg1' => 'arg_1', 'arg2' => 'arg_2')));
+        $this->fixture = new Python(array(1,1), $this->getKwargsMock(array('arg1' => 'arg_1', 'arg2' => 'arg_2')));
     }
 
     /**
@@ -89,6 +90,21 @@ class PythonTest extends RhubarbTestCase
             Rhubarb::$jsonOptions
         );
         $this->assertJsonStringEqualsJsonString($expected, $actual);
+    }
+    
+    public function testArgsandKwargs()
+    {
+        $expected = array(2,2);
+        $this->fixture->setArgs($expected);
+        $this->assertEquals($expected, $this->fixture->getArgs());
+        $expected = array('t' => 'z', 'c' => 'b');
+        $this->fixture->setKwargs($expected);
+        $this->assertEquals($expected, $this->fixture->getKwargs());
+    }
+    public function testGetHeaders()
+    {
+        $expected = array('lang' => 'py');
+        $this->assertEquals($expected, $this->fixture->getHeaders());
     }
 }
  

@@ -45,11 +45,11 @@ class CeleryTest extends PHPUnit_Framework_TestCase
 
     protected function setupMock()
     {
-        $this->expected = array('destination' => null, 'method' => 'revoke', 'arguments' => $this->expectedArguments);
+        $this->expected = array('destination' => 'destination', 'method' => 'revoke', 'arguments' => $this->expectedArguments);
         /* @var \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Task\Body\Celery\Arguments $mock */
         $mock = $this->getMock('\Rhubarb\Task\Body\Celery\Arguments', array('toArray'), array(), '', false);
         $mock->expects($this->once())->method('toArray')->will($this->returnValue($this->expectedArguments));
-        $this->fixture = new Celery('revoke', $mock);
+        $this->fixture = new Celery('revoke', $mock, 'destination');
     }
 
     /**
@@ -74,7 +74,7 @@ class CeleryTest extends PHPUnit_Framework_TestCase
         $this->fixture = null;
         /* @var \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Task\Body\Celery\Arguments $mock */
         $mock = $this->getMock('\Rhubarb\Task\Body\Celery\Arguments', array(), array(), '', false);
-        $this->fixture = new Celery('revoke', $mock);
+        $this->fixture = new Celery('revoke', $mock, 'destination');
         $this->assertEmpty($this->fixture->getHeaders());
 
     }

@@ -482,22 +482,6 @@ class SignatureTest extends RhubarbTestCase
     /**
      *
      */
-    public function testMap()
-    {
-        $this->markTestSkipped('Signature::map is not implemented yet');
-    }
-
-    /**
-     *
-     */
-    public function testStarmap()
-    {
-        $this->markTestSkipped('Signature::starmap is not implemented yet');
-    }
-
-    /**
-     *
-     */
     public function testOnSuccess()
     {
         $this->fixture->onSuccess(function($task){ $task->getId();});

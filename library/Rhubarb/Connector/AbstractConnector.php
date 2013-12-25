@@ -86,7 +86,7 @@ class AbstractConnector implements ConnectorInterface
     }
 
     /**
-     * @return mixed
+     * @return \Rhubarb\Rhubarb
      */
     public function getRhubarb()
     {
@@ -99,6 +99,16 @@ class AbstractConnector implements ConnectorInterface
     public function getProperties()
     {
         return $this->properties;
+    }
+
+    /**
+     * @param array $options
+     * @return $this
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = array_merge($this->options, $options);
+        return $this;
     }
 }
  

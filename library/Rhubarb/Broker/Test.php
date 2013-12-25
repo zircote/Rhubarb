@@ -22,18 +22,40 @@ namespace Rhubarb\Broker;
  * 
  */
 use Rhubarb\Message\Message;
+use Rhubarb\Rhubarb;
 use Rhubarb\Task\AsyncResult;
+use Rhubarb\Connector\AbstractTestConnector;
+use Rhubarb\Task\ResultBody;
 
 /**
  * @package     Rhubarb
  * @category    Broker
  * @codeCoverageIgnore
  */
-class Test implements BrokerInterface
+class Test extends AbstractTestConnector
 {
+    static protected $deliveryTag = 0;
+    protected $rhubarb;
     protected $exception;
     protected $published;
+    protected $callback;
+    
 
+
+    /**
+     * @param \Rhubarb\Rhubarb $rhubarb
+     * @param array $options
+     */
+    public function __construct(Rhubarb $rhubarb, array $options = array())
+    {
+        $this->setOptions($options);
+        $this->setRhubarb($rhubarb);
+        $this->callback = function($jsonString)
+        {
+            return $jsonString;
+        };
+    }
+    
     /**
      *
      */
@@ -41,6 +63,7 @@ class Test implements BrokerInterface
     {
         $this->exception = null;
         $this->published = null;
+        static::$deliveryTag = 0;
     }
 
     /**
@@ -49,27 +72,12 @@ class Test implements BrokerInterface
      */
     public function publishTask(Message $message)
     {
+        $message->setProperty('delivery_tag', ++static::$deliveryTag);
+        static::$nextResult = call_user_func($this->callback, array($message->serialize()));
+        return true;
     }
-
-    public function getPublishedValues()
+    public function setTaskCallback(callable $callback)
     {
-        return $this->published;
+        $this->callback = $callback;
     }
-
-    /**
-     * @return array
-     */
-    public function getHeaders()
-    {
-        // TODO: Implement getHeaders() method.
-    }
-
-    /**
-     * @return array
-     */
-    public function getProperties()
-    {
-        // TODO: Implement getProperties() method.
-    }
-
 }

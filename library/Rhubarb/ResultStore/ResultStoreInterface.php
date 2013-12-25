@@ -20,7 +20,8 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
-use \Rhubarb\Task\AsyncResult;
+use Rhubarb\Task\AsyncResult;
+use Rhubarb\Task\ResultBody;
 
 /**
  * @package     Rhubarb
@@ -30,7 +31,7 @@ interface ResultStoreInterface
 {
     /**
      * @param AsyncResult $task
-     * @return AsyncResult
+     * @return ResultBody
      */
     public function getTaskResult(AsyncResult $task);
 }

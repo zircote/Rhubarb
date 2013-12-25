@@ -20,42 +20,26 @@ namespace Rhubarb\ResultStore;
  * @package     Rhubarb
  * @category    ResultStore
  */
-use Rhubarb\Rhubarb;
+use Rhubarb\Task\ResultBody;
 use Rhubarb\Task\AsyncResult;
-
+use Rhubarb\Connector\AbstractTestConnector;
 /**
  * @package     Rhubarb
  * @category    ResultStore
  * @codeCoverageIgnore
  */
-class Test implements ResultStoreInterface
+class Test extends AbstractTestConnector
 {
 
-    protected $nextResult;
+    
     protected $exception;
-
     protected $wait = 0;
     protected $timer;
 
-    /**
-     * @param array $options
-     */
-    public function __construct(array $options)
-    {
-
-    }
 
     public function setWait($wait = 0)
     {
         $this->wait = $wait;
-    }
-
-    /**
-     * @param $result
-     */
-    public function setNextResult($result)
-    {
-        $this->nextResult = $result;
     }
 
     /**
@@ -71,13 +55,14 @@ class Test implements ResultStoreInterface
      */
     public function reset()
     {
-        $this->nextResult = null;
         $this->exception = null;
+        $this->timer = null;
+        $this->wait = 0;
     }
 
     /**
      * @param AsyncResult $task
-     * @return AsyncResult
+     * @return ResultBody
      */
     public function getTaskResult(AsyncResult $task)
     {
@@ -85,8 +70,8 @@ class Test implements ResultStoreInterface
             $this->timer = time() + $this->wait;
         }
         if ($this->timer <= time()) {
-            return json_decode($this->nextResult, Rhubarb::$jsonOptions);
+            return static::$nextResult;
         }
-        return $task;
+        return new ResultBody();
     }
 }

@@ -82,17 +82,6 @@ class Predis extends AbstractConnector
     );
 
     /**
-     * @param array $options
-     * @return $this
-     * @throws ConnectionException
-     */
-    public function setOptions(array $options)
-    {
-        $this->options = array_merge($this->options, $options);
-        return $this;
-    }
-
-    /**
      * @return Client
      */
     public function getConnection()

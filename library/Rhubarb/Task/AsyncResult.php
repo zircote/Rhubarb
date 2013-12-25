@@ -32,34 +32,13 @@ use Rhubarb\Exception\TimeoutException;
  */
 class AsyncResult
 {
-    /**
-     *
-     */
     const PENDING = 'PENDING';
-    /**
-     *
-     */
     const STARTED = 'STARTED';
-    /**
-     *
-     */
     const SUCCESS = 'SUCCESS';
-    /**
-     *
-     */
     const FAILURE = 'FAILURE';
-    /**
-     *
-     */
     const RETRY = 'RETRY';
-    /**
-     *
-     */
     const REVOKED = 'REVOKED';
 
-    /**
-     * @var array
-     */
     static public $allowedResultStates = array(
         AsyncResult::PENDING,
         AsyncResult::FAILURE,
@@ -68,9 +47,6 @@ class AsyncResult
         AsyncResult::STARTED,
         AsyncResult::SUCCESS
     );
-    /**
-     * @var array
-     */
     static public $completedState = array(
         AsyncResult::FAILURE,
         AsyncResult::REVOKED,
@@ -99,11 +75,11 @@ class AsyncResult
     {
         $this->setRhubarb($rhubarb);
         $this->setMessage($message);
-        $this->setResult(new ResultBody($result));
+        $this->result = new ResultBody($result);
     }
 
     /**
-     *
+     * @codeCoverageIgnore
      */
     public function revoke()
     {
@@ -123,7 +99,7 @@ class AsyncResult
      *
      * @return AsyncResult
      */
-    protected function setRhubarb(Rhubarb $rhubarb)
+    public function setRhubarb(Rhubarb $rhubarb)
     {
         $this->rhubarb = $rhubarb;
         return $this;
@@ -132,7 +108,7 @@ class AsyncResult
     /**
      * @return Rhubarb
      */
-    protected function getRhubarb()
+    public function getRhubarb()
     {
         return $this->rhubarb;
     }
@@ -150,7 +126,7 @@ class AsyncResult
      */
     public function isStarted()
     {
-        return $this->result->getState() == self::STARTED;
+        return $this->getResult()->getState() == self::STARTED;
     }
 
     /**
@@ -158,7 +134,7 @@ class AsyncResult
      */
     public function isRevoked()
     {
-        return $this->result->getState() == self::REVOKED;
+        return $this->getResult()->getState() == self::REVOKED;
     }
 
     /**
@@ -166,7 +142,7 @@ class AsyncResult
      */
     public function isSuccess()
     {
-        return $this->isReady() && $this->result->getState() == self::SUCCESS;
+        return $this->isReady() && $this->getResult()->getState() == self::SUCCESS;
     }
 
     /**
@@ -174,7 +150,7 @@ class AsyncResult
      */
     public function isRetry()
     {
-        return $this->result->getState() == self::RETRY;
+        return $this->getResult()->getState() == self::RETRY;
     }
 
     /**
@@ -182,7 +158,7 @@ class AsyncResult
      */
     public function isPending()
     {
-        return $this->result->getState() == self::PENDING;
+        return $this->getResult()->getState() == self::PENDING;
     }
 
     /**
@@ -215,14 +191,13 @@ class AsyncResult
         if (!$this->isReady()) {
             throw new TimeoutException(
                 sprintf(
-                    'AsyncResult %s(%s) did not return after %s seconds',
-                    $this->getMessage()->getId(),
-                    (string)$this->getMessage(),
+                    'AsyncResult( %s ) did not return after %s seconds',
+                    $this->getId(),
                     $timeout
                 )
             );
         }
-        return $this->getResult();
+        return $this->getResult()->getResult();
     }
 
     /**
@@ -245,24 +220,12 @@ class AsyncResult
     }
 
     /**
-     *
-     * @param ResultBody $result
-     * @return $this
-     */
-    public function setResult($result)
-    {
-        $this->result = $result;
-        return $this;
-    }
-
-    /**
      * @return ResultBody
      */
     public function getResult()
     {
         if (!in_array($this->result->getState(), self::$completedState)) {
-            $this->getRhubarb()->getResultStore()
-                ->getTaskResult($this);
+            $this->result = $this->getRhubarb()->getResultStore()->getTaskResult($this);
         }
         return $this->result;
     }

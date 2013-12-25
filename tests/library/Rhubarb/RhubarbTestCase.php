@@ -65,7 +65,7 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
         }
 
         if ($resultStoreMock) {
-            $rhubarb->expects($this->once())
+            $rhubarb->expects($this->any())
                 ->method('getResultStore')
                 ->will($this->returnValue($resultStoreMock));
         }
@@ -136,17 +136,17 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
             array($rhubarb, 'test.task')
         );
 
-        $signatureMock->expects($this->atLeastOnce())
+        $signatureMock->expects($this->any())
             ->method('getProperties')
             ->will($this->returnValue($signatureProperties));
 
-        $signatureMock->expects($this->atLeastOnce())
+        $signatureMock->expects($this->any())
             ->method('getHeaders')
             ->will($this->returnValue($signatureHeaders));
 
         $bodyMock = $this->getBodyMock($body);
 
-        $signatureMock->expects($this->atLeastOnce())
+        $signatureMock->expects($this->any())
             ->method('getBody')
             ->will($this->returnValue($bodyMock));
 

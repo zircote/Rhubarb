@@ -22,6 +22,7 @@ namespace Rhubarb\ResultStore;
  * @category    RhubarbTests\Result
  */
 use Rhubarb\RhubarbTestCase;
+use Rhubarb\Task\AsyncResult;
 
 /**
  * @package     Rhubarb
@@ -35,10 +36,19 @@ class PredisTest extends RhubarbTestCase
      */
     protected $fixture;
 
-    public function setUp()
+    public function getMockUp()
     {
         $this->rhubarb = $this->getRhubarbMock($this->getBrokerMock(array(), array()));
         $this->fixture = new Predis($this->rhubarb);
+        $result = '{ "state": "SUCCESS", "traceback": null, "result": 4, "children": [] }';
+        $connection = $this->getMock('\Predis\Client', array('get'), array(), '', false);
+        $connection->expects($this->once())->method('get')->will($this->returnValue($result));
+        $this->fixture->setConnection($connection);
+        $task = $this->getAsyncResultMock(
+            $this->rhubarb,
+            $this->getMessageMock($this->rhubarb, $this->getSignatureMock($this->rhubarb, array(), array(), array()))
+        );
+        return $task;
     }
 
     /**
@@ -50,9 +60,15 @@ class PredisTest extends RhubarbTestCase
         $this->fixture = null;
     }
 
-    public function testConstructor()
+    
+    public function testGetTaskResult()
     {
-        $this->markTestIncomplete();
+        $task = $this->getMockUp();
+        
+        $result = $this->fixture->getTaskResult($task);
+        $this->assertEquals(4, $result->getResult());
+        $this->assertNull($result->getTraceback());
+        $this->assertEquals(AsyncResult::SUCCESS, $result->getState());
     }
 
 }

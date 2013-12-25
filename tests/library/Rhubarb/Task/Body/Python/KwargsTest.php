@@ -86,5 +86,42 @@ class KwargsTest extends PHPUnit_Framework_TestCase
         $kwargs->assigned_arg2 = 'arg_2';
         $this->assertEquals($expected, $kwargs->toArray());
     }
+    public function testGet()
+    {
+        $expected = array('arg1' => 'arg_1', 'arg2' => 'arg_2');
+        $kwargs = new Kwargs($expected);
+        $this->assertEquals('arg_1', $kwargs->arg1);
+        $this->assertNull($kwargs->note_here);
+        $this->assertNull($kwargs['note_here']);
+    }
+    public function testUnset()
+    {
+        $expected = array('arg1' => 'arg_1', 'arg2' => 'arg_2');
+        $kwargs = new Kwargs($expected);
+        $this->assertEquals('arg_1', $kwargs->arg1);
+        unset($kwargs->arg1);
+        $this->assertNull($kwargs->arg1);
+    }
+    public function testArrayKeyExists()
+    {
+        $expected = array('arg1' => 'arg_1', 'arg2' => 'arg_2');
+        $kwargs = new Kwargs($expected);
+        $this->assertTrue(isset($kwargs['arg1']));
+    }
+    public function testArrayKeyEmpty()
+    {
+        $expected = array('arg1' => 'arg_1', 'arg2' => 'arg_2');
+        $kwargs = new Kwargs($expected);
+        $this->assertFalse(empty($kwargs['arg1']));
+        $this->assertTrue(empty($kwargs['note_here']));
+    }
+    public function testArrayKeyUnset()
+    {
+        $expected = array('arg1' => 'arg_1', 'arg2' => 'arg_2');
+        $kwargs = new Kwargs($expected);
+        $this->assertFalse(empty($kwargs['arg1']));
+        unset($kwargs['arg1']);
+        $this->assertTrue(empty($kwargs['arg1']));
+    }
 }
  

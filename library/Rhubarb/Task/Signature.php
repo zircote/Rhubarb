@@ -31,7 +31,7 @@ use InvalidArgumentException;
 
 /**
  * @package     Rhubarb
- * @category    Rhubarb\Message
+ * @category    Rhubarb\Task
  */
 class Signature
 {
