@@ -27,6 +27,5 @@ $config = include('configuration/predis.php');
 $rhubarb = new Rhubarb($config);
 $args = new PythonArgs(array(1, 2));
 
-$result = $rhubarb->task('app.add')
-    ->delay($args, array(), array('countdown' => 60)) /* Task will execute in 60 seconds */
-    ->get();
+$rhubarb->task('app.add')
+    ->delay($args, array(), array('countdown' => 60)); /* Task will execute in 60 seconds */

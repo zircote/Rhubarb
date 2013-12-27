@@ -31,6 +31,5 @@ $runAt = new \DateTime();
 /* One Hour: 3600S */
 $runAt->add(new DateInterval('PT3600S'));
 
-$result = $rhubarb->task('app.add')
-    ->delay($args, array(), array('eta' => $runAt->format(\DateTime::ISO8601)))
-    ->get();
+$rhubarb->task('app.add')
+    ->delay($args, array(), array('eta' => $runAt->format(\DateTime::ISO8601)));

@@ -29,6 +29,5 @@ $args = new PythonArgs(array(1, 2));
 $expiresAt = new \DateTime();
 /* One Hour: 3600S */
 $expiresAt->add(new DateInterval('PT3600S'));
-$result = $rhubarb->task('app.add')
-    ->delay($args, array(), array('expires' => $expiresAt->format(\DateTime::ISO8601)))
-    ->get();
+$rhubarb->task('app.add')
+    ->delay($args, array(), array('expires' => $expiresAt->format(\DateTime::ISO8601)));
