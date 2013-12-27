@@ -295,9 +295,10 @@ class Signature
      * @param array $properties
      * @param array $headers
      * @return AsyncResult
-     * @throws \Rhubarb\Exception\Exception
+     * @throws \Rhubarb\Exception\TaskSignatureException
+     * @throws \InvalidArgumentException
      */
-    public function applyAsync(BodyInterface $body = null, array $properties = array(), array $headers = array())
+    public function applyAsync($body = null, array $properties = array(), array $headers = array())
     {
         if ($this->isFroze()) {
             throw new TaskSignatureException('Signature is Frozen');
@@ -309,7 +310,11 @@ class Signature
             $this->setHeader($header, $value);
         }
         if ($body) {
-            $this->setBody($body);
+            if ($body instanceof BodyInterface){
+                $this->setBody($body);
+            } else {
+                throw new InvalidArgumentException('$body argument must be of type `BodyInterface`');
+            }
         }
         $this->getId();
         $message = new Message($this->getRhubarb(), $this);
@@ -455,11 +460,14 @@ class Signature
     }
 
     /**
-     * @return $this
+     * @param BodyInterface $body
+     * @param array $properties
+     * @param array $headers
+     * @return AsyncResult
      */
-    public function __invoke()
+    public function __invoke($body = null, array $properties = array(), array $headers = array())
     {
-        return $this->applyAsync($this->getBody());
+        return call_user_func(array($this, 'applyAsync'), func_get_args());
     }
 
     /**

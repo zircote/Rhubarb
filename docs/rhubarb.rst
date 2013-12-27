@@ -20,3 +20,10 @@ Rhubarb
 .. literalinclude:: examples/kwargs.php
    :language: php
    :lines: 23-
+
+**Send task using an invokable signature**
+
+.. literalinclude:: examples/invokable_signature.php
+   :language: php
+   :lines: 23-
+
