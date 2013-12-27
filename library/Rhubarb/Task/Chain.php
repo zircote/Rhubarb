@@ -22,6 +22,8 @@ namespace Rhubarb\Task;
  * @subcategory
  */
 use Rhubarb\Exception\TaskSignatureException;
+use Rhubarb\Message\Message;
+use Rhubarb\Rhubarb;
 
 /**
  * @package
@@ -29,26 +31,42 @@ use Rhubarb\Exception\TaskSignatureException;
  * @subcategory
  * @codeCoverageIgnore
  */
-class Chain
+class Chain extends Message
 {
     /**
      * @var array
      */
     protected $chain = array();
 
+
     /**
+     * @param Rhubarb $rhubarb
      * @param array $chain
+     */
+    public function __construct(Rhubarb $rhubarb, $chain = array())
+    {
+        $this->setRhubarb($rhubarb);
+        $this->setChain($chain);
+    }
+
+    /**
+     * @param array|Signature $chain
      * @throws \Rhubarb\Exception\TaskSignatureException
      */
-    public function setChain(array $chain)
+    public function setChain($chain)
     {
         foreach (func_get_args() as $signature) {
-            if (!$signature instanceof Signature) {
+            if (is_array($signature)) {
+                foreach ($signature as $sig) {
+                    $this->push($sig);
+                }
+            } elseif (!$signature instanceof Signature) {
                 throw new TaskSignatureException(
                     sprintf('Chains may only be built by Signature types [%s] provide', gettype($signature))
                 );
+            } else {
+                $this->push($signature);
             }
-            $this->push($signature);
         }
     }
 
@@ -72,12 +90,12 @@ class Chain
     }
 
     /**
-     * @return $this
+     * @return AsyncResult
      */
     public function __invoke()
     {
         $this->setChain(func_get_args());
-        return $this;
+        return $this->dispatch();
     }
 }
  

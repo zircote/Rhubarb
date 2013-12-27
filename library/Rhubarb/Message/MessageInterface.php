@@ -33,5 +33,10 @@ interface MessageInterface
      * @return array
      */
     public function getPayload();
+    
+    /**
+     * @return \Rhubarb\Task\AsyncResult
+     */
+    public function dispatch();
 }
  

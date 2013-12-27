@@ -28,6 +28,7 @@ use Rhubarb\Task\AsyncResult;
 use Rhubarb\Message\Message;
 use Rhubarb\Task\Body\BodyInterface;
 use Rhubarb\ResultStore\ResultStoreInterface;
+use Rhubarb\Task\Chain;
 use Rhubarb\Task\Signature;
 use Rhubarb\Exception\EncodingException;
 
@@ -553,5 +554,10 @@ class Rhubarb
                 sprintf('failed to unserialize payload of type [%s] ensure it is declared in your configuration', $type)
             );
         }
+    }
+    
+    public function chain()
+    {
+        return new Chain($this, func_get_args());
     }
 }

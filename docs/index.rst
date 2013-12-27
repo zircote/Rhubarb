@@ -8,6 +8,7 @@ Contents:
 .. toctree::
     installation
     rhubarb
+    chains
     connectors/index
 
 
