@@ -25,7 +25,7 @@ use Rhubarb\Task\Body\Python as PythonTask;
 
 $config = include('configuration/predis.php');
 $rhubarb = new Rhubarb($config);
-$argsPython = new PythonTask(array(1, 2));
+$argsPython = new PythonTask(1, 2);
 
 try {
     $result = $rhubarb->task('app.add')

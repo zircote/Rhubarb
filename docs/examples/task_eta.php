@@ -25,7 +25,7 @@ use Rhubarb\Task\Body\Python as PythonArgs;
 
 $config = include('configuration/predis.php');
 $rhubarb = new Rhubarb($config);
-$args = new PythonArgs(array(1, 2));
+$args = new PythonArgs(1, 2);
 
 $runAt = new \DateTime();
 /* One Hour: 3600S */
