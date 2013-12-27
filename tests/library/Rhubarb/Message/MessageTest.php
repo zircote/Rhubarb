@@ -27,6 +27,9 @@ use Rhubarb\RhubarbTestCase;
 /**
  * @package     Rhubarb
  * @category    RhubarbTests
+ * @group Rhubarb
+ * @group Rhubarb\Message
+ * @group Rhubarb\Message\Message
  */
 class MessageTest extends RhubarbTestCase
 {
@@ -140,6 +143,84 @@ class MessageTest extends RhubarbTestCase
     {
         $this->buildSimpleMock();
         $this->assertTrue(is_string((string)$this->fixture));
+    }
+
+    public function testGetPayLoadWithCountdown()
+    {
+        $this->buildSimpleMock();
+        $expectedETA = new \DateTime();
+        
+        $expectedETA->add(new \DateInterval("PT60S"));
+        $expected = array(
+            'headers' => array('lang' => 'py', 'c_type' => 'test.task',
+                'eta' => $expectedETA->format(\DateTime::ISO8601)),
+            'properties' => array(
+                'content_type' => Rhubarb::CONTENT_TYPE_JSON,
+                'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
+                'correlation_id' => 'abcdef0123456789'
+            ),
+            'body' => array(
+                'args' => array(1, 2), 
+                'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
+            )
+        );
+        $this->fixture->setHeader('countdown', 60);
+        $actual = $this->fixture->getPayload();
+        $this->assertEquals($expected, $actual);
+
+    }
+
+    public function testGetPayLoadWithETA()
+    {
+        $this->buildSimpleMock();
+        $expectedETA = new \DateTime();
+        
+        $expectedETA->add(new \DateInterval("PT60S"));
+        $eta = $expectedETA->format(\DateTime::ISO8601);
+        $expected = array(
+            'headers' => array('lang' => 'py', 'c_type' => 'test.task', 'eta' => $eta,
+            ),
+            'properties' => array(
+                'content_type' => Rhubarb::CONTENT_TYPE_JSON,
+                'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
+                'correlation_id' => 'abcdef0123456789'
+            ),
+            'body' => array(
+                'args' => array(1, 2), 
+                'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
+            )
+        );
+        $this->fixture->setHeader('eta', $eta);
+        $actual = $this->fixture->getPayload();
+        $this->assertEquals($expected, $actual);
+
+    }
+
+    public function testGetPayLoadWithExpires()
+    {
+        $this->buildSimpleMock();
+        $expectedETA = new \DateTime();
+        
+        $expectedETA->add(new \DateInterval("PT60S"));
+        $expires = $expectedETA->format(\DateTime::ISO8601);
+        $expected = array(
+            'headers' => array('lang' => 'py', 'c_type' => 'test.task',
+                'expires' => $expires,
+            ),
+            'properties' => array(
+                'content_type' => Rhubarb::CONTENT_TYPE_JSON,
+                'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
+                'correlation_id' => 'abcdef0123456789'
+            ),
+            'body' => array(
+                'args' => array(1, 2), 
+                'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
+            )
+        );
+        $this->fixture->setHeader('expires', $expires);
+        $actual = $this->fixture->getPayload();
+        $this->assertEquals($expected, $actual);
+
     }
 
     public function testGetPayLoad()

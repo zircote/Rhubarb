@@ -9,12 +9,6 @@ Rhubarb
    :language: php
    :lines: 23-
 
-**Send task with a 60 second countdown**
-
-.. literalinclude:: examples/countdown60.php
-   :language: php
-   :lines: 23-
-
 **Send task with kwargs**
 
 .. literalinclude:: examples/kwargs.php
@@ -27,3 +21,20 @@ Rhubarb
    :language: php
    :lines: 23-
 
+**Send task with a 60 second countdown header**
+
+.. literalinclude:: examples/countdown60.php
+   :language: php
+   :lines: 23-
+
+**Send task using ETA header**
+
+.. literalinclude:: examples/task_eta.php
+   :language: php
+   :lines: 23-
+
+**Send task using Expires header**
+
+.. literalinclude:: examples/task_expires.php
+   :language: php
+   :lines: 23-

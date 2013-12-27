@@ -23,10 +23,14 @@
 use Rhubarb\Rhubarb;
 use Rhubarb\Task\Body\Python as PythonArgs;
 
-$config = include('configuration/amqp.php');
+$config = include('configuration/predis.php');
 $rhubarb = new Rhubarb($config);
+$args = new PythonArgs(array(1, 2));
 
-$args = new PythonArgs(1, 2);
+$runAt = new \DateTime();
+/* One Hour: 3600S */
+$runAt->add(new DateInterval('PT3600S'));
 
-$signature = $rhubarb->task('app.add');
-$result = $signature($args)->get();
+$result = $rhubarb->task('app.add')
+    ->delay($args, array(), array('eta' => $runAt->format(\DateTime::ISO8601)))
+    ->get();

@@ -229,6 +229,18 @@ class Message implements MessageInterface
                 'body' => $body
             );
         }
+        
+        if (isset($this->payload['headers']['countdown'])) {
+            $datetime = new \DateTime();
+            $datetime->add(new \DateInterval("PT{$this->payload['headers']['countdown']}S"));
+            unset($this->payload['headers']['countdown']);
+            $this->payload['headers']['eta'] = $datetime->format(\DateTime::ISO8601);
+        }
+        if (isset($this->payload['headers']['expires'])) {
+            $datetime = new \DateTime();
+            $datetime->setTimestamp(strtotime($this->payload['headers']['expires']));
+            $this->payload['headers']['expires'] = $datetime->format(\DateTime::ISO8601);
+        }
         return $this->payload;
     }
 
@@ -268,6 +280,28 @@ class Message implements MessageInterface
         if (isset($this->headers[$header])) {
             return $this->headers[$header];
         }
+    }
+
+    /**
+     * @param $header
+     * @param $value
+     * @returns $this
+     * @throws Exception
+     */
+    public function setHeader($header, $value)
+    {
+        if ($this->isSent()) {
+            throw new MessageSentException(
+                sprintf(
+                    'message sent, setting properties is not allowed [ %s(%s::%s) ]',
+                    __METHOD__,
+                    $header,
+                    $value
+                )
+            );
+        }
+        $this->headers[$header] = $value;
+        return $this;
     }
 
     /**
