@@ -14,3 +14,9 @@ Rhubarb
 .. literalinclude:: examples/countdown60.php
    :language: php
    :lines: 23-
+
+**Send task with kwargs**
+
+.. literalinclude:: examples/kwargs.php
+   :language: php
+   :lines: 23-

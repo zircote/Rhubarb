@@ -46,13 +46,14 @@ class Python implements BodyInterface
      */
     protected $kwargs;
 
-    public function __construct($args = array(), Kwargs $kwargs = null)
+    public function __construct()
     {
-        if ($args) {
-            $this->setArgs($args);
-        }
-        if ($kwargs instanceof Kwargs) {
-            $this->setKwargs($kwargs);
+        foreach (func_get_args() as $args) {
+            if ($args instanceof Kwargs) {
+                $this->setKwargs($args);
+            } else {
+                array_push($this->args, $args);
+            }
         }
     }
 
