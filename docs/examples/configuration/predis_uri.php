@@ -17,24 +17,14 @@
  * limitations under the License.
  *
  * @package     Rhubarb
- * @category    Examples
- *
+ * @category    ${NAMESPACE}
  */
-use Rhubarb\Rhubarb;
-use Rhubarb\Task\Body\Python as PythonTask;
 
-$config = include('configuration/predis.php');
-$rhubarb = new Rhubarb($config);
-$argsPython = new PythonTask(array(1, 2));
-
-try {
-    $result = $rhubarb->task('app.add')
-        ->delay($argsPython, array())
-        ->get();
-} catch (\Rhubarb\Exception\TimeoutException $e) {
-    /*
-     * If the task result is not received within '10' seconds (default) a
-     * `\Rhubarb\Exception\TimeoutException` is thrown. 
-     */
-    echo $e->getMessage(), PHP_EOL;
-}
+return array(
+    'broker' => array(
+        'connection' => 'tcp://localhost:6379?password=54321'
+    ),
+    'result_store' => array(
+        'connection' => 'tcp://localhost:6370?database=0'
+    )
+);

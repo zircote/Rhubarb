@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys, os
-
 extensions = []
 
 templates_path = ['_templates']
@@ -9,9 +7,9 @@ templates_path = ['_templates']
 master_doc = 'index'
 
 project = u'Rhubarb'
-copyright = u'2012, Robert Allen'
+copyright = u'2013, Robert Allen'
 
-version = '2013-05-09'
+version = '3.2-dev'
 
 release = ''
 
@@ -29,7 +27,6 @@ from pygments.lexers.web import PhpLexer
 
 lexers['php'] = PhpLexer(startinline=True)
 lexers['php-annotations'] = PhpLexer(startinline=True)
-pygments_style = 'sphinx'
 primary_domain = "php"
 
 latex_elements = {
@@ -47,6 +44,6 @@ man_pages = [
 
 texinfo_documents = [
     ('index', 'Rhubarb', u'Rhubarb Documentation',
-     u'Robert Allen', 'Rhubarb', 'One line description of project.',
+     u'Robert Allen', 'Rhubarb', 'A PHP library connecting to Celery',
      'Miscellaneous'),
 ]

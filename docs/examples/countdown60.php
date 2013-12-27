@@ -21,20 +21,12 @@
  *
  */
 use Rhubarb\Rhubarb;
-use Rhubarb\Task\Body\Python as PythonTask;
+use Rhubarb\Task\Body\Python as PythonArgs;
 
 $config = include('configuration/predis.php');
 $rhubarb = new Rhubarb($config);
-$argsPython = new PythonTask(array(1, 2));
+$args = new PythonArgs(array(1, 2));
 
-try {
-    $result = $rhubarb->task('app.add')
-        ->delay($argsPython, array())
-        ->get();
-} catch (\Rhubarb\Exception\TimeoutException $e) {
-    /*
-     * If the task result is not received within '10' seconds (default) a
-     * `\Rhubarb\Exception\TimeoutException` is thrown. 
-     */
-    echo $e->getMessage(), PHP_EOL;
-}
+$result = $rhubarb->task('app.add')
+    ->delay($args, array('countdown' => 60))
+    ->get();

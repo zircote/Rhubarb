@@ -1,9 +1,8 @@
-Rhubarb Connectors
-===================================
+Connectors
+==========
 
 Contents:
 
 .. toctree::
     amqp
     redis
-    mongo

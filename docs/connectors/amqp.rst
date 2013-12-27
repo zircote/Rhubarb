@@ -1,114 +1,38 @@
 AMQP
 ====
 
-.. topic:: **Rhubarb** currently supports two **AMQP** connectors:
- 
- - `zircote/amqp <https://packagist.org/packages/zircote/amqp>`_
- - `ext-amqp <https://github.com/bkw/php-amqp>`_
- 
-.. note:: Note that at this time the **ext-amqp** extension does not support *TLS*; for *TLS* support you will be required to utilize the **zircote/amqp** package.
- 
+**Rhubarb** supports **AMQP** by way of `ext-amqp <https://github.com/bkw/pecl-amqp-official>`_
 
-zircote/amqp
-------------
+.. note:: Note that at this time the **ext-amqp** extension does not support *TLS*
 
-.. topic:: Configuration
- 
- The configuration of the *zircote/amqp* implementation for **Rhubarb** is comprised of the following key hierarchy:
- 
-     - **broker**
-        - **type**: the broker class name without the namespace
-        - **options**: the broker specific options
-            - **exchange**: the name of the target exchange
-            - **queue**: an array of options related to the queue
-                - **name**: the queue name
-                - **arguments**: an array of arguments related to the queue, these are AMQP specific and are documented in the *zircote/amqp* library
-            - **uri**: the amqp server/cluster uri (it should match your celery worker configuration)
-     - **result_store**
-         - **type**: the result_store class name without the namespace
-         - **options**: the result_store specific options
-             - **exchange**: the name of the target exchange
-         - **uri**: the amqp server/cluster uri (it should match your celery worker configuration)
- 
- .. note:: These options SHOULD match your celery worker configuration.
- 
- .. code-block:: php
- 
-  $options = array(
-      'broker' => array(
-          'type' => 'Amqp',
-          'options' => array(
-              'exchange' => 'celery',
-              'queue' => array(
-                  'name' => 'celery',
-                  'arguments' => array(
-                      'x-ha-policy' => array('S', 'all')
-                  )
-              ),
-              'connection' => 'amqp://guest:guest@localhost:5672/celery'
-          )
-      ),
-      'result_store' => array(
-          'type' => 'Amqp',
-          'options' => array(
-              'exchange' => 'celery',
-              'connection' => 'amqp://guest:guest@localhost:5672/celery'
-          )
-      )
-  );
-    
-  $rhubarb = new \Rhubarb\Rhubarb($options);
+Configuration
+-------------
+   
+    **Simple AMQP Config**
 
+    .. literalinclude:: ../examples/configuration/amqp.php
+       :language: php
+       :lines: 1,23-
 
+AMQP supports a number of options listed below:
+  - host [string - default: localhost]
+  - port [integer - default: 5672] 
+  - vhost [string - default: celery]
+  - login [string - default: guest]
+  - password [string - default: guest]
+  - write_timeout [integer - default: -1]
+  - read_timeout [integer - default: -1]
 
-ext-amqp
----------
+These options may be used as an associative array or an URI:
 
+    **URI string Connection definition**
 
-.. topic:: Configuration
+    .. literalinclude:: ../examples/configuration/amqp_uri.php
+       :language: php
+       :lines: 1,23-
 
- The configuration of the *ext-amqp* implementation for **Rhubarb** is comprised of the following key hierarchy:
- 
-    - **broker**
-        - **type**: the broker class name without the namespace
-        - **options**: the broker specific options
-            - **exchange**: the name of the target exchange
-            - **queue**: an array of options related to the queue
-                - **name**: the queue name
-                - **arguments**: an array of arguments related to the queue, these are AMQP specific
-            - **uri**: the amqp server/cluster uri (it should match your celery worker configuration)
-    - **result_store**
-        - **type**: the result_store class name without the namespace
-        - **options**: the result_store specific options
-            - **exchange**: the name of the target exchange
-        - **uri**: the amqp server/cluster uri (it SHOULD match your celery worker configuration)
- 
- .. note:: These options SHOULD match your celery worker configuration.
- 
- .. code-block:: php
- 
-  $options = array(
-      'broker' => array(
-          'type' => 'PhpAmqp',
-          'options' => array(
-              'exchange' => 'celery',
-              'queue' => array(
-                  'arguments' => array(
-                  )
-              ),
-              'connection' => 'amqp://guest:guest@localhost:5672/celery'
-          )
-      ),
-      'result_store' => array(
-          'type' => 'PhpAmqp',
-          'options' => array(
-              'exchange' => 'celery',
-              'connection' => 'amqp://guest:guest@localhost:5672/celery'
-          )
-      )
-  );
-  
-  $rhubarb = new \Rhubarb\Rhubarb($options);
-  
+    **Array Connection definition**
 
-
+    .. literalinclude:: ../examples/configuration/amqp_array.php
+       :language: php
+       :lines: 1,23-

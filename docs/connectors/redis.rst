@@ -1,49 +1,37 @@
 redis
 =====
 
-.. topic:: **Rhubarb** currently supports one `**redis** <http://redis.io>`_ connectors:
- 
- - `predis/predis <https://packagist.org/packages/predis/predis>`_
- 
+**Rhubarb** supports `redis <http://redis.io>`_ by way of `predis/predis <https://packagist.org/packages/predis/predis>`_
 
-predis/predis
---------------
+Configuration
+-------------
+  
+    **Simple Predis Config**
 
-.. topic:: Configuration
- 
- The configuration of the *predis/predis* implementation for **Rhubarb** is comprised of the following key hierarchy:
- 
-     - **broker**
-        - **type**: the broker class name without the namespace
-        - **options**: the broker specific options
-            - **exchange**: the name of the target exchange
-            - **uri**: the amqp server/cluster uri (it should match your celery worker configuration)
-     - **result_store**
-         - **type**: the result_store class name without the namespace
-         - **options**: the result_store specific options
-            - **exchange**: the name of the target exchange
-            - **uri**: the amqp server/cluster uri (it should match your celery worker configuration)
- 
- .. note:: These options SHOULD match your celery worker configuration.
- 
- .. code-block:: php
- 
-    $options = array(
-        'broker' => array(
-            'type' => 'Predis',
-            'options' => array(
-                'exchange' => 'celery',
-                'connection' => 'redis://localhost:6379/1'
-            )
-        ),
-        'result_store' => array(
-            'type' => 'Predis',
-            'options' => array(
-                'exchange' => 'celery',
-            )
-        )
-    );
-    
-  $rhubarb = new \Rhubarb\Rhubarb($options);
+    .. literalinclude:: ../examples/configuration/predis.php
+       :language: php
+       :lines: 1,23-
 
+Predis supports a number of options listed below:
+  - scheme [string - default: tcp] [tcp, unix, http]
+  - host [string - default: 127.0.0.1]
+  - port [integer - default: 6379]
+  - path [string - default: not set]
+  - database [integer - default: not set]
+  - password [string - default: not set]
+  - connection_async [boolean - default: false]
+  - connection_persistent [boolean - default: false]
+  - connection_timeout [float - default: 5.0]
+  - read_write_timeout [float - default: not set]
+  - alias [string - default: not set]
+  - weight [integer - default: not set]
+  - iterable_multibulk [boolean - default: false]
+  - throw_errors [boolean - default: true]
 
+Details on the configuration may be found at https://github.com/nrk/predis/wiki/Connection-Parameters
+
+    **Example Usage**
+
+    .. literalinclude:: ../examples/configuration/predis_uri.php
+       :language: php
+       :lines: 1,23-

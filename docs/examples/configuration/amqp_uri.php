@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * 
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2013] [Robert Allen]
  *
@@ -15,26 +15,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
+ * 
  * @package     Rhubarb
- * @category    Examples
- *
+ * @category    ${NAMESPACE}
  */
-use Rhubarb\Rhubarb;
-use Rhubarb\Task\Body\Python as PythonTask;
 
-$config = include('configuration/predis.php');
-$rhubarb = new Rhubarb($config);
-$argsPython = new PythonTask(array(1, 2));
-
-try {
-    $result = $rhubarb->task('app.add')
-        ->delay($argsPython, array())
-        ->get();
-} catch (\Rhubarb\Exception\TimeoutException $e) {
-    /*
-     * If the task result is not received within '10' seconds (default) a
-     * `\Rhubarb\Exception\TimeoutException` is thrown. 
-     */
-    echo $e->getMessage(), PHP_EOL;
-}
+return array(
+    'broker' => array(
+        'type' => 'phpamqp',
+        'connection' => 'amqp://guest:guest@localhost:5372/celery?read_timeout=5&write_timeout=2'
+    ),
+    'result_broker' => array(
+        'type' => 'phpamqp',
+        'connection' => 'amqp://guest:guest@localhost:5372/celery'
+    )
+);
