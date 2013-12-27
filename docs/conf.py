@@ -7,7 +7,7 @@ templates_path = ['_templates']
 master_doc = 'index'
 
 project = u'Rhubarb'
-copyright = u'2013, Robert Allen'
+copyright = u'2012-2014, Robert Allen'
 
 version = '3.2-dev'
 
