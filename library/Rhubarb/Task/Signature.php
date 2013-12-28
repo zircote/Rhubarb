@@ -19,10 +19,10 @@ namespace Rhubarb\Task;
  * limitations under the License.
  *
  * @package     Rhubarb
- * @category    Rhubarb\Message
+ * @category    Rhubarb\Task
  */
 use Rhubarb\Exception\Exception;
-use Rhubarb\Message\Message;
+use Rhubarb\Task\Message;
 use Rhubarb\Rhubarb;
 use Rhubarb\Exception\TaskSignatureException;
 use Rhubarb\Task\Body\BodyInterface;
@@ -35,7 +35,13 @@ use InvalidArgumentException;
  */
 class Signature
 {
+    /**
+     *
+     */
     const MUTABLE = true;
+    /**
+     *
+     */
     const IMMUTABLE = false;
     /**
      * @var string
@@ -72,6 +78,9 @@ class Signature
      */
     private $frozen = false;
 
+    /**
+     * @var array
+     */
     protected $callbacks = array(
         'on_success' => array(),
         'on_failure' => array(),
@@ -310,7 +319,7 @@ class Signature
             $this->setHeader($header, $value);
         }
         if ($body) {
-            if ($body instanceof BodyInterface){
+            if ($body instanceof BodyInterface) {
                 $this->setBody($body);
             } else {
                 throw new InvalidArgumentException('$body argument must be of type `BodyInterface`');

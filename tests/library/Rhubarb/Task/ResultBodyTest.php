@@ -35,13 +35,13 @@ class ResultBodyTest extends RhubarbTestCase
      */
     protected $fixture;
 
-    protected $body =  array(
+    protected $body = array(
         'state' => AsyncResult::STARTED,
-        'children' => array(1,2),
+        'children' => array(1, 2),
         'traceback' => array('trace.me'),
         'result' => 4
     );
-    
+
     public function setUp()
     {
         $this->fixture = new ResultBody($this->body);

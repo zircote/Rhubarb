@@ -28,7 +28,7 @@ $rhubarb = new Rhubarb($config);
 $sig = $rhubarb->task('app.add');
 
 $chain = $rhubarb->chain();
-for($i=0; $i<10; $i++) {
-    $chain->push($sig->s(new Python($i, $i*10)));
+for ($i = 0; $i < 10; $i++) {
+    $chain->push($sig->s(new Python($i, $i * 10)));
 }
 $asyncResult = $chain();

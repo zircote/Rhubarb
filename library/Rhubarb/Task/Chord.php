@@ -22,6 +22,8 @@ namespace Rhubarb\Task;
  * @subcategory
  */
 use Rhubarb\Exception\TaskSignatureException;
+use Rhubarb\Task\Body\BodyInterface;
+use Rhubarb\Rhubarb;
 
 /**
  * @package
@@ -29,35 +31,37 @@ use Rhubarb\Exception\TaskSignatureException;
  * @subcategory
  * @codeCoverageIgnore
  */
-class Chord
+class Chord extends Signature
 {
+    /**
+     * 
+     */
+    const NAME = 'celery.chord';
+
     /**
      * @var Group
      */
     protected $group;
 
     /**
-     * @var Signature
-     */
-    protected $chordSignature;
-
-    /**
+     * @param Rhubarb $rhubarb
+     * @param array|Signature|Group $group
+     * @param BodyInterface $body
+     * @param array $properties
+     * @param array $headers
+     *
      * @throws TaskSignatureException
-     * @param $group
-     * @param Signature $chordSignature
      */
-    public function __construct($group, Signature $chordSignature = null)
+    public function __construct(Rhubarb $rhubarb, $group = array(), BodyInterface $body = null, $properties = array(), $headers = array())
     {
+        parent::__construct($rhubarb, self::NAME, null, $properties, $headers);
         if ($group instanceof Group) {
             $this->group = $group;
         } elseif ($group instanceof Signature) {
-            $this->group = new Group(array($group));
-        } elseif (is_array($group)) {
-            $this->group = new Group($group);
-        } else {
-            throw new TaskSignatureException;
+            $this->group = new Group($rhubarb, array($group));
+        } elseif (is_array($group) && $group) {
+            $this->group = new Group($rhubarb, $group);
         }
-        $this->chordSignature = $chordSignature;
     }
 }
  

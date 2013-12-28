@@ -139,7 +139,7 @@ class SignatureTest extends RhubarbTestCase
         $this->fixture->freeze();
         $this->fixture->setHeader('c_type', 'my_type');
     }
-    
+
     public function testGetHeader()
     {
         $this->assertEquals($this->fixtureArgs['headers']['c_meth'], $this->fixture->getHeader('c_meth'));
@@ -184,7 +184,7 @@ class SignatureTest extends RhubarbTestCase
      */
     public function testGetHeadersNoBody()
     {
-        
+
         $this->fixture = new Signature(
             $this->rhubarb,
             $this->fixtureArgs['name']);
@@ -255,7 +255,7 @@ class SignatureTest extends RhubarbTestCase
     {
         $this->assertEquals($this->fixtureArgs['properties'], $this->fixture->getProperties());
     }
-    
+
     /**
      *
      */
@@ -342,7 +342,7 @@ class SignatureTest extends RhubarbTestCase
     {
         $this->fixture->freeze();
         $this->fixture->applyAsync(null, array('prop' => 1), array('head' => 2));
-        
+
     }
 
     /**
@@ -484,7 +484,9 @@ class SignatureTest extends RhubarbTestCase
      */
     public function testOnSuccess()
     {
-        $this->fixture->onSuccess(function($task){ $task->getId();});
+        $this->fixture->onSuccess(function ($task) {
+            $task->getId();
+        });
     }
 
     /**
@@ -492,7 +494,9 @@ class SignatureTest extends RhubarbTestCase
      */
     public function testOnFailure()
     {
-        $this->fixture->onFailure(function($task){ $task->getId();});
+        $this->fixture->onFailure(function ($task) {
+            $task->getId();
+        });
     }
 
     /**
@@ -500,7 +504,9 @@ class SignatureTest extends RhubarbTestCase
      */
     public function testOnRetry()
     {
-        $this->fixture->onRetry(function($task){ $task->getId();});
+        $this->fixture->onRetry(function ($task) {
+            $task->getId();
+        });
     }
 
     /**
@@ -510,7 +516,9 @@ class SignatureTest extends RhubarbTestCase
     public function testOnSuccessWhileFrozen()
     {
         $this->fixture->freeze();
-        $this->fixture->onSuccess(function($task){ $task->getId();});
+        $this->fixture->onSuccess(function ($task) {
+            $task->getId();
+        });
     }
 
     /**
@@ -520,7 +528,9 @@ class SignatureTest extends RhubarbTestCase
     public function testOnFailureWhileFrozen()
     {
         $this->fixture->freeze();
-        $this->fixture->onFailure(function($task){ $task->getId();});
+        $this->fixture->onFailure(function ($task) {
+            $task->getId();
+        });
     }
 
     /**
@@ -530,7 +540,9 @@ class SignatureTest extends RhubarbTestCase
     public function testOnRetryWhileFrozen()
     {
         $this->fixture->freeze();
-        $this->fixture->onRetry(function($task){ $task->getId();});
+        $this->fixture->onRetry(function ($task) {
+            $task->getId();
+        });
     }
 
 }

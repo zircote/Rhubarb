@@ -23,6 +23,7 @@ namespace Rhubarb\ResultStore;
 use Rhubarb\Task\ResultBody;
 use Rhubarb\Task\AsyncResult;
 use Rhubarb\Connector\AbstractTestConnector;
+
 /**
  * @package     Rhubarb
  * @category    ResultStore
@@ -31,7 +32,7 @@ use Rhubarb\Connector\AbstractTestConnector;
 class Test extends AbstractTestConnector
 {
 
-    
+
     protected $exception;
     protected $wait = 0;
     protected $timer;

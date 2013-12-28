@@ -2,7 +2,7 @@
 namespace Rhubarb;
 
 /**
- * 
+ *
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2012-2014], [Robert Allen]
  *
@@ -17,7 +17,7 @@ namespace Rhubarb;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * @package     Rhubarb
  * @category    Rhubarb
  */
@@ -33,40 +33,40 @@ use Rhubarb\Task\AsyncResult;
 class FunctionalTest extends \PHPUnit_Framework_TestCase
 {
     protected $options = array(
-            'broker' => array(
-                'type' => 'Test',
-                'class_namespace' => Rhubarb::BROKER_NAMESPACE
+        'broker' => array(
+            'type' => 'Test',
+            'class_namespace' => Rhubarb::BROKER_NAMESPACE
+        ),
+        'result_store' => array(
+            'type' => 'Test',
+            'class_namespace' => Rhubarb::RESULTSTORE_NAMESPACE
+        ),
+        'tasks' => array(
+            array(
+                'name' => 'app.add', // c_type
             ),
-            'result_store' => array(
-                'type' => 'Test',
-                'class_namespace' => Rhubarb::RESULTSTORE_NAMESPACE
-            ),
-            'tasks' => array(
-                array(
-                    'name' => 'app.add', // c_type
+        ),
+        'logger' => array(
+            'loggers' => array(
+                'dev' => array(
+                    'level' => 'DEBUG',
+                    'appenders' => array(__NAMESPACE__),
                 ),
             ),
-            'logger' => array(
-                'loggers' => array(
-                    'dev' => array(
-                        'level' => 'DEBUG',
-                        'appenders' => array(__NAMESPACE__),
-                    ),
-                ),
-                'appenders' => array(
-                    __NAMESPACE__ => array(
-                        'class' => 'LoggerAppenderNull'
-                    )
+            'appenders' => array(
+                __NAMESPACE__ => array(
+                    'class' => 'LoggerAppenderNull'
                 )
             )
-        );
+        )
+    );
 
     public function testRhubarbFunctional()
     {
         $rhubarb = new Rhubarb($this->options);
         $expected = 6;
         $rhubarb->getBroker()->setTaskCallback(
-            function(){
+            function () {
                 return new ResultBody(array('state' => AsyncResult::SUCCESS, 'result' => 6));
             }
         );
@@ -82,7 +82,7 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     {
         $rhubarb = new Rhubarb($this->options);
         $rhubarb->getBroker()->setTaskCallback(
-            function(){
+            function () {
                 return new ResultBody(array('state' => AsyncResult::SUCCESS, 'result' => 6));
             }
         );
@@ -93,14 +93,14 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * 
+     *
      */
     public function testRhubarbFunctionalTimeout()
     {
         $rhubarb = new Rhubarb($this->options);
         $expected = 6;
         $rhubarb->getBroker()->setTaskCallback(
-            function(){
+            function () {
                 return new ResultBody(array('state' => AsyncResult::SUCCESS, 'result' => 6));
             }
         );

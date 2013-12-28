@@ -60,11 +60,11 @@ class PredisTest extends RhubarbTestCase
         $this->fixture = null;
     }
 
-    
+
     public function testGetTaskResult()
     {
         $task = $this->getMockUp();
-        
+
         $result = $this->fixture->getTaskResult($task);
         $this->assertEquals(4, $result->getResult());
         $this->assertNull($result->getTraceback());

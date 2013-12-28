@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Message;
+namespace Rhubarb\Task;
 
 /**
  *
@@ -28,8 +28,8 @@ use Rhubarb\RhubarbTestCase;
  * @package     Rhubarb
  * @category    RhubarbTests
  * @group Rhubarb
- * @group Rhubarb\Message
- * @group Rhubarb\Message\Message
+ * @group Rhubarb\Task
+ * @group Rhubarb\Task\Task
  */
 class MessageTest extends RhubarbTestCase
 {
@@ -83,7 +83,7 @@ class MessageTest extends RhubarbTestCase
 
     /**
      * @group V2
-     * @group Message
+     * @group Task
      */
     public function testSimpleMerge()
     {
@@ -102,7 +102,16 @@ class MessageTest extends RhubarbTestCase
         $expected = array(
             'headers' => array_merge($brokerHeaders, $signatureHeaders),
             'properties' => array_merge($brokerProperties, $signatureProperties),
-            'body' => $body
+            'body' => $body,
+            'sent_event' => array(
+                'uuid' => 'abcdef0123456789',
+                'name' => 'test.task',
+                'args' => $body['args'],
+                'kwargs' => $body['kwargs'],
+                'retries' => null,
+                'eta' => null,
+                'expires' => null
+            )
         );
 
         $payload = $this->fixture->getPayload();
@@ -111,7 +120,7 @@ class MessageTest extends RhubarbTestCase
 
     /**
      * @group V2
-     * @group Message
+     * @group Task
      */
     public function testBrokerAndSignatureMerge()
     {
@@ -133,7 +142,16 @@ class MessageTest extends RhubarbTestCase
         $expected = array(
             'headers' => array('lang' => 'php', 'c_type' => 'test.task'),
             'properties' => array('content_encoding' => 'utf-8', 'correlation_id' => 'abcdef0123456789'),
-            'body' => $body
+            'body' => $body,
+            'sent_event' => array(
+                'uuid' => 'abcdef0123456789',
+                'name' => 'test.task',
+                'args' => $body['args'],
+                'kwargs' => $body['kwargs'],
+                'retries' => null,
+                'eta' => null,
+                'expires' => null
+            )
         );
 
         $this->assertEquals($expected, $this->fixture->getPayload());
@@ -149,19 +167,30 @@ class MessageTest extends RhubarbTestCase
     {
         $this->buildSimpleMock();
         $expectedETA = new \DateTime();
-        
+
         $expectedETA->add(new \DateInterval("PT60S"));
+        $eta = $expectedETA->format(\DateTime::ISO8601);
         $expected = array(
             'headers' => array('lang' => 'py', 'c_type' => 'test.task',
-                'eta' => $expectedETA->format(\DateTime::ISO8601)),
+                'eta' => $eta,
+            ),
             'properties' => array(
                 'content_type' => Rhubarb::CONTENT_TYPE_JSON,
                 'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
                 'correlation_id' => 'abcdef0123456789'
             ),
             'body' => array(
-                'args' => array(1, 2), 
+                'args' => array(1, 2),
                 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
+            ),
+            'sent_event' => array(
+                'uuid' => 'abcdef0123456789',
+                'name' => 'test.task',
+                'args' => array(1,2),
+                'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2'),
+                'retries' => null,
+                'eta' => $eta,
+                'expires' => null
             )
         );
         $this->fixture->setHeader('countdown', 60);
@@ -174,7 +203,7 @@ class MessageTest extends RhubarbTestCase
     {
         $this->buildSimpleMock();
         $expectedETA = new \DateTime();
-        
+
         $expectedETA->add(new \DateInterval("PT60S"));
         $eta = $expectedETA->format(\DateTime::ISO8601);
         $expected = array(
@@ -186,8 +215,17 @@ class MessageTest extends RhubarbTestCase
                 'correlation_id' => 'abcdef0123456789'
             ),
             'body' => array(
-                'args' => array(1, 2), 
+                'args' => array(1, 2),
                 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
+            ),
+            'sent_event' => array(
+                'uuid' => 'abcdef0123456789',
+                'name' => 'test.task',
+                'args' => array(1,2),
+                'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2'),
+                'retries' => null,
+                'eta' => $eta,
+                'expires' => null
             )
         );
         $this->fixture->setHeader('eta', $eta);
@@ -200,7 +238,7 @@ class MessageTest extends RhubarbTestCase
     {
         $this->buildSimpleMock();
         $expectedETA = new \DateTime();
-        
+
         $expectedETA->add(new \DateInterval("PT60S"));
         $expires = $expectedETA->format(\DateTime::ISO8601);
         $expected = array(
@@ -213,8 +251,17 @@ class MessageTest extends RhubarbTestCase
                 'correlation_id' => 'abcdef0123456789'
             ),
             'body' => array(
-                'args' => array(1, 2), 
+                'args' => array(1, 2),
                 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
+            ),
+            'sent_event' => array(
+                'uuid' => 'abcdef0123456789',
+                'name' => 'test.task',
+                'args' => array(1,2),
+                'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2'),
+                'retries' => null,
+                'eta' => null,
+                'expires' => $expires
             )
         );
         $this->fixture->setHeader('expires', $expires);
@@ -234,8 +281,17 @@ class MessageTest extends RhubarbTestCase
                 'correlation_id' => 'abcdef0123456789'
             ),
             'body' => array(
-                'args' => array(1, 2), 
+                'args' => array(1, 2),
                 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
+            ),
+            'sent_event' => array(
+                'uuid' => 'abcdef0123456789',
+                'name' => 'test.task',
+                'args' => array(1,2),
+                'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2'),
+                'retries' => null,
+                'eta' => null,
+                'expires' => null
             )
         );
         $actual = $this->fixture->getPayload();
@@ -245,7 +301,7 @@ class MessageTest extends RhubarbTestCase
 
     /**
      * @expectedException \Rhubarb\Exception\MessageSentException
-     * @expectedExceptionMessage message sent, setting properties is not allowed [ Rhubarb\Message\Message::setProperty(message_property::true) ]
+     * @expectedExceptionMessage message sent, setting properties is not allowed [ Rhubarb\Task\Message::setProperty(message_property::true) ]
      */
     public function testSetPropertyAfterMessageSent()
     {
@@ -260,15 +316,29 @@ class MessageTest extends RhubarbTestCase
     public function testGetHeaders()
     {
         $this->buildSimpleMock();
-        $expected = array('lang' => 'py', 'c_type' => 'test.task');
+        $expected = array(
+            'lang' => 'py',
+            'c_type' => 'test.task',
+            'c_meth' => null,
+            'c_shadow' => null,
+            'eta' => null,
+            'expires' => null,
+            'callbacks' => null,
+            'errbacks' => null,
+            'chain' => array(),
+            'group' => array(),
+            'chord' => array(),
+            'retries' => null,
+            'timelimit' => array()
+        );
         $actual = $this->fixture->getHeaders();
         $this->assertEquals($expected, $actual);
         $this->fixture->getPayload();
 
     }
+
     public function testGetHeader()
     {
-        
         $this->buildSimpleMock();
         $expected = 'py';
         $actual = $this->fixture->getHeader('lang');

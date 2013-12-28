@@ -53,6 +53,7 @@ class PythonTest extends RhubarbTestCase
     {
         $this->fixture = null;
     }
+
     public function testConstructor()
     {
         $expected = array(
@@ -126,9 +127,10 @@ class PythonTest extends RhubarbTestCase
             $p->toArray()
         );
     }
+
     public function testKwargsOnly()
     {
-        
+
         $p = new Python(new Kwargs(array('arg1' => 'arg_1', 'arg2' => 'arg_2')));
         $this->assertEquals(
             array('args' => array(), 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')),

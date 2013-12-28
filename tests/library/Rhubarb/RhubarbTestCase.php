@@ -22,7 +22,7 @@ namespace Rhubarb;
  * @category    RhubarbTests\Mock
  */
 use PHPUnit_Framework_TestCase;
-use Rhubarb\Message\Message;
+use Rhubarb\Task\Message;
 use Rhubarb\Task\Signature;
 
 /**
@@ -222,7 +222,7 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
      */
     public function getMessageMock(Rhubarb $rhubarb, Signature $signature)
     {
-        $messageMock = $this->getMock('\Rhubarb\Message\Message', array(), func_get_args());
+        $messageMock = $this->getMock('\Rhubarb\Task\Message', array(), func_get_args());
         return $messageMock;
     }
 

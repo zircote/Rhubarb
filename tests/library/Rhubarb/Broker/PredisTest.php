@@ -21,7 +21,7 @@ namespace Rhubarb\Broker;
  * @category    Tests
  * @subcategory AsyncResult
  */
-use Rhubarb\Message\Message;
+use Rhubarb\Task\Message;
 use Rhubarb\PhpPredisTestCase;
 
 /**

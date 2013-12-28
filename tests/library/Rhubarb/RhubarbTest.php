@@ -22,6 +22,7 @@ namespace Rhubarb;
  * @subcategory AsyncResult
  */
 use Rhubarb\ResultStore\ResultStoreInterface;
+
 /**
  * @package     Rhubarb
  * @category    Tests
@@ -44,36 +45,36 @@ class RhubarbTest extends RhubarbTestCase
      */
     protected $rhubarb;
     protected $options = array(
-            'broker' => array(
-                'type' => 'Test',
-                'class_namespace' => Rhubarb::BROKER_NAMESPACE
+        'broker' => array(
+            'type' => 'Test',
+            'class_namespace' => Rhubarb::BROKER_NAMESPACE
+        ),
+        'result_store' => array(
+            'type' => 'Test',
+            'class_namespace' => Rhubarb::RESULTSTORE_NAMESPACE
+        ),
+        'tasks' => array(
+            array(
+                'name' => 'app.add', // c_type
+                'headers' => array(
+                    'timelimit' => array(5, 10)
+                )
             ),
-            'result_store' => array(
-                'type' => 'Test',
-                'class_namespace' => Rhubarb::RESULTSTORE_NAMESPACE
-            ),
-            'tasks' => array(
-                array(
-                    'name' => 'app.add', // c_type
-                    'headers' => array(
-                        'timelimit' => array(5, 10)
-                    )
+        ),
+        'logger' => array(
+            'loggers' => array(
+                'dev' => array(
+                    'level' => 'DEBUG',
+                    'appenders' => array(__NAMESPACE__),
                 ),
             ),
-            'logger' => array(
-                'loggers' => array(
-                    'dev' => array(
-                        'level' => 'DEBUG',
-                        'appenders' => array(__NAMESPACE__),
-                    ),
-                ),
-                'appenders' => array(
-                    __NAMESPACE__ => array(
-                        'class' => 'LoggerAppenderNull'
-                    )
+            'appenders' => array(
+                __NAMESPACE__ => array(
+                    'class' => 'LoggerAppenderNull'
                 )
             )
-        );
+        )
+    );
 
     /**
      *
@@ -126,10 +127,12 @@ class RhubarbTest extends RhubarbTestCase
         $logger = $this->rhubarb->getLogger();
         $this->assertEquals('Rhubarb', $logger->getName());
     }
+
     public function testGetBroker()
     {
         $this->assertInstanceOf('\Rhubarb\Broker\Test', $this->rhubarb->getBroker());
     }
+
     public function testGetResultStore()
     {
         $this->assertInstanceOf('\Rhubarb\ResultStore\Test', $this->rhubarb->getResultStore());
@@ -249,7 +252,8 @@ class RhubarbTest extends RhubarbTestCase
      * @expectedException \Rhubarb\Exception\EncodingException
      * @expectedExceptionMessage failed to encode payload of type [unknown] ensure it is declared in your configuration
      */
-    public function testUnknownEncodeException(){
+    public function testUnknownEncodeException()
+    {
         $this->rhubarb->encode('blah', 'UNKNOWN');
     }
 
@@ -257,27 +261,30 @@ class RhubarbTest extends RhubarbTestCase
      * @expectedException \Rhubarb\Exception\EncodingException
      * @expectedExceptionMessage failed to decode payload of type [unknown] ensure it is declared in your configuration
      */
-    public function testUnknownDecodeException(){
+    public function testUnknownDecodeException()
+    {
         $this->rhubarb->decode('blah', 'UNKNOWN');
     }
-    
+
     /**
      * @expectedException \Rhubarb\Exception\MessageUnserializeException
      * @expectedExceptionMessage failed to serialize payload of type [unknown] ensure it is declared in your configuration
      */
-    public function testUnknownSerializeException(){
-        
+    public function testUnknownSerializeException()
+    {
+
         $this->rhubarb->serialize('blah', 'UNKNOWN');
     }
-    
+
     /**
      * @expectedException \Rhubarb\Exception\MessageUnserializeException
      * @expectedExceptionMessage failed to unserialize payload of type [unknown] ensure it is declared in your configuration
      */
-    public function testUnknownUnSerializeException(){
+    public function testUnknownUnSerializeException()
+    {
         $this->rhubarb->unserialize('blah', 'UNKNOWN');
     }
-    
+
     public function testSetResultStoreWithResultStore()
     {
         $this->rhubarb->setResultStore($this->getMock('\Rhubarb\ResultStore\ResultStoreInterface'));
@@ -293,6 +300,7 @@ class RhubarbTest extends RhubarbTestCase
     {
         $this->rhubarb->setResultStore(array('type' => 'IDoNotExistsClassName'));
     }
+
     public function testSeBrokerWithResultStore()
     {
         $this->rhubarb->setBroker($this->getMock('\Rhubarb\Broker\BrokerInterface'));
@@ -308,6 +316,7 @@ class RhubarbTest extends RhubarbTestCase
     {
         $this->rhubarb->setBroker(array('type' => 'IDoNotExistsClassName'));
     }
+
     public function testDispatch()
     {
         $sig = $this->rhubarb->t('app.add');

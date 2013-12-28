@@ -25,10 +25,12 @@ use Rhubarb\Exception\Exception;
 use Rhubarb\Exception\MessageUnserializeException;
 use Rhubarb\Exception\TaskSignatureException;
 use Rhubarb\Task\AsyncResult;
-use Rhubarb\Message\Message;
+use Rhubarb\Task\Message;
 use Rhubarb\Task\Body\BodyInterface;
 use Rhubarb\ResultStore\ResultStoreInterface;
 use Rhubarb\Task\Chain;
+use Rhubarb\Task\Chord;
+use Rhubarb\Task\Group;
 use Rhubarb\Task\Signature;
 use Rhubarb\Exception\EncodingException;
 
@@ -555,9 +557,30 @@ class Rhubarb
             );
         }
     }
-    
+
+    /**
+     * @return Chain
+     */
     public function chain()
     {
         return new Chain($this, func_get_args());
+    }
+
+    /**
+     * @return Group
+     */
+    public function group()
+    {
+        return new Group($this, func_get_args());
+    }
+
+    /**
+     * @param array|Group $group
+     * @param Signature $chordSignature
+     * @return Chord
+     */
+    public function chord($group, Signature $chordSignature = null)
+    {
+        return new Chord($this, func_get_args());
     }
 }

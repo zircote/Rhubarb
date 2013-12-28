@@ -22,7 +22,7 @@ namespace Rhubarb\Broker;
  */
 use Rhubarb\Connector\Predis as PredisConnection;
 use Rhubarb\Exception\ConnectionException;
-use Rhubarb\Message\Message;
+use Rhubarb\Task\Message;
 use Rhubarb\Rhubarb;
 
 /**

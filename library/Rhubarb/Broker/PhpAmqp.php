@@ -21,7 +21,7 @@ namespace Rhubarb\Broker;
  * @category    Broker
  */
 use Rhubarb\Connector\PhpAmqp as PhpAmqpConnector;
-use Rhubarb\Message\Message;
+use Rhubarb\Task\Message;
 use Rhubarb\Task\AsyncResult;
 
 /**
@@ -69,7 +69,7 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
 
     /**
      * @codeCoverageIgnore
-     * 
+     *
      * @param Message $message
      * @return \AMQPQueue
      */
@@ -89,7 +89,7 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
 
     /**
      * @codeCoverageIgnore
-     * 
+     *
      * @return \AMQPChannel
      */
     protected function getChannel()
@@ -106,7 +106,7 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
 
     /**
      * @codeCoverageIgnore
-     * 
+     *
      * @param \AMQPChannel $amqpChannel
      * @param Message $message
      * @return \AMQPExchange

@@ -19,17 +19,20 @@
  * @package     Rhubarb
  * @category    ${NAMESPACE}
  */
-
 use Rhubarb\Rhubarb;
 use Rhubarb\Task\Body\Python;
 
 $config = include('configuration/predis.php');
 $rhubarb = new Rhubarb($config);
-$sig = $rhubarb->task('app.add');
 
-$tasks = array();
 for ($i = 0; $i < 10; $i++) {
-    $tasks[] = $sig->s(new Python($i, $i * 10));
+    $tasks[] = $rhubarb->task('app.add', new Python($i, $i * 10));
 }
-$chain = $rhubarb->chain($tasks);
-$asyncResult = $chain();
+
+$group = $rhubarb->group($tasks);
+$res = $group();
+while (!$res->isReady()) {
+    usleep(1000);
+}
+$res->get();
+ 

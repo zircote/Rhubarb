@@ -19,9 +19,9 @@ namespace Rhubarb\Broker;
  *
  * @package     Rhubarb
  * @category    Broker
- * 
+ *
  */
-use Rhubarb\Message\Message;
+use Rhubarb\Task\Message;
 use Rhubarb\Rhubarb;
 use Rhubarb\Task\AsyncResult;
 use Rhubarb\Connector\AbstractTestConnector;
@@ -39,7 +39,6 @@ class Test extends AbstractTestConnector
     protected $exception;
     protected $published;
     protected $callback;
-    
 
 
     /**
@@ -50,12 +49,11 @@ class Test extends AbstractTestConnector
     {
         $this->setOptions($options);
         $this->setRhubarb($rhubarb);
-        $this->callback = function($jsonString)
-        {
+        $this->callback = function ($jsonString) {
             return $jsonString;
         };
     }
-    
+
     /**
      *
      */
@@ -67,7 +65,7 @@ class Test extends AbstractTestConnector
     }
 
     /**
-     * @param \Rhubarb\Message\Message $message
+     * @param \Rhubarb\Task\Message $message
      * @return AsyncResult
      */
     public function publishTask(Message $message)
@@ -76,6 +74,7 @@ class Test extends AbstractTestConnector
         static::$nextResult = call_user_func($this->callback, array($message->serialize()));
         return true;
     }
+
     public function setTaskCallback(callable $callback)
     {
         $this->callback = $callback;

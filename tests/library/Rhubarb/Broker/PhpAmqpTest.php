@@ -68,7 +68,7 @@ class PhpAmqpTest extends PhpAmqpTestCase
 
     /**
      *
-     * 
+     *
      */
     public function testPublishTask()
     {
@@ -104,9 +104,9 @@ class PhpAmqpTest extends PhpAmqpTestCase
             $this->getBodyMock(array(2, 1))
         );
 
-        /* @var $message \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Message\Message */
+        /* @var $message \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Task\Message */
         $message = $this->getMock(
-            '\Rhubarb\Message\Message',
+            '\Rhubarb\Task\Message',
             array('getProperties', 'getHeaders'),
             array($this->rhubarb, $signature)
         );
@@ -120,16 +120,17 @@ class PhpAmqpTest extends PhpAmqpTestCase
         /* So many mocks, I dont like it... */
         $this->fixture->publishTask($message);
     }
-/**
-    public function testGetHeaders()
-    {
-        $expected = array();
-        $this->getMockFixture();
-        $this->assertEquals($expected, $this->fixture->getHeaders());
-    }
 
     /**
-     * 
+     * public function testGetHeaders()
+     * {
+     * $expected = array();
+     * $this->getMockFixture();
+     * $this->assertEquals($expected, $this->fixture->getHeaders());
+     * }
+     *
+     * /**
+     *
      */
     public function testGetProperties()
     {

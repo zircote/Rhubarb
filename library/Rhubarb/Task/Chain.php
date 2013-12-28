@@ -22,7 +22,6 @@ namespace Rhubarb\Task;
  * @subcategory
  */
 use Rhubarb\Exception\TaskSignatureException;
-use Rhubarb\Message\Message;
 use Rhubarb\Rhubarb;
 
 /**
@@ -31,21 +30,26 @@ use Rhubarb\Rhubarb;
  * @subcategory
  * @codeCoverageIgnore
  */
-class Chain extends Message
+class Chain extends Signature
 {
+    /**
+     * 
+     */
+    const NAME = 'celery.chain';
     /**
      * @var array
      */
     protected $chain = array();
 
-
     /**
      * @param Rhubarb $rhubarb
      * @param array $chain
+     * @param array $properties
+     * @param array $headers
      */
-    public function __construct(Rhubarb $rhubarb, $chain = array())
+    public function __construct(Rhubarb $rhubarb, $chain = array(), $properties = array(), $headers = array())
     {
-        $this->setRhubarb($rhubarb);
+        parent::__construct($rhubarb, self::NAME, null, $properties, $headers);
         $this->setChain($chain);
     }
 
@@ -78,24 +82,6 @@ class Chain extends Message
     {
         array_push($this->chain, $signature);
         return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function reset()
-    {
-        $this->chain = array();
-        return $this;
-    }
-
-    /**
-     * @return AsyncResult
-     */
-    public function __invoke()
-    {
-        $this->setChain(func_get_args());
-        return $this->dispatch();
     }
 }
  

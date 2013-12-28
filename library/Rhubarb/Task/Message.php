@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Message;
+namespace Rhubarb\Task;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
@@ -18,22 +18,33 @@ namespace Rhubarb\Message;
  * limitations under the License.
  *
  * @package     Rhubarb
- * @category    Rhubarb\Message
+ * @category    Rhubarb\Task
  */
 use Rhubarb\Broker\BrokerInterface;
 use Rhubarb\Exception\Exception;
 use Rhubarb\Exception\MessageSentException;
 use Rhubarb\Rhubarb;
 use Rhubarb\Task\Body\BodyInterface;
-use Rhubarb\Task\Signature;
 
 /**
  * @package     Rhubarb
- * @category    Rhubarb\Message
+ * @category    Rhubarb\Task
  *
  */
 class Message implements MessageInterface
 {
+    /**
+     *
+     */
+    const V1 = 1;
+    /**
+     *
+     */
+    const V2 = 2;
+    /**
+     * @var int
+     */
+    static public $messageFormat = self::V2;
     /**
      * @var Rhubarb
      */
@@ -174,14 +185,12 @@ class Message implements MessageInterface
         $brokerHeaders = array();
         $signatureHeaders = array();
         if ($this->getRhubarb() && $this->getRhubarb()->getBroker() instanceof BrokerInterface) {
-            $brokerHeaders = array_filter($this->getRhubarb()->getBroker()->getHeaders(), array($this, 'filter'));
+            $brokerHeaders = (array)$this->getRhubarb()->getBroker()->getHeaders();
         }
         if ($this->getSignature() instanceof Signature) {
-            $signatureHeaders = array_filter((array)$this->getSignature()->getHeaders(), array($this, 'filter'));
+            $signatureHeaders = (array)$this->getSignature()->getHeaders();
         }
-        $this->headers = array_filter(
-            array_merge($brokerHeaders, $this->headers, $signatureHeaders), array($this, 'filter')
-        );
+        $this->headers = array_merge($brokerHeaders, $this->headers, $signatureHeaders);
         return $this;
     }
 
@@ -193,16 +202,12 @@ class Message implements MessageInterface
         $brokerProperties = array();
         $signatureProperties = array();
         if ($this->getRhubarb() && $this->getRhubarb()->getBroker() instanceof BrokerInterface) {
-            $brokerProperties = array_filter(
-                (array)$this->getRhubarb()->getBroker()->getProperties(), array($this, 'filter')
-            );
+            $brokerProperties = (array)$this->getRhubarb()->getBroker()->getProperties();
         }
         if ($this->getSignature() instanceof Signature) {
-            $signatureProperties = array_filter((array)$this->getSignature()->getProperties(), array($this, 'filter'));
+            $signatureProperties = (array)$this->getSignature()->getProperties();
         }
-        $this->properties = array_filter(
-            array_merge($brokerProperties, $this->properties, $signatureProperties), array($this, 'filter')
-        );
+        $this->properties = array_merge($brokerProperties, $this->properties, $signatureProperties);
         return $this;
     }
 
@@ -223,26 +228,93 @@ class Message implements MessageInterface
                 $body,
                 $this->getProperty('content_encoding') ? : Rhubarb::CONTENT_ENCODING_UTF8
             );
-            $this->payload = array(
+            $payload = array(
                 'headers' => $this->getHeaders(),
                 'properties' => $this->getProperties(),
                 'body' => $body
             );
+
+            if (isset($payload['headers']['countdown'])) {
+                $datetime = new \DateTime();
+                $datetime->add(new \DateInterval("PT{$payload['headers']['countdown']}S"));
+                unset($payload['headers']['countdown']);
+                $payload['headers']['eta'] = $datetime->format(\DateTime::ISO8601);
+            }
+            if (isset($payload['headers']['expires'])) {
+                $datetime = new \DateTime();
+                $datetime->setTimestamp(strtotime($payload['headers']['expires']));
+                $payload['headers']['expires'] = $datetime->format(\DateTime::ISO8601);
+            }
+            if (static::$messageFormat == self::V2) {
+                $this->payload = $this->getPayloadAsV2($payload);
+            } else {
+                $this->payload = $this->getPayloadAsV1($payload);
+            }
         }
-        
-        if (isset($this->payload['headers']['countdown'])) {
-            $datetime = new \DateTime();
-            $datetime->add(new \DateInterval("PT{$this->payload['headers']['countdown']}S"));
-            unset($this->payload['headers']['countdown']);
-            $this->payload['headers']['eta'] = $datetime->format(\DateTime::ISO8601);
-        }
-        if (isset($this->payload['headers']['expires'])) {
-            $datetime = new \DateTime();
-            $datetime->setTimestamp(strtotime($this->payload['headers']['expires']));
-            $this->payload['headers']['expires'] = $datetime->format(\DateTime::ISO8601);
-        }
+
         return $this->payload;
     }
+
+    /**
+     * @param $payload
+     * @return mixed
+     */
+    protected function getPayloadAsV1($payload)
+    {
+        return array(
+            'properties' => array_filter((array)$payload['properties'], array($this, 'filter')),
+            'headers' => array_diff_key($payload['headers'], $this->headers),
+            'body' => array(
+                'task' => $payload['headers']['name'],
+                'id' => $payload['properties']['correlation_id'],
+                'args' => $payload['body']['args'],
+                'kwargs' => $payload['body']['kwargs'],
+                'retries' => $payload['headers']['retries'],
+                'eta' => $payload['headers']['eta'],
+                'expire' => $payload['headers']['expires'],
+                'utc' => true,
+                'callbacks' => $payload['headers']['callbacks'],
+                'errbacks' => $payload['headers']['errbacks'],
+                'timelimit' => $payload['headers']['timelimit'],
+                'taskset' => $payload['headers']['group'],
+                'chord' => $payload['headers']['chord']
+            ),
+            'sent_event' => array(
+                'uuid' => isset($payload['properties']['correlation_id']) ? 
+                        $payload['properties']['correlation_id'] : null,
+                'name' => isset($payload['headers']['c_type']) ? $payload['headers']['c_type'] : null,
+                'args' => isset($payload['body']['args']) ? $payload['body']['args'] : null,
+                'kwargs' => isset($payload['body']['kwargs']) ? $payload['body']['kwargs'] : null,
+                'retries' => isset($payload['headers']['retries']) ? $payload['headers']['retries'] : null,
+                'eta' => isset($payload['headers']['eta']) ? $payload['headers']['eta'] : null,
+                'expires' => isset($payload['headers']['expires']) ? $payload['headers']['expires'] : null
+            )
+        );
+    }
+
+    /**
+     * @param $payload
+     * @return mixed
+     */
+    protected function getPayloadAsV2($payload)
+    {
+        return array(
+            'headers' => array_filter((array)$payload['headers'], array($this, 'filter')),
+            'properties' => array_filter((array)$payload['properties'], array($this, 'filter')),
+            'body' => array_filter((array)$payload['body'], array($this, 'filter')),
+            'sent_event' => array(
+                'uuid' => isset($payload['properties']['correlation_id']) ? 
+                        $payload['properties']['correlation_id'] : null,
+                'name' => isset($payload['headers']['c_type']) ? $payload['headers']['c_type'] : null,
+                'args' => isset($payload['body']['args']) ? $payload['body']['args'] : null,
+                'kwargs' => isset($payload['body']['kwargs']) ? $payload['body']['kwargs'] : null,
+                'retries' => isset($payload['headers']['retries']) ? $payload['headers']['retries'] : null,
+                'eta' => isset($payload['headers']['eta']) ? $payload['headers']['eta'] : null,
+                'expires' => isset($payload['headers']['expires']) ? $payload['headers']['expires'] : null
+            )
+        );
+    }
+
 
     /**
      * @return array|string
@@ -256,7 +328,6 @@ class Message implements MessageInterface
             $body = $this->getSignature()
                 ->getBody()
                 ->toArray();
-            $body = array_filter((array)$body, array($this, 'filter'));
         }
         return $body;
     }

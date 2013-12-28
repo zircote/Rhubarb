@@ -20,7 +20,7 @@ namespace Rhubarb\Broker;
  * @package     Rhubarb
  * @category    Broker
  */
-use Rhubarb\Message\Message;
+use Rhubarb\Task\Message;
 
 /**
  * @package     Rhubarb
@@ -29,7 +29,7 @@ use Rhubarb\Message\Message;
 interface BrokerInterface
 {
     /**
-     * @param \Rhubarb\Message\Message $message
+     * @param \Rhubarb\Task\Message $message
      * @returns \Rhubarb\Task\AsyncResult
      */
     public function publishTask(Message $message);

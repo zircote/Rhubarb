@@ -28,7 +28,7 @@ use Rhubarb\RhubarbTestCase;
  * @package     Rhubarb
  * @category    Tests
  * @subcategory AsyncResult
- * 
+ *
  * @group \Rhubarb
  * @group \Rhubarb\Task
  * @group \Rhubarb\Task\AsyncResult
@@ -40,14 +40,14 @@ class AsyncResultTest extends RhubarbTestCase
      */
     protected $fixture;
     /**
-     * @var \Rhubarb\Message\Message|\PHPUnit_Framework_MockObject_MockObject
+     * @var \Rhubarb\Task\Message|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $message;
     /**
      * @var \Rhubarb\ResultStore\ResultStoreInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $resultStore;
-    
+
     protected $parameters = array(
         'name' => 'test.task',
         'id' => '1234567890abcdef'
@@ -62,13 +62,13 @@ class AsyncResultTest extends RhubarbTestCase
             ->method('getTaskResult')
             ->will($this->returnValue($body));
     }
-    
+
     protected function setUp()
     {
         $broker = $this->getBrokerMock();
         $this->resultStore = $this->getMock('\Rhubarb\ResultStore\ResultStoreInterface', array('getTaskResult'));
         $this->rhubarb = $this->getRhubarbMock($broker, $this->resultStore);
-        $this->message = $this->getMock('\\Rhubarb\\Message\\Message', array('getId'), array(), '', false);
+        $this->message = $this->getMock('\\Rhubarb\\Task\\Message', array('getId'), array(), '', false);
         $this->fixture = new AsyncResult($this->rhubarb, $this->message);
     }
 
@@ -78,109 +78,109 @@ class AsyncResultTest extends RhubarbTestCase
     }
 
     /**
-     * 
+     *
      */
     public function testGetId()
     {
-        
+
         $this->message->expects($this->once())
             ->method('getId')
             ->will($this->returnValue($this->parameters['id']));
-        
+
         $this->assertEquals($this->parameters['id'], $this->fixture->getId());
     }
-    
+
     public function testIsReady()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::SUCCESS, 'body' => '1')));
         $this->assertTrue($this->fixture->isReady());
     }
-    
+
     public function testIsReadyPending()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'body' => '1')));
         $this->assertFalse($this->fixture->isReady());
     }
-    
+
     public function testIsStarted()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::STARTED, 'body' => '1')));
         $this->assertTrue($this->fixture->isStarted());
     }
-    
+
     public function testIsStartedRevoked()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::REVOKED, 'body' => '1')));
         $this->assertFalse($this->fixture->isStarted());
     }
-    
+
     public function testIsRevoked()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::REVOKED, 'body' => '1')));
         $this->assertTrue($this->fixture->isRevoked());
     }
-    
+
     public function testIsRevokedPending()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'body' => '1')));
         $this->assertFalse($this->fixture->isRevoked());
     }
-    
+
     public function testIsSuccess()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::SUCCESS, 'body' => '1')));
         $this->assertTrue($this->fixture->isSuccess());
     }
-    
+
     public function testIsSuccessFailure()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::FAILURE, 'body' => '1')));
         $this->assertFalse($this->fixture->isSuccess());
     }
-    
+
     public function testIsRetry()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::RETRY, 'body' => '1')));
         $this->assertTrue($this->fixture->isRetry());
     }
-    
+
     public function testIsRetryPending()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'body' => '1')));
         $this->assertFalse($this->fixture->isRetry());
     }
-    
+
     public function testIsPending()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'body' => '1')));
         $this->assertTrue($this->fixture->isPending());
     }
-    
+
     public function testIsPendingStarted()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::STARTED, 'body' => '1')));
         $this->assertFalse($this->fixture->isPending());
     }
-    
+
     public function testIsFailure()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::FAILURE, 'body' => '1')));
         $this->assertTrue($this->fixture->isFailure());
     }
-    
+
     public function testIsFailureSuccess()
     {
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::SUCCESS, 'body' => '1')));
         $this->assertFalse($this->fixture->isFailure());
     }
-    
+
     public function testGet()
     {
         $expected = 1;
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::SUCCESS, 'result' => $expected)));
         $actual = $this->fixture->get();
         $this->assertEquals($expected, $actual);
-        
+
     }
 
     public function testGetSlowResult()
@@ -194,6 +194,6 @@ class AsyncResultTest extends RhubarbTestCase
         );
         $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'result' => '')));
         $this->fixture->get(1);
-        
+
     }
 }

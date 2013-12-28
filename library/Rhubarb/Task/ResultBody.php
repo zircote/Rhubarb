@@ -109,7 +109,7 @@ class ResultBody
      */
     protected function setState($state)
     {
-        if (!in_array($state, AsyncResult::$allowedResultStates)) {
+        if (!in_array($state, AsyncResult::$allStates)) {
             throw new RuntimeException('status provided is not a known state');
         }
         $this->state = $state;

@@ -22,7 +22,6 @@ namespace Rhubarb\Task;
  * @subcategory AsyncResult
  */
 use Rhubarb\Rhubarb;
-use Rhubarb\Message\Message;
 use Rhubarb\Exception\TimeoutException;
 
 /**
@@ -32,25 +31,78 @@ use Rhubarb\Exception\TimeoutException;
  */
 class AsyncResult
 {
+    /**
+     *
+     */
     const PENDING = 'PENDING';
+    /**
+     *
+     */
     const STARTED = 'STARTED';
+    /**
+     *
+     */
     const SUCCESS = 'SUCCESS';
+    /**
+     *
+     */
     const FAILURE = 'FAILURE';
+    /**
+     *
+     */
     const RETRY = 'RETRY';
+    /**
+     *
+     */
     const REVOKED = 'REVOKED';
+    /**
+     *
+     */
+    const RECEIVED = 'RECEIVED';
 
-    static public $allowedResultStates = array(
-        AsyncResult::PENDING,
-        AsyncResult::FAILURE,
-        AsyncResult::RETRY,
-        AsyncResult::REVOKED,
-        AsyncResult::STARTED,
-        AsyncResult::SUCCESS
+    /**
+     * @var array
+     */
+    static public $allStates = array(
+        self::PENDING,
+        self::FAILURE,
+        self::RETRY,
+        self::REVOKED,
+        self::STARTED,
+        self::SUCCESS,
+        self::RECEIVED
     );
-    static public $completedState = array(
-        AsyncResult::FAILURE,
-        AsyncResult::REVOKED,
-        AsyncResult::SUCCESS
+    /**
+     * @var array
+     */
+    static public $readyStates = array(
+        self::FAILURE,
+        self::REVOKED,
+        self::SUCCESS
+    );
+    /**
+     * @var array
+     */
+    static public $unReadyStates = array(
+        self::PENDING, 
+        self::RECEIVED,
+        self::STARTED,
+        self::RETRY
+    );
+    /**
+     * @var array
+     */
+    static public $exceptionStates = array(
+        self::RETRY,
+        self::FAILURE,
+        self::REVOKED
+    );
+    /**
+     * @var array
+     */
+    static public $propagateStates = array(
+        self::FAILURE,
+        self::REVOKED
     );
     /**
      * @var Rhubarb
@@ -118,7 +170,7 @@ class AsyncResult
      */
     public function isReady()
     {
-        return in_array($this->getResult()->getState(), static::$completedState);
+        return in_array($this->getResult()->getState(), static::$readyStates);
     }
 
     /**
@@ -202,7 +254,7 @@ class AsyncResult
 
     /**
      *
-     * @param \Rhubarb\Message\Message $message
+     * @param \Rhubarb\Task\Message $message
      * @return AsyncResult
      */
     public function setMessage($message)
@@ -212,7 +264,7 @@ class AsyncResult
     }
 
     /**
-     * @return \Rhubarb\Message\Message
+     * @return \Rhubarb\Task\Message
      */
     public function getMessage()
     {
@@ -224,7 +276,7 @@ class AsyncResult
      */
     public function getResult()
     {
-        if (!in_array($this->result->getState(), self::$completedState)) {
+        if (!in_array($this->result->getState(), self::$readyStates)) {
             $this->result = $this->getRhubarb()->getResultStore()->getTaskResult($this);
         }
         return $this->result;

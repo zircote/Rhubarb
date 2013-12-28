@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Message;
+namespace Rhubarb\Task;
 
     /**
      *
@@ -19,12 +19,12 @@ namespace Rhubarb\Message;
      * limitations under the License.
      *
      * @package     Rhubarb
-     * @category    Rhubarb\Message
+     * @category    Rhubarb\Task
      */
 
 /**
  * @package     Rhubarb
- * @category    Rhubarb\Message
+ * @category    Rhubarb\Task
  */
 interface MessageInterface
 {
@@ -33,7 +33,7 @@ interface MessageInterface
      * @return array
      */
     public function getPayload();
-    
+
     /**
      * @return \Rhubarb\Task\AsyncResult
      */
