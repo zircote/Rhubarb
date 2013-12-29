@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Task\Body;
+namespace Rhubarb\Task\Args;
 
     /**
      *
@@ -19,14 +19,14 @@ namespace Rhubarb\Task\Body;
      * limitations under the License.
      *
      * @package     Rhubarb
-     * @category    Rhubarb\Task\Body
+     * @category    Rhubarb\Task\Args
      */
 
 /**
  * @package     Rhubarb
- * @category    Rhubarb\Task\Body
+ * @category    Rhubarb\Task\Args
  */
-interface BodyInterface
+interface ArgsInterface
 {
 
     /**

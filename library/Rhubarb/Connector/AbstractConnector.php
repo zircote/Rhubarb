@@ -32,8 +32,8 @@ use \Rhubarb\Rhubarb;
 class AbstractConnector implements ConnectorInterface
 {
 
-    const AMQP_PERSISTENT = 2;
-    const AMQP_NON_PERSISTENT = 1;
+    const PERSISTENT = 2;
+    const NON_PERSISTENT = 1;
     /**
      * @var array
      */
@@ -52,7 +52,7 @@ class AbstractConnector implements ConnectorInterface
     protected $properties = array(
         'content_type' => Rhubarb::CONTENT_TYPE_JSON,
         'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
-        'delivery_mode' => self::AMQP_PERSISTENT,
+        'delivery_mode' => self::PERSISTENT,
         'priority' => 0
     );
 

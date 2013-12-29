@@ -26,7 +26,7 @@ use Rhubarb\Exception\MessageUnserializeException;
 use Rhubarb\Exception\TaskSignatureException;
 use Rhubarb\Task\AsyncResult;
 use Rhubarb\Task\Message;
-use Rhubarb\Task\Body\BodyInterface;
+use Rhubarb\Task\Args\ArgsInterface;
 use Rhubarb\ResultStore\ResultStoreInterface;
 use Rhubarb\Task\Chain;
 use Rhubarb\Task\Chord;
@@ -194,6 +194,9 @@ class Rhubarb
                         'class' => 'LoggerAppenderNull'
                     )
                 )
+            ),
+            'events' => array(
+                'enabled' => false
             )
         );
     /**
@@ -208,7 +211,7 @@ class Rhubarb
      */
     public function __construct(array $options = array())
     {
-        /* I would prefer this was a class constant; however PHP will not allow bitwise assignments in the class body */
+        /* I would prefer this was a class constant; however PHP will not allow bitwise assignments in the class args */
         static::$jsonOptions = JSON_BIGINT_AS_STRING | JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES;
         $this->serializers[self::CONTENT_TYPE_JSON] = function ($payload) {
             return json_encode($payload, static::$jsonOptions);
@@ -391,8 +394,28 @@ class Rhubarb
             $this->options['logger'] = $value;
         } elseif ($name == 'tasks') {
             $this->setTasks($value);
+        } elseif ($name == 'events') {
+            $this->setEventOptions($value);
         }
         return $this;
+    }
+
+    /**
+     * @param array $options
+     * @return $this
+     */
+    public function setEventOptions(array $options)
+    {
+        $this->options['events'] = array_merge($this->options['events'], $options);
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEventOptions()
+    {
+        return $this->options['events'];
     }
 
     /**
@@ -467,12 +490,12 @@ class Rhubarb
     /**
      * @throws TaskSignatureException
      * @param $name
-     * @param BodyInterface $body
+     * @param ArgsInterface $body
      * @param array $properties
      * @param array $headers
      * @return Signature
      */
-    public function task($name, BodyInterface $body = null, $properties = array(), $headers = array())
+    public function task($name, ArgsInterface $body = null, $properties = array(), $headers = array())
     {
         if (!array_key_exists($name, $this->taskRegistry)) {
             throw new TaskSignatureException(sprintf('Task [%s] is not in registered', $name));

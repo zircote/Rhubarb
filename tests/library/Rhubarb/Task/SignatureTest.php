@@ -40,7 +40,7 @@ class SignatureTest extends RhubarbTestCase
      * @var array
      */
     protected $fixtureArgs = array(
-        'body' => array(1, 2),
+        'args' => array(1, 2),
         'name' => __CLASS__,
         'headers' => array('lang' => 'py', 'c_meth' => 'my_meth'),
         'properties' => array('content_encoding' => 'UTF-8')
@@ -56,7 +56,7 @@ class SignatureTest extends RhubarbTestCase
         $this->fixture = new Signature(
             $this->rhubarb,
             $this->fixtureArgs['name'],
-            $this->getBodyMock($this->fixtureArgs['body']),
+            $this->getBodyMock($this->fixtureArgs['args']),
             $this->fixtureArgs['properties'],
             $this->fixtureArgs['headers']
         );
@@ -83,7 +83,7 @@ class SignatureTest extends RhubarbTestCase
     {
         $this->assertInstanceOf('\Rhubarb\Rhubarb', $this->fixture->getRhubarb());
         $this->assertEquals($this->fixtureArgs['name'], $this->fixture->getName());
-        $this->assertInstanceOf('\Rhubarb\Task\Body\BodyInterface', $this->fixture->getBody());
+        $this->assertInstanceOf('\Rhubarb\Task\Args\ArgsInterface', $this->fixture->getArgs());
         $this->assertEquals($this->fixtureArgs['headers'], $this->fixture->getHeaders());
         $this->assertEquals($this->fixtureArgs['properties'], $this->fixture->getProperties());
     }
@@ -95,8 +95,8 @@ class SignatureTest extends RhubarbTestCase
     {
         $expected = array(2, 1);
         $bodyMock = $this->getBodyMock($expected);
-        $this->fixture->setBody($bodyMock);
-        $this->assertEquals($expected, $this->fixture->getBody()->toArray());
+        $this->fixture->setArgs($bodyMock);
+        $this->assertEquals($expected, $this->fixture->getArgs()->toArray());
 
     }
 
@@ -107,7 +107,7 @@ class SignatureTest extends RhubarbTestCase
     public function testSetBodyFrozen()
     {
         $this->fixture->freeze();
-        $this->fixture->setBody(new Task\Body\Python());
+        $this->fixture->setArgs(new Task\Args\Python());
 
     }
 
@@ -116,7 +116,7 @@ class SignatureTest extends RhubarbTestCase
      */
     public function testGetBody()
     {
-        $this->assertEquals($this->fixtureArgs['body'], $this->fixture->getBody()->toArray());
+        $this->assertEquals($this->fixtureArgs['args'], $this->fixture->getArgs()->toArray());
     }
 
     /**
@@ -287,7 +287,7 @@ class SignatureTest extends RhubarbTestCase
     public function testSWithBody()
     {
         $expected = '\Rhubarb\Task\Signature';
-        $actual = $this->fixture->s(new Task\Body\Python(array()));
+        $actual = $this->fixture->s(new Task\Args\Python(array()));
         $this->assertInstanceOf($expected, $actual);
         $this->assertTrue($this->fixture->isMutable());
     }
@@ -309,7 +309,7 @@ class SignatureTest extends RhubarbTestCase
     public function testSiWithBody()
     {
         $expected = '\Rhubarb\Task\Signature';
-        $actual = $this->fixture->si(new Task\Body\Python());
+        $actual = $this->fixture->si(new Task\Args\Python());
         $this->assertInstanceOf($expected, $actual);
         $this->assertFalse($this->fixture->isMutable());
     }

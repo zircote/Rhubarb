@@ -102,7 +102,7 @@ class MessageTest extends RhubarbTestCase
         $expected = array(
             'headers' => array_merge($brokerHeaders, $signatureHeaders),
             'properties' => array_merge($brokerProperties, $signatureProperties),
-            'body' => $body,
+            'args' => $body,
             'sent_event' => array(
                 'uuid' => 'abcdef0123456789',
                 'name' => 'test.task',
@@ -142,7 +142,7 @@ class MessageTest extends RhubarbTestCase
         $expected = array(
             'headers' => array('lang' => 'php', 'c_type' => 'test.task'),
             'properties' => array('content_encoding' => 'utf-8', 'correlation_id' => 'abcdef0123456789'),
-            'body' => $body,
+            'args' => $body,
             'sent_event' => array(
                 'uuid' => 'abcdef0123456789',
                 'name' => 'test.task',
@@ -179,7 +179,7 @@ class MessageTest extends RhubarbTestCase
                 'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
                 'correlation_id' => 'abcdef0123456789'
             ),
-            'body' => array(
+            'args' => array(
                 'args' => array(1, 2),
                 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
             ),
@@ -214,7 +214,7 @@ class MessageTest extends RhubarbTestCase
                 'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
                 'correlation_id' => 'abcdef0123456789'
             ),
-            'body' => array(
+            'args' => array(
                 'args' => array(1, 2),
                 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
             ),
@@ -250,7 +250,7 @@ class MessageTest extends RhubarbTestCase
                 'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
                 'correlation_id' => 'abcdef0123456789'
             ),
-            'body' => array(
+            'args' => array(
                 'args' => array(1, 2),
                 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
             ),
@@ -280,7 +280,7 @@ class MessageTest extends RhubarbTestCase
                 'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
                 'correlation_id' => 'abcdef0123456789'
             ),
-            'body' => array(
+            'args' => array(
                 'args' => array(1, 2),
                 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2')
             ),

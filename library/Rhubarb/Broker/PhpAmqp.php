@@ -21,6 +21,7 @@ namespace Rhubarb\Broker;
  * @category    Broker
  */
 use Rhubarb\Connector\PhpAmqp as PhpAmqpConnector;
+use Rhubarb\Rhubarb;
 use Rhubarb\Task\Message;
 use Rhubarb\Task\AsyncResult;
 
@@ -53,6 +54,18 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
                 AMQP_NOPARAM,
                 $this->formatProperties($message)
             );
+        
+        if (isset($events['enabled']) && $events['enabled']) {
+            $payload = $message->getPayload();
+            $payload = $this->getRhubarb()->serialize($payload['sent_event']);
+            $this->declareEventsQueue();
+            $this->getEventsExchange($this->getChannel())
+                ->publish(
+                    $payload,
+                    Rhubarb::EVENTS_EXCHANGE_NAME,
+                    AMQP_NOPARAM
+                );
+        }
         $this->getConnection()->disconnect();
     }
 
@@ -88,6 +101,20 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
     }
 
     /**
+     * @return \AMQPQueue
+     */
+    protected function declareEventsQueue()
+    {
+        $amqpQueue = new \AMQPQueue($this->getChannel());
+        $amqpQueue->setName(Rhubarb::EVENTS_EXCHANGE_NAME);
+        $amqpQueue->setFlags(AMQP_DURABLE);
+
+        $amqpQueue->declareQueue();
+        $amqpQueue->bind(Rhubarb::EVENTS_EXCHANGE_NAME, Rhubarb::EVENTS_EXCHANGE_NAME);
+        return $amqpQueue;
+    }
+
+    /**
      * @codeCoverageIgnore
      *
      * @return \AMQPChannel
@@ -102,6 +129,27 @@ class PhpAmqp extends PhpAmqpConnector implements BrokerInterface
         }
 
         return $this->channel;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     *
+     * @param \AMQPChannel $amqpChannel
+     * @return \AMQPExchange
+     */
+    protected function getEventsExchange($amqpChannel)
+    {
+        if (!$this->getConnection()->isConnected()) {
+            $this->getConnection()->reconnect();
+        }
+        $amqpExchange = new \AMQPExchange($amqpChannel);
+
+        $amqpExchange->setFlags(AMQP_PASSIVE | AMQP_DURABLE);
+        $amqpExchange->setType(AMQP_EX_TYPE_DIRECT);
+        $amqpExchange->setName(Rhubarb::EVENTS_EXCHANGE_NAME);
+
+        $amqpExchange->declareExchange();
+        return $amqpExchange;
     }
 
     /**

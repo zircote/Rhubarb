@@ -132,7 +132,7 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
     {
         $signatureMock = $this->getMock(
             '\Rhubarb\Task\Signature',
-            array('getProperties', 'getHeaders', 'getBody'),
+            array('getProperties', 'getHeaders', 'getArgs'),
             array($rhubarb, 'test.task')
         );
 
@@ -147,7 +147,7 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
         $bodyMock = $this->getBodyMock($body);
 
         $signatureMock->expects($this->any())
-            ->method('getBody')
+            ->method('getArgs')
             ->will($this->returnValue($bodyMock));
 
         return $signatureMock;
@@ -155,12 +155,12 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
 
     /**
      * @param $body
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Task\Body\BodyInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Task\Args\ArgsInterface
      */
     protected function getBodyMock($body)
     {
         $bodyMock = $this->getMock(
-            '\Rhubarb\Task\Body\BodyInterface',
+            '\Rhubarb\Task\Args\ArgsInterface',
             array(),
             array('toArray', 'serialize', '__toString', 'getHeaders')
         );
@@ -189,11 +189,11 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
     /**
      * @param array $args
      * @param array $kwargs
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Task\Body\Python
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Task\Args\Python
      */
     public function getPythonMock($args = array(), $kwargs = array())
     {
-        $pythonMock = $this->getMock('Rhubarb\Task\Body\Python', array('toArray'), array());
+        $pythonMock = $this->getMock('Rhubarb\Task\Args\Python', array('toArray'), array());
         $pythonMock->expects($this->any())
             ->method('toArray')
             ->will($this->returnValue(array('args' => $args, 'kwargs' => $this->getKwargsMock($kwargs))));
@@ -203,11 +203,11 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
 
     /**
      * @param array $kwargs
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Task\Body\Python\Kwargs
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Rhubarb\Task\Args\Python\Kwargs
      */
     public function getKwargsMock($kwargs = array())
     {
-        $kwargsMock = $this->getMock('Rhubarb\Task\Body\Python\Kwargs', array('toArray'), array());
+        $kwargsMock = $this->getMock('Rhubarb\Task\Args\Python\Kwargs', array('toArray'), array());
         $kwargsMock->expects($this->any())
             ->method('toArray')
             ->will($this->returnValue($kwargs));

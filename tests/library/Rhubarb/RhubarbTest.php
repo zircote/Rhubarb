@@ -73,6 +73,9 @@ class RhubarbTest extends RhubarbTestCase
                     'class' => 'LoggerAppenderNull'
                 )
             )
+        ),
+        'events' => array(
+            'enabled' => false
         )
     );
 

@@ -21,8 +21,8 @@
  *
  */
 use Rhubarb\Rhubarb;
-use Rhubarb\Task\Body\Python as PythonArgs;
-use Rhubarb\Task\Body\Python\Kwargs;
+use Rhubarb\Task\Args\Python as PythonArgs;
+use Rhubarb\Task\Args\Python\Kwargs;
 
 $config = include('configuration/predis.php');
 $rhubarb = new Rhubarb($config);

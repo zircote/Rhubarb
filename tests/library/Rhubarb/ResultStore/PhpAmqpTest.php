@@ -50,8 +50,8 @@ class PhpAmqpTest extends RhubarbTestCase
         $result = '{ "state": "SUCCESS", "traceback": null, "result": 4, "children": [] }';
 
         $this->rhubarb = $this->getRhubarbMock($this->getBrokerMock(array()));
-        $AMQPEnvelope = $this->getMock('\AMQPEnvelope', array('getBody', 'getHeader'), array(), '', false);
-        $AMQPEnvelope->expects($this->any())->method('getBody')->will($this->returnValue($result));
+        $AMQPEnvelope = $this->getMock('\AMQPEnvelope', array('getArgs', 'getHeader'), array(), '', false);
+        $AMQPEnvelope->expects($this->any())->method('getArgs')->will($this->returnValue($result));
         $AMQPEnvelope->expects($this->any())->method('getHeader')->will($this->returnValue(Rhubarb::CONTENT_TYPE_JSON));
 
 

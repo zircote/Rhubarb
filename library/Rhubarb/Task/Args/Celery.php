@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Task\Body;
+namespace Rhubarb\Task\Args;
 
 /**
  *
@@ -21,15 +21,16 @@ namespace Rhubarb\Task\Body;
  * @package     Rhubarb
  * @category    Rhubarb
  */
-use Rhubarb\Task\Body\Celery\Arguments;
+use Rhubarb\Task\Args\Celery\Arguments;
 use Rhubarb\Rhubarb;
 
 /**
  * @package     Rhubarb
  * @category    Rhubarb
  */
-class Celery implements BodyInterface
+class Celery implements ArgsInterface
 {
+    const LANG = 'celery';
     /**
      * @var string
      */

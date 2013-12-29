@@ -22,14 +22,3 @@
 
 use Rhubarb\Rhubarb;
 use Rhubarb\Task\Args\Python;
-
-$config = include('configuration/predis.php');
-$rhubarb = new Rhubarb($config);
-$sig = $rhubarb->task('app.add');
-
-$tasks = array();
-for ($i = 0; $i < 10; $i++) {
-    $tasks[] = $sig->s(new Python($i, $i * 10));
-}
-$chain = $rhubarb->chain($tasks);
-$asyncResult = $chain();

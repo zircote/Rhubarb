@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Task\Body\Python;
+namespace Rhubarb\Task\Args\Python;
 
 /**
  *
@@ -19,16 +19,16 @@ namespace Rhubarb\Task\Body\Python;
  * limitations under the License.
  *
  * @package     Rhubarb
- * @category    RhubarbTests\Body\Python
+ * @category    RhubarbTests\Args\Python
  */
 use  PHPUnit_Framework_TestCase;
 use Rhubarb\Exception\KwargException;
 
 /**
  * @package     Rhubarb
- * @category    Task\Body\Python
+ * @category    Task\Args\Python
  * @group Task
- * @group Body
+ * @group Args
  * @group Python
  * @group Kwarg
  */

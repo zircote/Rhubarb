@@ -53,7 +53,7 @@ class PhpAmqp extends PhpAmqpConnector implements ResultStoreInterface
                 $queue->ack($message->getDeliveryTag());
                 $queue->delete(AMQP_IFUNUSED | AMQP_IFEMPTY | AMQP_NOWAIT);
                 $result = new ResultBody(
-                    $this->getRhubarb()->unserialize($message->getBody(), $message->getHeader('content_type'))
+                    $this->getRhubarb()->unserialize($message->getArgs(), $message->getHeader('content_type'))
                 );
             }
         } catch (\AMQPChannelException $e) {

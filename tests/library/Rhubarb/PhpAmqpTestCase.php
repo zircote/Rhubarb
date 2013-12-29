@@ -81,7 +81,7 @@ class PhpAmqpTestCase extends RhubarbTestCase
     public function getAMQPEnvelopeMock()
     {
         $methods = array(
-            'getAppId', 'getBody', 'getContentEncoding', 'getContentType', 'getCorrelationId', 'getDeliveryTag',
+            'getAppId', 'getArgs', 'getContentEncoding', 'getContentType', 'getCorrelationId', 'getDeliveryTag',
             'getExchangeName', 'getHeader', 'getHeaders', 'getMessageId', 'getPriority', 'getReplyTo', 'getTimeStamp',
             'getType', 'getUserId', 'isRedelivery'
         );

@@ -20,7 +20,7 @@
  * @category    ${NAMESPACE}
  */
 use Rhubarb\Rhubarb;
-use Rhubarb\Task\Body\Python;
+use Rhubarb\Task\Args\Python;
 
 $config = include('configuration/predis.php');
 $rhubarb = new Rhubarb($config);

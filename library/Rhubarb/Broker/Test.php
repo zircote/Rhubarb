@@ -39,6 +39,7 @@ class Test extends AbstractTestConnector
     protected $exception;
     protected $published;
     protected $callback;
+    
 
 
     /**
@@ -62,6 +63,8 @@ class Test extends AbstractTestConnector
         $this->exception = null;
         $this->published = null;
         static::$deliveryTag = 0;
+        static::$nextResult = null;
+        static::$events = array();
     }
 
     /**
@@ -72,6 +75,12 @@ class Test extends AbstractTestConnector
     {
         $message->setProperty('delivery_tag', ++static::$deliveryTag);
         static::$nextResult = call_user_func($this->callback, array($message->serialize()));
+        $events = $this->getRhubarb()->getEventOptions();
+        if (isset($events['enabled']) && $events['enabled']) {
+            $payload = $message->getPayload();
+            $payload = $this->getRhubarb()->serialize($payload['sent_event']);
+            array_push(static::$events, $payload);
+        }
         return true;
     }
 

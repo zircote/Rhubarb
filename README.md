@@ -21,7 +21,7 @@ Via Composer: `composer require 'zircote/rhubarb=dev-master'`
 ```php
 
 use Rhubarb\Rhubarb;
-use Rhubarb\Task\Body\Python as PythonArgs;
+use Rhubarb\Task\Args\Python as PythonArgs;
 
 $config = array(
     'broker' => array(

@@ -24,7 +24,7 @@ use Rhubarb\Broker\BrokerInterface;
 use Rhubarb\Exception\Exception;
 use Rhubarb\Exception\MessageSentException;
 use Rhubarb\Rhubarb;
-use Rhubarb\Task\Body\BodyInterface;
+use Rhubarb\Task\Args\ArgsInterface;
 
 /**
  * @package     Rhubarb
@@ -231,7 +231,7 @@ class Message implements MessageInterface
             $payload = array(
                 'headers' => $this->getHeaders(),
                 'properties' => $this->getProperties(),
-                'body' => $body
+                'args' => $body
             );
 
             if (isset($payload['headers']['countdown'])) {
@@ -264,11 +264,11 @@ class Message implements MessageInterface
         return array(
             'properties' => array_filter((array)$payload['properties'], array($this, 'filter')),
             'headers' => array_diff_key($payload['headers'], $this->headers),
-            'body' => array(
+            'args' => array(
                 'task' => $payload['headers']['name'],
                 'id' => $payload['properties']['correlation_id'],
-                'args' => $payload['body']['args'],
-                'kwargs' => $payload['body']['kwargs'],
+                'args' => $payload['args']['args'],
+                'kwargs' => $payload['args']['kwargs'],
                 'retries' => $payload['headers']['retries'],
                 'eta' => $payload['headers']['eta'],
                 'expire' => $payload['headers']['expires'],
@@ -283,8 +283,8 @@ class Message implements MessageInterface
                 'uuid' => isset($payload['properties']['correlation_id']) ? 
                         $payload['properties']['correlation_id'] : null,
                 'name' => isset($payload['headers']['c_type']) ? $payload['headers']['c_type'] : null,
-                'args' => isset($payload['body']['args']) ? $payload['body']['args'] : null,
-                'kwargs' => isset($payload['body']['kwargs']) ? $payload['body']['kwargs'] : null,
+                'args' => isset($payload['args']['args']) ? $payload['args']['args'] : null,
+                'kwargs' => isset($payload['args']['kwargs']) ? $payload['args']['kwargs'] : null,
                 'retries' => isset($payload['headers']['retries']) ? $payload['headers']['retries'] : null,
                 'eta' => isset($payload['headers']['eta']) ? $payload['headers']['eta'] : null,
                 'expires' => isset($payload['headers']['expires']) ? $payload['headers']['expires'] : null
@@ -301,13 +301,13 @@ class Message implements MessageInterface
         return array(
             'headers' => array_filter((array)$payload['headers'], array($this, 'filter')),
             'properties' => array_filter((array)$payload['properties'], array($this, 'filter')),
-            'body' => array_filter((array)$payload['body'], array($this, 'filter')),
+            'args' => array_filter((array)$payload['args'], array($this, 'filter')),
             'sent_event' => array(
                 'uuid' => isset($payload['properties']['correlation_id']) ? 
                         $payload['properties']['correlation_id'] : null,
                 'name' => isset($payload['headers']['c_type']) ? $payload['headers']['c_type'] : null,
-                'args' => isset($payload['body']['args']) ? $payload['body']['args'] : null,
-                'kwargs' => isset($payload['body']['kwargs']) ? $payload['body']['kwargs'] : null,
+                'args' => isset($payload['args']['args']) ? $payload['args']['args'] : null,
+                'kwargs' => isset($payload['args']['kwargs']) ? $payload['args']['kwargs'] : null,
                 'retries' => isset($payload['headers']['retries']) ? $payload['headers']['retries'] : null,
                 'eta' => isset($payload['headers']['eta']) ? $payload['headers']['eta'] : null,
                 'expires' => isset($payload['headers']['expires']) ? $payload['headers']['expires'] : null
@@ -323,10 +323,10 @@ class Message implements MessageInterface
     {
         $body = array();
         if ($this->getSignature() instanceof Signature && $this->getSignature()
-                ->getBody() instanceof BodyInterface
+                ->getArgs() instanceof ArgsInterface
         ) {
             $body = $this->getSignature()
-                ->getBody()
+                ->getArgs()
                 ->toArray();
         }
         return $body;

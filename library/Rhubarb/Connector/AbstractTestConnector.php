@@ -29,6 +29,7 @@ namespace Rhubarb\Connector;
 class AbstractTestConnector extends AbstractConnector
 {
     static protected $nextResult;
+    static protected $events = array();
 
     /**
      * @param string $result

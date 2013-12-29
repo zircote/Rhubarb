@@ -7,9 +7,13 @@ Contents:
 
 .. toctree::
     installation
+    backends
     rhubarb
+    args
+    signature
     chains
-    connectors/index
+    groups
+    chords
 
 
 

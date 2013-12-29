@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Task\Body\Celery;
+namespace Rhubarb\Task\Args\Celery;
 
 /**
  *
@@ -19,13 +19,13 @@ namespace Rhubarb\Task\Body\Celery;
  * limitations under the License.
  *
  * @package     Rhubarb
- * @category    Rhubarb\Task\Body\Celery
+ * @category    Rhubarb\Task\Args\Celery
  */
 use PHPUnit_Framework_TestCase;
 
 /**
  * @package     Rhubarb
- * @category    Rhubarb\Task\Body\Celery
+ * @category    Rhubarb\Task\Args\Celery
  */
 class ArgumentsTest extends PHPUnit_Framework_TestCase
 {

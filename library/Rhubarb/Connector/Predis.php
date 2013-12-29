@@ -77,7 +77,7 @@ class Predis extends AbstractConnector
     protected $properties = array(
         'content_type' => Rhubarb::CONTENT_TYPE_JSON,
         'content_encoding' => Rhubarb::CONTENT_ENCODING_BASE64,
-        'delivery_mode' => self::AMQP_PERSISTENT,
+        'delivery_mode' => self::PERSISTENT,
         'priority' => 0
     );
 

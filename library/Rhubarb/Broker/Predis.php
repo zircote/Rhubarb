@@ -22,6 +22,7 @@ namespace Rhubarb\Broker;
  */
 use Rhubarb\Connector\Predis as PredisConnection;
 use Rhubarb\Exception\ConnectionException;
+use Rhubarb\Task\AsyncResult;
 use Rhubarb\Task\Message;
 use Rhubarb\Rhubarb;
 
@@ -41,8 +42,15 @@ class Predis extends PredisConnection implements BrokerInterface
     public function publishTask(Message $message)
     {
         $message->setProperty('delivery_tag', ++static::$deliveryTag);
-        return $this->getConnection()
+        $result = $this->getConnection()
             ->lpush($message->getHeader('exchange') ? : Rhubarb::DEFAULT_EXCHANGE_NAME, $message->serialize());
+        $events = $this->getRhubarb()->getEventOptions();
+        if (isset($events['enabled']) && $events['enabled']) {
+            $payload = $message->getPayload();
+            $payload = $this->getRhubarb()->serialize($payload['sent_event']);
+            $this->getConnection()->set(Rhubarb::EVENTS_EXCHANGE_NAME, $payload);
+        }
+        return $result;
     }
 
 }

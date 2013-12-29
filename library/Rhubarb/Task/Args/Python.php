@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Task\Body;
+namespace Rhubarb\Task\Args;
 
 /**
  *
@@ -19,16 +19,16 @@ namespace Rhubarb\Task\Body;
  * limitations under the License.
  *
  * @package     Rhubarb
- * @category    Rhubarb\Task\Body
+ * @category    Rhubarb\Task\Args
  */
 use Rhubarb\Rhubarb;
-use Rhubarb\Task\Body\Python\Kwargs;
+use Rhubarb\Task\Args\Python\Kwargs;
 
 /**
  * @package     Rhubarb
- * @category    Rhubarb\Task\Body
+ * @category    Rhubarb\Task\Args
  */
-class Python implements BodyInterface
+class Python implements ArgsInterface
 {
     const LANG = 'py';
 
@@ -78,7 +78,7 @@ class Python implements BodyInterface
 
     /**
      *
-     * @param \Rhubarb\Task\Body\Python\Kwargs $kwargs
+     * @param \Rhubarb\Task\Args\Python\Kwargs $kwargs
      * @return Python
      */
     public function setKwargs($kwargs)
@@ -88,7 +88,7 @@ class Python implements BodyInterface
     }
 
     /**
-     * @return \Rhubarb\Task\Body\Python\Kwargs
+     * @return \Rhubarb\Task\Args\Python\Kwargs
      */
     public function getKwargs()
     {

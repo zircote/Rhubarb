@@ -137,7 +137,7 @@ class PhpAmqpTest extends PhpAmqpTestCase
         $expected = array(
             'content_type' => Rhubarb::CONTENT_TYPE_JSON,
             'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
-            'delivery_mode' => PhpAmqp::AMQP_PERSISTENT,
+            'delivery_mode' => PhpAmqp::PERSISTENT,
             'priority' => 0
         );
         $this->getMockFixture();

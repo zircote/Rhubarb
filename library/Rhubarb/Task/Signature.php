@@ -25,7 +25,7 @@ use Rhubarb\Exception\Exception;
 use Rhubarb\Task\Message;
 use Rhubarb\Rhubarb;
 use Rhubarb\Exception\TaskSignatureException;
-use Rhubarb\Task\Body\BodyInterface;
+use Rhubarb\Task\Args\ArgsInterface;
 use Rhumsaa\Uuid\Uuid;
 use InvalidArgumentException;
 
@@ -62,9 +62,9 @@ class Signature
         'timelimit' => array(null, null)
     );
     /**
-     * @var BodyInterface
+     * @var ArgsInterface
      */
-    protected $body = array();
+    protected $args = array();
     /**
      * @var Rhubarb
      */
@@ -90,17 +90,17 @@ class Signature
     /**
      * @param Rhubarb $rhubarb
      * @param $name
-     * @param BodyInterface $body
+     * @param ArgsInterface $body
      * @param array $headers
      * @param array $properties
      */
-    public function __construct(Rhubarb $rhubarb, $name, BodyInterface $body = null, $properties = array(), $headers = array())
+    public function __construct(Rhubarb $rhubarb, $name, ArgsInterface $body = null, $properties = array(), $headers = array())
     {
         $this->setHeader('c_type', $name);
         $this->setRhubarb($rhubarb);
         $this->setName($name);
-        if ($body instanceof BodyInterface) {
-            $this->setBody($body);
+        if ($body instanceof ArgsInterface) {
+            $this->setArgs($body);
         }
         if ($headers) {
             $this->setHeaders($headers);
@@ -112,24 +112,24 @@ class Signature
 
     /**
      * @throws TaskSignatureException
-     * @param BodyInterface $body
+     * @param ArgsInterface $body
      * @return Signature
      */
-    public function setBody(BodyInterface $body)
+    public function setArgs(ArgsInterface $body)
     {
         if ($this->isFroze()) {
             throw new TaskSignatureException('Signature is Frozen');
         }
-        $this->body = $body;
+        $this->args = $body;
         return $this;
     }
 
     /**
-     * @return BodyInterface
+     * @return ArgsInterface
      */
-    public function getBody()
+    public function getArgs()
     {
-        return $this->body;
+        return $this->args;
     }
 
     /**
@@ -177,8 +177,8 @@ class Signature
      */
     public function getHeaders()
     {
-        if ($this->getBody()) {
-            return array_merge($this->headers, $this->getBody()->getHeaders());
+        if ($this->getArgs()) {
+            return array_merge($this->headers, $this->getArgs()->getHeaders());
         }
         return $this->headers;
     }
@@ -275,32 +275,32 @@ class Signature
     }
 
     /**
-     * @param BodyInterface $body
+     * @param ArgsInterface $body
      * @return $this
      */
-    public function s(BodyInterface $body = null)
+    public function s(ArgsInterface $body = null)
     {
         if ($body) {
-            $this->setBody($body);
+            $this->setArgs($body);
         }
         return $this;
     }
 
     /**
-     * @param BodyInterface $body
+     * @param ArgsInterface $body
      * @return $this
      */
-    public function si(BodyInterface $body = null)
+    public function si(ArgsInterface $body = null)
     {
         $this->isMutable(self::IMMUTABLE);
         if ($body) {
-            $this->setBody($body);
+            $this->setArgs($body);
         }
         return $this;
     }
 
     /**
-     * @param BodyInterface $body
+     * @param ArgsInterface $body
      * @param array $properties
      * @param array $headers
      * @return AsyncResult
@@ -319,10 +319,10 @@ class Signature
             $this->setHeader($header, $value);
         }
         if ($body) {
-            if ($body instanceof BodyInterface) {
-                $this->setBody($body);
+            if ($body instanceof ArgsInterface) {
+                $this->setArgs($body);
             } else {
-                throw new InvalidArgumentException('$body argument must be of type `BodyInterface`');
+                throw new InvalidArgumentException('$args argument must be of type `ArgsInterface`');
             }
         }
         $this->getId();
@@ -331,36 +331,36 @@ class Signature
     }
 
     /**
-     * @param BodyInterface $body
+     * @param ArgsInterface $body
      * @param array $properties
      * @param array $headers
      * @return AsyncResult
      * @throws \Rhubarb\Exception\Exception
      */
-    public function delay(BodyInterface $body = null, array $properties = array(), array $headers = array())
+    public function delay(ArgsInterface $body = null, array $properties = array(), array $headers = array())
     {
         return $this->applyAsync($body, $properties, $headers);
     }
 
     /**
-     * @param BodyInterface $args
+     * @param ArgsInterface $args
      * @return $this
      * @codeCoverageIgnore
      */
-    public function map(BodyInterface $args)
+    public function map(ArgsInterface $args)
     {
-        $this->setBody($args);
+        $this->setArgs($args);
         return $this;
     }
 
     /**
-     * @param BodyInterface $args
+     * @param ArgsInterface $args
      * @return $this
      * @codeCoverageIgnore
      */
-    public function starmap(BodyInterface $args)
+    public function starmap(ArgsInterface $args)
     {
-        $this->setBody($args);
+        $this->setArgs($args);
         return $this;
     }
 
@@ -461,7 +461,7 @@ class Signature
         $clone = new Signature(
             $this->getRhubarb(),
             $this->getName(),
-            $this->getBody(),
+            $this->getArgs(),
             $this->getHeaders(),
             $this->getProperties()
         );
@@ -469,7 +469,7 @@ class Signature
     }
 
     /**
-     * @param BodyInterface $body
+     * @param ArgsInterface $body
      * @param array $properties
      * @param array $headers
      * @return AsyncResult

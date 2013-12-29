@@ -92,85 +92,85 @@ class AsyncResultTest extends RhubarbTestCase
 
     public function testIsReady()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::SUCCESS, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::SUCCESS, 'args' => '1')));
         $this->assertTrue($this->fixture->isReady());
     }
 
     public function testIsReadyPending()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'args' => '1')));
         $this->assertFalse($this->fixture->isReady());
     }
 
     public function testIsStarted()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::STARTED, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::STARTED, 'args' => '1')));
         $this->assertTrue($this->fixture->isStarted());
     }
 
     public function testIsStartedRevoked()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::REVOKED, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::REVOKED, 'args' => '1')));
         $this->assertFalse($this->fixture->isStarted());
     }
 
     public function testIsRevoked()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::REVOKED, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::REVOKED, 'args' => '1')));
         $this->assertTrue($this->fixture->isRevoked());
     }
 
     public function testIsRevokedPending()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'args' => '1')));
         $this->assertFalse($this->fixture->isRevoked());
     }
 
     public function testIsSuccess()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::SUCCESS, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::SUCCESS, 'args' => '1')));
         $this->assertTrue($this->fixture->isSuccess());
     }
 
     public function testIsSuccessFailure()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::FAILURE, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::FAILURE, 'args' => '1')));
         $this->assertFalse($this->fixture->isSuccess());
     }
 
     public function testIsRetry()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::RETRY, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::RETRY, 'args' => '1')));
         $this->assertTrue($this->fixture->isRetry());
     }
 
     public function testIsRetryPending()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'args' => '1')));
         $this->assertFalse($this->fixture->isRetry());
     }
 
     public function testIsPending()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::PENDING, 'args' => '1')));
         $this->assertTrue($this->fixture->isPending());
     }
 
     public function testIsPendingStarted()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::STARTED, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::STARTED, 'args' => '1')));
         $this->assertFalse($this->fixture->isPending());
     }
 
     public function testIsFailure()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::FAILURE, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::FAILURE, 'args' => '1')));
         $this->assertTrue($this->fixture->isFailure());
     }
 
     public function testIsFailureSuccess()
     {
-        $this->getResultMock(new ResultBody(array('state' => AsyncResult::SUCCESS, 'body' => '1')));
+        $this->getResultMock(new ResultBody(array('state' => AsyncResult::SUCCESS, 'args' => '1')));
         $this->assertFalse($this->fixture->isFailure());
     }
 

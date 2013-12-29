@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Task\Body\Celery;
+namespace Rhubarb\Task\Args\Celery;
 
     /**
      *

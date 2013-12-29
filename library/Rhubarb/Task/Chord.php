@@ -22,7 +22,7 @@ namespace Rhubarb\Task;
  * @subcategory
  */
 use Rhubarb\Exception\TaskSignatureException;
-use Rhubarb\Task\Body\BodyInterface;
+use Rhubarb\Task\Args\ArgsInterface;
 use Rhubarb\Rhubarb;
 
 /**
@@ -46,13 +46,13 @@ class Chord extends Signature
     /**
      * @param Rhubarb $rhubarb
      * @param array|Signature|Group $group
-     * @param BodyInterface $body
+     * @param ArgsInterface $body
      * @param array $properties
      * @param array $headers
      *
      * @throws TaskSignatureException
      */
-    public function __construct(Rhubarb $rhubarb, $group = array(), BodyInterface $body = null, $properties = array(), $headers = array())
+    public function __construct(Rhubarb $rhubarb, $group = array(), ArgsInterface $body = null, $properties = array(), $headers = array())
     {
         parent::__construct($rhubarb, self::NAME, null, $properties, $headers);
         if ($group instanceof Group) {

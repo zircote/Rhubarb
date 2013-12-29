@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Task\Body;
+namespace Rhubarb\Task\Args;
 
 /**
  *
@@ -19,20 +19,20 @@ namespace Rhubarb\Task\Body;
  * limitations under the License.
  *
  * @package     Rhubarb
- * @category    RhubarbTests\Body
+ * @category    RhubarbTests\Args
  */
 use Rhubarb\Rhubarb;
 use Rhubarb\RhubarbTestCase;
-use Rhubarb\Task\Body\Python\Kwargs;
+use Rhubarb\Task\Args\Python\Kwargs;
 
 /**
  * @package     Rhubarb
- * @category    RhubarbTests\Body
+ * @category    RhubarbTests\Args
  *
  * @group \Rhubarb\
  * @group \Rhubarb\Task
- * @group \Rhubarb\Task\Body
- * @group \Rhubarb\Task\Body\Python
+ * @group \Rhubarb\Task\Args
+ * @group \Rhubarb\Task\Args\Python
  */
 class PythonTest extends RhubarbTestCase
 {

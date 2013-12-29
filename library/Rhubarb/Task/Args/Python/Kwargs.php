@@ -1,5 +1,5 @@
 <?php
-namespace Rhubarb\Task\Body\Python;
+namespace Rhubarb\Task\Args\Python;
 
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
@@ -152,5 +152,13 @@ class Kwargs implements ArrayAccess
         $this->__unset($offset);
     }
 
+    /**
+     * @param array $kwargs
+     * @return Kwargs
+     */
+    static public function newKwargs(array $kwargs = array())
+    {
+        return new self($kwargs);
+    }
 }
  
