@@ -9,11 +9,7 @@ Contents:
     installation
     backends
     rhubarb
-    args
-    signature
-    chains
-    groups
-    chords
+    tasks
 
 
 

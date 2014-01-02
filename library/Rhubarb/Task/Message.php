@@ -74,7 +74,7 @@ class Message implements MessageInterface
         'group' => array(), # group_id
         'chord' => array(), # chord
         'retries' => null,
-        'timelimit' => array() # (time_limit, soft_time_limit)
+        'timelimit' => array(null, null) # (time_limit, soft_time_limit)
     );
     /**
      * @var array
@@ -265,7 +265,7 @@ class Message implements MessageInterface
             'properties' => array_filter((array)$payload['properties'], array($this, 'filter')),
             'headers' => array_diff_key($payload['headers'], $this->headers),
             'args' => array(
-                'task' => $payload['headers']['name'],
+                'task' => $payload['headers']['c_type'],
                 'id' => $payload['properties']['correlation_id'],
                 'args' => $payload['args']['args'],
                 'kwargs' => $payload['args']['kwargs'],

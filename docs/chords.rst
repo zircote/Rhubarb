@@ -1,4 +1,0 @@
-Chords
-======
-
-.. topic:: Task Chords

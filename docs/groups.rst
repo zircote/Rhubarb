@@ -1,4 +1,0 @@
-Groups
-======
-
-.. topic:: Task Groups

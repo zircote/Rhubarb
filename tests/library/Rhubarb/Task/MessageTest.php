@@ -18,6 +18,8 @@ namespace Rhubarb\Task;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
+ * application/vnd.celery.v1+json
+ * application/vnd.celery.v2+json
  * @package     Rhubarb
  * @category    RhubarbTests
  */
@@ -29,7 +31,7 @@ use Rhubarb\RhubarbTestCase;
  * @category    RhubarbTests
  * @group Rhubarb
  * @group Rhubarb\Task
- * @group Rhubarb\Task\Task
+ * @group Rhubarb\Task\Message
  */
 class MessageTest extends RhubarbTestCase
 {
@@ -90,7 +92,7 @@ class MessageTest extends RhubarbTestCase
         /* setup mocks */
         $brokerHeaders = array();
         $brokerProperties = array('content_type' => 'application/json', 'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8);
-        $signatureHeaders = array('lang' => 'py', 'c_type' => 'test.task');
+        $signatureHeaders = array('lang' => 'py', 'c_type' => 'test.task', 'timelimit' => array(null, null));
         $signatureProperties = array('correlation_id' => 'abcdef0123456789');
         $body = array('args' => array(1, 2), 'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2'));
 
@@ -140,7 +142,7 @@ class MessageTest extends RhubarbTestCase
 
         /* expected result */
         $expected = array(
-            'headers' => array('lang' => 'php', 'c_type' => 'test.task'),
+            'headers' => array('lang' => 'php', 'c_type' => 'test.task', 'timelimit' => array(null, null)),
             'properties' => array('content_encoding' => 'utf-8', 'correlation_id' => 'abcdef0123456789'),
             'args' => $body,
             'sent_event' => array(
@@ -171,7 +173,10 @@ class MessageTest extends RhubarbTestCase
         $expectedETA->add(new \DateInterval("PT60S"));
         $eta = $expectedETA->format(\DateTime::ISO8601);
         $expected = array(
-            'headers' => array('lang' => 'py', 'c_type' => 'test.task',
+            'headers' => array(
+                'lang' => 'py',
+                'c_type' => 'test.task',
+                'timelimit' => array(null, null),
                 'eta' => $eta,
             ),
             'properties' => array(
@@ -207,7 +212,11 @@ class MessageTest extends RhubarbTestCase
         $expectedETA->add(new \DateInterval("PT60S"));
         $eta = $expectedETA->format(\DateTime::ISO8601);
         $expected = array(
-            'headers' => array('lang' => 'py', 'c_type' => 'test.task', 'eta' => $eta,
+            'headers' => array(
+                'lang' => 'py',
+                'c_type' => 'test.task',
+                'eta' => $eta,
+                'timelimit' => array(null, null)
             ),
             'properties' => array(
                 'content_type' => Rhubarb::CONTENT_TYPE_JSON,
@@ -242,7 +251,10 @@ class MessageTest extends RhubarbTestCase
         $expectedETA->add(new \DateInterval("PT60S"));
         $expires = $expectedETA->format(\DateTime::ISO8601);
         $expected = array(
-            'headers' => array('lang' => 'py', 'c_type' => 'test.task',
+            'headers' => array(
+                'lang' => 'py',
+                'c_type' => 'test.task',
+                'timelimit' => array(null, null),
                 'expires' => $expires,
             ),
             'properties' => array(
@@ -270,11 +282,57 @@ class MessageTest extends RhubarbTestCase
 
     }
 
-    public function testGetPayLoad()
+    public function testGetPayLoadV1()
     {
+        Message::$messageFormat = Message::V1;
         $this->buildSimpleMock();
         $expected = array(
-            'headers' => array('lang' => 'py', 'c_type' => 'test.task'),
+            'properties' => array(
+                'content_type' => Rhubarb::CONTENT_TYPE_JSON,
+                'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
+                'correlation_id' => 'abcdef0123456789'
+            ),
+            'headers' => array(),
+            'args' => array(
+                'task' => 'test.task',
+                'id' => 'abcdef0123456789',
+                'args' => array(1, 2),
+                'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2'),
+                'retries' => null,
+                'eta' => null,
+                'expire' => null,
+                'utc' => true,
+                'callbacks' => null,
+                'errbacks' => null,
+                'timelimit' => array(null, null),
+                'taskset' => array(),
+                'chord' => array()
+            ),
+            'sent_event' => array(
+                'uuid' => 'abcdef0123456789',
+                'name' => 'test.task',
+                'args' => array(1,2),
+                'kwargs' => array('arg1' => 'arg_1', 'arg2' => 'arg_2'),
+                'retries' => null,
+                'eta' => null,
+                'expires' => null
+            )
+        );
+        $actual = $this->fixture->getPayload();
+        $this->assertEquals($expected, $actual);
+
+    }
+
+    public function testGetPayLoadV2()
+    {
+        Message::$messageFormat = Message::V2;
+        $this->buildSimpleMock();
+        $expected = array(
+            'headers' => array(
+                'lang' => 'py',
+                'c_type' => 'test.task',
+                'timelimit' => array(null, null)
+            ),
             'properties' => array(
                 'content_type' => Rhubarb::CONTENT_TYPE_JSON,
                 'content_encoding' => Rhubarb::CONTENT_ENCODING_UTF8,
@@ -329,7 +387,7 @@ class MessageTest extends RhubarbTestCase
             'group' => array(),
             'chord' => array(),
             'retries' => null,
-            'timelimit' => array()
+            'timelimit' => array(null, null)
         );
         $actual = $this->fixture->getHeaders();
         $this->assertEquals($expected, $actual);

@@ -1,8 +1,9 @@
+============
 Installation
 ============
 
 Composer
---------
+========
 
 The recommended method of installation is via `composer <http://getcomposer.org>`_
   
@@ -20,7 +21,7 @@ Depending on your selection of connectors you will also need to require or compi
     
 
 PECL AMQP
----------
+=========
 
 The Official PHP AMQP extension may be found at https://github.com/bkw/pecl-amqp-official as well as stubs and tests.
 
