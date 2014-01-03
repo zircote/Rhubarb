@@ -21,6 +21,7 @@ namespace Rhubarb;
  * @package     Rhubarb
  * @category    Rhubarb
  */
+use Rhubarb\Task\Message;
 use Rhubarb\Task\ResultBody;
 use Rhubarb\Task\AsyncResult;
 
@@ -58,7 +59,8 @@ class FunctionalTest extends \PHPUnit_Framework_TestCase
                     'class' => 'LoggerAppenderNull'
                 )
             )
-        )
+        ),
+        'message_format' => Message::V2
     );
 
     public function testRhubarbFunctional()

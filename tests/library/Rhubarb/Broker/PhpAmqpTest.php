@@ -48,6 +48,7 @@ class PhpAmqpTest extends PhpAmqpTestCase
     public function setUp()
     {
         $this->rhubarb = $this->getRhubarbMock($this->getBrokerMock(array(), array()));
+        $this->rhubarb->setMessageFormat(\Rhubarb\Task\Message::V2);
     }
 
     /**

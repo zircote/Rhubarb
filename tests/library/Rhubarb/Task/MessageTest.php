@@ -116,6 +116,7 @@ class MessageTest extends RhubarbTestCase
             )
         );
 
+        $this->fixture->setMessageFormat(Message::V2);
         $payload = $this->fixture->getPayload();
         $this->assertEquals($expected, $payload);
     }
@@ -156,6 +157,7 @@ class MessageTest extends RhubarbTestCase
             )
         );
 
+        $this->fixture->setMessageFormat(Message::V2);
         $this->assertEquals($expected, $this->fixture->getPayload());
     }
 
@@ -199,6 +201,7 @@ class MessageTest extends RhubarbTestCase
             )
         );
         $this->fixture->setHeader('countdown', 60);
+        $this->fixture->setMessageFormat(Message::V2);
         $actual = $this->fixture->getPayload();
         $this->assertEquals($expected, $actual);
 
@@ -238,6 +241,7 @@ class MessageTest extends RhubarbTestCase
             )
         );
         $this->fixture->setHeader('eta', $eta);
+        $this->fixture->setMessageFormat(Message::V2);
         $actual = $this->fixture->getPayload();
         $this->assertEquals($expected, $actual);
 
@@ -277,6 +281,7 @@ class MessageTest extends RhubarbTestCase
             )
         );
         $this->fixture->setHeader('expires', $expires);
+        $this->fixture->setMessageFormat(Message::V2);
         $actual = $this->fixture->getPayload();
         $this->assertEquals($expected, $actual);
 
@@ -284,8 +289,8 @@ class MessageTest extends RhubarbTestCase
 
     public function testGetPayLoadV1()
     {
-        Message::$messageFormat = Message::V1;
         $this->buildSimpleMock();
+        $this->fixture->setMessageFormat(Message::V1);
         $expected = array(
             'properties' => array(
                 'content_type' => Rhubarb::CONTENT_TYPE_JSON,
@@ -325,8 +330,8 @@ class MessageTest extends RhubarbTestCase
 
     public function testGetPayLoadV2()
     {
-        Message::$messageFormat = Message::V2;
         $this->buildSimpleMock();
+        $this->fixture->setMessageFormat(Message::V2);
         $expected = array(
             'headers' => array(
                 'lang' => 'py',

@@ -44,7 +44,7 @@ class Message implements MessageInterface
     /**
      * @var int
      */
-    static public $messageFormat = self::V2;
+    protected $messageFormat;
     /**
      * @var Rhubarb
      */
@@ -165,8 +165,9 @@ class Message implements MessageInterface
 
     public function serialize()
     {
+        $payload = $this->getPayload();
         return $this->getRhubarb()
-            ->serialize($this->getPayload(), $this->getProperty('content_type') ? : Rhubarb::DEFAULT_CONTENT_TYPE);
+            ->serialize($payload, $this->getProperty('content_type') ? : Rhubarb::DEFAULT_CONTENT_TYPE);
     }
 
     /**
@@ -245,7 +246,7 @@ class Message implements MessageInterface
                 $datetime->setTimestamp(strtotime($payload['headers']['expires']));
                 $payload['headers']['expires'] = $datetime->format(\DateTime::ISO8601);
             }
-            if (static::$messageFormat == self::V2) {
+            if ($this->getMessageFormat() == self::V2) {
                 $this->payload = $this->getPayloadAsV2($payload);
             } else {
                 $this->payload = $this->getPayloadAsV1($payload);
@@ -254,6 +255,36 @@ class Message implements MessageInterface
 
         return $this->payload;
     }
+
+    /**
+     * @param $messageFormat
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function setMessageFormat($messageFormat)
+    {
+        if (!in_array($messageFormat, array(self::V1, self::V2))) {
+            throw new \InvalidArgumentException(sprintf('unrecognized message format [ %s ]', $messageFormat));
+        }
+        $this->messageFormat = $messageFormat;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMessageFormat()
+    {
+        if ($this->messageFormat && in_array($this->messageFormat, array(self::V1, self::V2))) {
+            return $this->messageFormat;
+        } elseif ($this->getRhubarb()->getMessageFormat()) {
+            return $this->getRhubarb()->getMessageFormat();
+        } else {
+            return Message::V1;
+        }
+
+    }
+
 
     /**
      * @param $payload
@@ -280,8 +311,8 @@ class Message implements MessageInterface
                 'chord' => $payload['headers']['chord']
             ),
             'sent_event' => array(
-                'uuid' => isset($payload['properties']['correlation_id']) ? 
-                        $payload['properties']['correlation_id'] : null,
+                'uuid' => isset($payload['properties']['correlation_id']) ?
+                              $payload['properties']['correlation_id'] : null,
                 'name' => isset($payload['headers']['c_type']) ? $payload['headers']['c_type'] : null,
                 'args' => isset($payload['args']['args']) ? $payload['args']['args'] : null,
                 'kwargs' => isset($payload['args']['kwargs']) ? $payload['args']['kwargs'] : null,
@@ -303,8 +334,8 @@ class Message implements MessageInterface
             'properties' => array_filter((array)$payload['properties'], array($this, 'filter')),
             'args' => array_filter((array)$payload['args'], array($this, 'filter')),
             'sent_event' => array(
-                'uuid' => isset($payload['properties']['correlation_id']) ? 
-                        $payload['properties']['correlation_id'] : null,
+                'uuid' => isset($payload['properties']['correlation_id']) ?
+                              $payload['properties']['correlation_id'] : null,
                 'name' => isset($payload['headers']['c_type']) ? $payload['headers']['c_type'] : null,
                 'args' => isset($payload['args']['args']) ? $payload['args']['args'] : null,
                 'kwargs' => isset($payload['args']['kwargs']) ? $payload['args']['kwargs'] : null,

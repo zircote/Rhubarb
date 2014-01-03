@@ -197,7 +197,8 @@ class Rhubarb
             ),
             'events' => array(
                 'enabled' => false
-            )
+            ),
+            'message_format' => Message::V1
         );
     /**
      * @var array
@@ -396,10 +397,32 @@ class Rhubarb
             $this->setTasks($value);
         } elseif ($name == 'events') {
             $this->setEventOptions($value);
+        } elseif ($name == 'message_format') {
+            $this->setMessageFormat($value);
         }
         return $this;
     }
 
+    /**
+     * @return integer
+     */
+    public function getMessageFormat()
+    {
+        return $this->options['message_format'];
+    }
+    /**
+     * @param $format
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    public function setMessageFormat($format)
+    {
+        if (!in_array($format, array(Message::V1, Message::V2))) {
+            throw new \InvalidArgumentException(sprintf('unrecognized message format [ %s ]', $format));
+        }
+        $this->options['message_format'] = $format;
+        return $this;
+    }
     /**
      * @param array $options
      * @return $this
@@ -472,6 +495,7 @@ class Rhubarb
      */
     public function dispatch(Message $message)
     {
+        $message->setMessageFormat($this->getOption('message_format'));
         $this->state[$message->getId()] = $message;
         $this->getBroker()->publishTask($message);
         $result = new AsyncResult($this, $message);

@@ -303,11 +303,13 @@ class Signature
      * @param ArgsInterface $body
      * @param array $properties
      * @param array $headers
+     * @param integer $messageFormat Message::V1|Message::V2
      * @return AsyncResult
      * @throws \Rhubarb\Exception\TaskSignatureException
      * @throws \InvalidArgumentException
      */
-    public function applyAsync($body = null, array $properties = array(), array $headers = array())
+    public function applyAsync($body = null, array $properties = array(), array $headers = array(),
+                               $messageFormat = null)
     {
         if ($this->isFroze()) {
             throw new TaskSignatureException('Signature is Frozen');
@@ -327,6 +329,9 @@ class Signature
         }
         $this->getId();
         $message = new Message($this->getRhubarb(), $this);
+        if (null !== $messageFormat) {
+            $message->setMessageFormat($messageFormat);
+        }
         return $message->dispatch($this);
     }
 
@@ -334,12 +339,14 @@ class Signature
      * @param ArgsInterface $body
      * @param array $properties
      * @param array $headers
+     * @param integer $messageFormat Message::V1|Message::V2
      * @return AsyncResult
      * @throws \Rhubarb\Exception\Exception
      */
-    public function delay(ArgsInterface $body = null, array $properties = array(), array $headers = array())
+    public function delay(ArgsInterface $body = null, array $properties = array(), array $headers = array(),
+                          $messageFormat = null)
     {
-        return $this->applyAsync($body, $properties, $headers);
+        return $this->applyAsync($body, $properties, $headers, $messageFormat);
     }
 
     /**

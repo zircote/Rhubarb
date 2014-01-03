@@ -69,7 +69,6 @@ class RhubarbTestCase extends PHPUnit_Framework_TestCase
                 ->method('getResultStore')
                 ->will($this->returnValue($resultStoreMock));
         }
-
         return $rhubarb;
     }
 

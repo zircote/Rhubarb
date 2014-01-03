@@ -21,7 +21,7 @@ namespace Rhubarb\Task;
  * @category    Tests
  * @subcategory AsyncResult
  */
-use AMQP\Message;
+use AMQP\Message as AMQPMessage;
 use Rhubarb\RhubarbTestCase;
 
 /**

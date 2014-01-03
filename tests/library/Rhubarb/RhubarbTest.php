@@ -22,6 +22,7 @@ namespace Rhubarb;
  * @subcategory AsyncResult
  */
 use Rhubarb\ResultStore\ResultStoreInterface;
+use Rhubarb\Task\Message;
 
 /**
  * @package     Rhubarb
@@ -76,7 +77,8 @@ class RhubarbTest extends RhubarbTestCase
         ),
         'events' => array(
             'enabled' => false
-        )
+        ),
+        'message_format' => Message::V2
     );
 
     /**
@@ -85,6 +87,7 @@ class RhubarbTest extends RhubarbTestCase
     public function setup()
     {
         $this->rhubarb = new Rhubarb($this->options);
+        $this->rhubarb->setMessageFormat(Message::V2);
 
     }
 

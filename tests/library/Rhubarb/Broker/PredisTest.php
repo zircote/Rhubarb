@@ -41,6 +41,7 @@ class PredisTest extends PhpPredisTestCase
     public function setUp()
     {
         $this->rhubarb = $this->getRhubarbMock($this->getBrokerMock(array(), $this->getResultStoreMock(), array()));
+        $this->rhubarb->setMessageFormat(\Rhubarb\Task\Message::V2);
         $this->fixture = new Predis($this->rhubarb);
     }
 
