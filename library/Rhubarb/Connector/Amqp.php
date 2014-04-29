@@ -68,7 +68,7 @@ class Amqp implements ConnectorInterface
             unset($options['queue']);
         }
         $merged = array('uri' => isset($options['connection']) ? $options['connection'] : $this->options['uri']);
-        $merge['options'] = array_merge($this->options['options'], (array) @$options['options']);
+        $merged['options'] = array_merge($this->options['options'], (array) @$options['options']);
         $this->options = $merged;
         return $this;
     }
