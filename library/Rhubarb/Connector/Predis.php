@@ -79,7 +79,7 @@ class Predis
             }
             if (isset($uri['path'])) {
                 $uri['database'] = trim($uri['path'], '/');
-                $options['connection']['database'] = isset($uri['databsae']) ? $uri['database'] : null;
+                $options['connection']['database'] = isset($uri['database']) ? $uri['database'] : null;
             }
             $options['connection']['host'] = $uri['host'];
             $options['connection']['port'] = isset($uri['port']) ? $uri['port'] : 6379;

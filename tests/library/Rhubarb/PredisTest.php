@@ -1,6 +1,8 @@
 <?php
 namespace RhubarbTests;
 
+use Rhubarb\Connector\Predis as PredisConnector;
+
 /**
  * @license http://www.apache.org/licenses/LICENSE-2.0
  * Copyright [2012] [Robert Allen]
@@ -30,7 +32,7 @@ namespace RhubarbTests;
  */
 class PredisTest extends \PHPUnit_Framework_TestCase
 {
-    
+
     /**
      * @group job
      */
@@ -64,4 +66,24 @@ class PredisTest extends \PHPUnit_Framework_TestCase
 //        $this->assertEquals(2105, $res->get());
     }
 
+    public function testSetOptionsWhenNonZeroRedisDatabaseNumberIsSpecified()
+    {
+        $connector = new PredisConnector();
+        $connector->setOptions(
+            array('connection' => 'redis://127.0.0.1:6379/3')
+        );
+
+        $expectedOptions = array(
+            'connection' => array(
+                'database'=> 3,
+                'host' => '127.0.0.1',
+                'port' => 6379,
+                'login' => null,
+                'password' => null
+            ),
+            'options' => array()
+        );
+
+        $this->assertEquals($expectedOptions, $connector->getOptions());
+    }
 }
