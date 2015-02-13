@@ -2,16 +2,16 @@
 namespace Rhubarb\Connector;
 
 /**
- * @package     
- * @category    
- * @subcategory 
+ * @package
+ * @category
+ * @subcategory
  */
 use AMQP\Connection;
 
 /**
- * @package     
- * @category    
- * @subcategory 
+ * @package
+ * @category
+ * @subcategory
  */
 class Amqp implements ConnectorInterface
 {
@@ -20,7 +20,7 @@ class Amqp implements ConnectorInterface
      * @var Connection
      */
     protected $connection;
-    
+
     /**
      * @var array
      */
@@ -67,8 +67,8 @@ class Amqp implements ConnectorInterface
             }
             unset($options['queue']);
         }
-        $merged = array('uri' => isset($options['connection']) ? $options['connection'] : $this->options['uri']);
-        $merge['options'] = array_merge($this->options['options'], (array) @$options['options']);
+        $merged = array('uri' => isset($options['uri']) ? $options['uri'] : $this->options['uri']);
+        $merged['options'] = array_merge($this->options['options'], (array) @$options['options']);
         $this->options = $merged;
         return $this;
     }
